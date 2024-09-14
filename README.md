@@ -7,7 +7,19 @@ Bookmarks Forums
 Table of contents    
 </h2>  
 
-[TOC]
+1. [About this Web Application](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#1-about-this-web-application)
+2. [Medium blog link](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#2-medium-blog-link)
+3. [GitHub Project link](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#3-github-project-link)
+4. [What this does](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#4-what-this-does)
+5. [Other details](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#5-other-details)
+   1. [Entities](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#i-entities)
+   2. [Permissions per kind of user](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#ii-permissions-per-kind-of-user)
+   3. [Images' info](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#iii-images-info)
+   4. [Graphs and charts](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#iv-graphs-and-charts)
+   5. [Advanced complementary technology](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#v-advanced-complementary-technology)
+   6. [Other algorithms](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#vi-other-algorithms)
+   7. [Extras](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#vii-extras)
+7. [Wireframe](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#6-wireframe)
 
 ## 1. About this Web Application
 
@@ -45,7 +57,7 @@ Here are the technical aspects of the web application described:
 
 
 
-### 5.1. Entities
+### i. Entities
 
 This web application has the following entities in its database:
 
@@ -58,9 +70,10 @@ This web application has the following entities in its database:
 
 The users database is separated from Bookmarks to let the users decide whether they want to participate in the forums or not, regardless of having a Bookmarks account.
 
+![ER DB Diagram](https://github.com/user-attachments/assets/b09bc8af-5a64-46e9-a440-86be834c69c7)
 
 
-### 5.2. Permissions per kind of user
+### ii. Permissions per kind of user
 
 This table defines the permissions each kind of user has over which entity:
 
@@ -74,7 +87,7 @@ This table defines the permissions each kind of user has over which entity:
 
 
 
-### 5.3. Images' info
+### iii. Images' info
 
 These entities have images linked to them:
 
@@ -85,14 +98,14 @@ These entities have images linked to them:
 
 
 
-### 5.4. Graphs and charts
+### iv. Graphs and charts
 
 - Users with the most liked content: shown in the landing page as a bar chart.
 - Rate of users registered per day: shown as a line chart in the administrator zone.
 
 
 
-### 5.5. Advanced complementary technology
+### v. Advanced complementary technology
 
 The aim is to include the following additional technologies to the project:
 
@@ -101,7 +114,7 @@ The aim is to include the following additional technologies to the project:
 
 
 
-### 5.6. Other algorithms
+### vi. Other algorithms
 
 The landing page will show users the most popular posts based on how many likes they have and the most recent ones.
 
@@ -111,7 +124,7 @@ Users will be able to sort posts by date (from most recent to least recent) or l
 
 
 
-### 5.7. Extras
+### vii. Extras
 
 Apart from the main functionality and technologies mentioned above, the web application will contain:
 
@@ -138,12 +151,8 @@ Below is the list of screens the web application has:
 - Administrator zone.
 - Error page.
 
-
-
 And here is the navigation map:
 
+![Bookmarks Forums Navigation Map](https://github.com/user-attachments/assets/64abd20b-b7b3-431e-a35f-6a121ddf0c87)
 
-
-
-
-**NOTE**: The Search Results Page is accessible through the search bar located in the application's navigation bar at the top of the screen, which is visible in all pages except the Login and Sign-up pages.
+⚠️ **NOTE**: The Search Results Page is accessible through the search bar located in the application's navigation bar at the top of the screen, which is visible in all pages except the Login and Sign-up pages.
