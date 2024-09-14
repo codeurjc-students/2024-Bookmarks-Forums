@@ -43,12 +43,29 @@ Click [here](https://github.com/codeurjc-students/2024-Bookmarks-Forums) if you 
 
 ## 4. What this does
 
+### Basic functionality
+
 Bookmarks is an already existing web application where users could search for books and mark them as **currently reading**, **already read** and **want to read**.
 
 Bookmarks Forums is the update that brings the social to that application!
 
-With Bookmarks Forums users will be able to create content about their favorite authors or books, follow other users, join and create communities and meet new people!
+With Bookmarks Forums any user will be able to sign-up or login to the forums, create content about their favorite authors or books, follow other users, join and create communities and meet new people!
 
+### Advanced functionality
+
+Apart from what has been mentioned above, Bookmarks Forums will allow set search sorting filters for searching the most popular or recent posts.
+
+Users will be able to create chat rooms to chat between each other.
+
+The main landing page will serve posts and content using an algorithm based on the popularity of posts.
+
+The application will offer charts that will allow users and administrators to easily check the most popular users and more.
+
+Users will receive emails regarding messages or replies to their posts.
+
+The application will serve a REST API.
+
+More details on these advanced technologies are described below.
 
 
 ## 5. Other details
@@ -95,6 +112,7 @@ These entities have images linked to them:
 * User: users have profile pictures.
 * Post: a post may have multiple images.
 * Reply: a reply may contain multiple images.
+* Message: a message may contain an image.
 
 
 
@@ -112,6 +130,7 @@ The aim is to include the following additional technologies to the project:
 - Mail notifications will be sent to users that have been directly messaged or replied.
 - Websockets will be used in order to offer real-time notifications for chat messages.
 
+These are cosidered part of the advanced functionalities of the application.
 
 
 ### vi. Other algorithms
