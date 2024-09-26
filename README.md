@@ -1,9 +1,9 @@
-<h1 align="center">    
+<h1 style="text-align: center;">
 Bookmarks Forums    
 </h1>  
 
 
-<h2 align="left">    
+<h2 style="text-align: left;">
 Table of contents    
 </h2>  
 
@@ -19,7 +19,7 @@ Table of contents
    5. [Advanced complementary technology](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#v-advanced-complementary-technology)
    6. [Other algorithms](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#vi-other-algorithms)
    7. [Extras](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#vii-extras)
-7. [Wireframe](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#6-wireframe)
+6. [Wireframe](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#6-wireframe)
 
 ## 1. About this Web Application
 
@@ -49,7 +49,7 @@ Bookmarks is an already existing web application where users could search for bo
 
 Bookmarks Forums is the update that brings the social to that application!
 
-With Bookmarks Forums any user will be able to sign-up or login to the forums, create content about their favorite authors or books, follow other users, join and create communities and meet new people!
+With Bookmarks Forums any user will be able to sign up or login to the forums, create content about their favorite authors or books, follow other users, join and create communities and meet new people!
 
 ### Advanced functionality
 
@@ -94,11 +94,11 @@ The users database is separated from Bookmarks to let the users decide whether t
 
 This table defines the permissions each kind of user has over which entity:
 
-| Kind of user                | Permissions                                                  | Owner of                              |
-| --------------------------- | ------------------------------------------------------------ | ------------------------------------- |
-| Visitor (unregistered user) | Visit the landing page, search for forum posts, visit profiles, visit posts, visit communities. | N/A                                   |
+| Kind of user                | Permissions                                                                                                                                                                                                                                                                                                                                                           | Owner of                              |
+|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|
+| Visitor (unregistered user) | Visit the landing page, search for forum posts, visit profiles, visit posts, visit communities.                                                                                                                                                                                                                                                                       | N/A                                   |
 | Registered user             | All the above plus participate in chats, join communities, create communities, join communities, modify communities, ban users from communities, create forum posts, modify posts, delete posts (only the ones they are owners of), reply to other users' posts, like posts, dislike posts, create chat with other users, send messages to other user (using a chat). | Post, Community, Message, Chat, User. |
-| Administrator               | All the above plus modify and delete all communities, modify and delete all posts, ban users from site, access the administrator zone. | All                                   |
+| Administrator               | All the above plus modify and delete all communities, modify and delete all posts, ban users from site, access the administrator zone.                                                                                                                                                                                                                                | All                                   |
 
 ⚠️ **NOTE:** Registered users can **only** modify communities and ban users from communities they are **owners** of.
 
@@ -130,7 +130,7 @@ The aim is to include the following additional technologies to the project:
 - Mail notifications will be sent to users that have been directly messaged or replied.
 - Websockets will be used in order to offer real-time notifications for chat messages.
 
-These are cosidered part of the advanced functionalities of the application.
+These are considered part of the advanced functionalities of the application.
 
 
 ### vi. Other algorithms
