@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Setter
@@ -26,7 +29,10 @@ public class Chat {
     @Id
     @JsonView(BasicInfo.class)
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
-    private Long id;
+    private Long identifier;
+
+    @JsonView(BasicInfo.class)
+    private String name;
 
     // A chat can only be between two users
     @ManyToOne
@@ -41,6 +47,24 @@ public class Chat {
     @JsonView(Messages.class)
     @OneToMany(mappedBy = "chat")
     private List<Message> messages;
+
+    @JsonView(BasicInfo.class)
+    private LocalDate creationDate = LocalDate.now();
+
+    @JsonView(BasicInfo.class)
+    private LocalTime creationTime = LocalTime.now();
+
+    @JsonView(BasicInfo.class) // Chat creation date
+    private LocalDateTime fullCreationDate = LocalDateTime.of(creationDate, creationTime);
+
+    @JsonView(BasicInfo.class)
+    private LocalDate lastMessageDate = LocalDate.now();
+
+    @JsonView(BasicInfo.class)
+    private LocalTime lastMessageTime = LocalTime.now();
+
+    @JsonView(BasicInfo.class) // Chat modification date (last message sent)
+    private LocalDateTime fullLastMessageDate = LocalDateTime.of(lastMessageDate, lastMessageTime);
 
     public Chat() {
     }

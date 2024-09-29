@@ -9,6 +9,9 @@ import lombok.Setter;
 import javax.sql.rowset.serial.SerialBlob;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +27,19 @@ public class User {
     @Id
     private String username;
 
+    @JsonIgnore
+    private String password;
+
     @JsonView(BasicInfo.class)
     private String alias;
 
     @JsonView(BasicInfo.class)
+    private String email;
+
+    @JsonView(BasicInfo.class)
     private String description;
 
+    @Getter
     @JsonView(BasicInfo.class)
     @ElementCollection
     private List<String> roles;
@@ -47,17 +57,29 @@ public class User {
     private List<Reply> replies = new ArrayList<>();
 
     // A user can join 0 or multiple communities
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "members")
     private List<Community> communities = new ArrayList<>();
 
     // A user can have 0 or multiple chats
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Chat> chats = new ArrayList<>();
+    @OneToMany(mappedBy = "user1", cascade = CascadeType.ALL)
+    private List<Chat> chats1 = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user2", cascade = CascadeType.ALL)
+    private List<Chat> chats2 = new ArrayList<>();
 
     // A user may have sent 0 or multiple messages
     @JsonIgnore
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
     private List<Message> sentMessages = new ArrayList<>();
+
+    @JsonView(BasicInfo.class)
+    private LocalDate creationDate = LocalDate.now();
+
+    @JsonView(BasicInfo.class)
+    private LocalTime creationTime = LocalTime.now();
+
+    @JsonView(BasicInfo.class) // User creation date
+    private LocalDateTime fullCreationDate = LocalDateTime.of(creationDate, creationTime);
 
     public User() {
     }

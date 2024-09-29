@@ -6,7 +6,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -27,18 +31,17 @@ public class Post {
     public interface CommunityInfo {
     }
 
+    public interface UserInfo {
+    }
+
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
     @JsonView(BasicInfo.class)
-    private Long id;
+    private Long identifier;
 
-    @JsonIgnore
+    @JsonView(UserInfo.class)
     @ManyToOne
     private User author;
-
-    // Author's username
-    @JsonView(BasicInfo.class)
-    private String authorUsername;
 
     @JsonView(BasicInfo.class)
     private String title;
@@ -63,6 +66,24 @@ public class Post {
     @JsonView(DetailedInfo.class) // Number of comments
     private int comments;
 
+    @JsonView(BasicInfo.class)
+    private LocalDate creationDate = LocalDate.now();
+
+    @JsonView(BasicInfo.class)
+    private LocalTime creationTime = LocalTime.now();
+
+    @JsonView(BasicInfo.class) // Post creation date
+    private LocalDateTime fullCreationDate = LocalDateTime.of(creationDate, creationTime);
+
+    @JsonView(BasicInfo.class)
+    private LocalDate lastReplyDate = LocalDate.now();
+
+    @JsonView(BasicInfo.class)
+    private LocalTime lastReplyTime = LocalTime.now();
+
+    @JsonView(BasicInfo.class) // Post modification date (last reply)
+    private LocalDateTime fullLastReplyDate = LocalDateTime.of(lastReplyDate, lastReplyTime);
+
     @JsonView(Replies.class) // List of comments
     @OneToMany(mappedBy = "post", cascade = jakarta.persistence.CascadeType.ALL)
     private List<Reply> replyList = new ArrayList<>();
@@ -74,7 +95,6 @@ public class Post {
         this.title = title;
         this.content = content;
         this.author = author;
-        this.authorUsername = author.getUsername();
         this.community = community;
         this.communityNameString = community.getName();
     }

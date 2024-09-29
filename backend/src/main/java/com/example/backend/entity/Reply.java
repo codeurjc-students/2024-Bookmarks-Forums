@@ -1,12 +1,17 @@
 package com.example.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.zaxxer.hikari.util.ClockSource;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -25,7 +30,7 @@ public class Reply {
     @JsonView(BasicInfo.class)
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
-    private Long id;
+    private Long identifier;
 
     @ManyToOne
     @JsonView(PostInfo.class)
@@ -38,11 +43,20 @@ public class Reply {
     private String content;
 
     @JsonView(BasicInfo.class)
-    private String authorUsername;
+    private int likes = 0;
 
     @JsonView(UserInfo.class)
     @ManyToOne
     private User author;
+
+    @JsonView(BasicInfo.class)
+    private LocalDate creationDate = LocalDate.now();
+
+    @JsonView(BasicInfo.class)
+    private LocalTime creationTime = LocalTime.now();
+
+    @JsonView(BasicInfo.class) // Reply creation date
+    private LocalDateTime fullCreationDate = LocalDateTime.of(creationDate, creationTime);
 
     public Reply() {
     }
@@ -51,17 +65,20 @@ public class Reply {
         this.title = title;
         this.content = content;
         this.author = author;
-        this.authorUsername = author.getUsername();
         this.post = post;
     }
 
     @Override
     public String toString() {
         return "Reply{" +
-                "id=" + id +
+                "identifier=" + identifier +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", authorUsername='" + authorUsername + '\'' +
+                ", likes=" + likes +
+                ", author=" + author +
+                ", creationDate=" + creationDate +
+                ", creationTime=" + creationTime +
+                ", fullCreationDate=" + fullCreationDate +
                 '}';
     }
 }
