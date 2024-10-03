@@ -1,7 +1,6 @@
 package com.example.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.zaxxer.hikari.util.ClockSource;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;

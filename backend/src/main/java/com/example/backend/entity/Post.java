@@ -6,11 +6,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Blob;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -52,6 +52,10 @@ public class Post {
     @JsonView(BasicInfo.class)
     private String communityNameString;
 
+    @JsonIgnore
+    @Lob
+    private Blob image;
+
     // A post can only be made in one community
     @ManyToOne
     @JsonView(CommunityInfo.class)
@@ -89,6 +93,18 @@ public class Post {
     private List<Reply> replyList = new ArrayList<>();
 
     public Post() {
+    }
+
+    public void upvote() {
+        this.upvotes++;
+    }
+
+    public void downvote() {
+        this.downvotes++;
+    }
+
+    public void addImage(Blob image) {
+        this.image = image;
     }
 
     public Post(String title, String content, User author, Community community) {

@@ -1,11 +1,14 @@
 package com.example.backend.repository;
 
 import com.example.backend.entity.Community;
+import com.example.backend.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface CommunityRepository extends JpaRepository<Community, String> {
     Page<Community> findByName(String name, Pageable pageable);
@@ -58,6 +61,19 @@ public interface CommunityRepository extends JpaRepository<Community, String> {
     @Query("SELECT COUNT(c.members) FROM Community c WHERE c.identifier = :communityId")
     int getMembersCount(String communityId);
 
+    // Return posts count of a community
+    @Query("SELECT COUNT(c.posts) FROM Community c WHERE c.identifier = :communityId")
+    int getPostsCount(String communityId);
 
+    // Get members of a community
+    @Query("SELECT c.members FROM Community c WHERE c.identifier = :communityId")
+    Page<User> getMembers(String communityId, Pageable pageable);
+
+    @Query("SELECT c.members FROM Community c WHERE c.identifier = :communityId")
+    List<User> getMembersList(String communityId);
+
+    // Get admin of a community
+    @Query("SELECT c.admin FROM Community c WHERE c.identifier = :communityId")
+    User getAdmin(String communityId);
 
 }

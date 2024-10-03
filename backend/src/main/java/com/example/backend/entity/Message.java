@@ -1,10 +1,12 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Blob;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -27,6 +29,10 @@ public class Message {
 
     @JsonView(BasicInfo.class)
     private String content;
+
+    @JsonIgnore // Do not serialize this field
+    @Lob
+    private Blob image;
 
     // Sender
     @ManyToOne
@@ -54,6 +60,10 @@ public class Message {
         this.content = content;
         this.sender = sender;
         this.chat = chat;
+    }
+
+    public void addImage(Blob image) {
+        this.image = image;
     }
 
     @Override

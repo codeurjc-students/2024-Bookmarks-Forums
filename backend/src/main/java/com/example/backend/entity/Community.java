@@ -85,6 +85,14 @@ public class Community {
         }
     }
 
+    public void addMember(User user) {
+        this.members.add(user);
+    }
+
+    public void removeMember(User user) {
+        this.members.remove(user);
+    }
+
     public String toString() {
         return this.name;
     }

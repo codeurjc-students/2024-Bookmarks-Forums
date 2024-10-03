@@ -11,8 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, String> {
     User findByUsername(String username);
-    User findByEmail(String email);
-    User findByAlias(String alias);
+    Page<User> findByEmail(String email, Pageable pageable);
+    Page<User> findByAlias(String alias, Pageable pageable);
 
     @Operation(summary = "Search users by username, email, alias or description. Search Engine's default behaviour")
     @Query("SELECT u FROM User u WHERE " +
@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     // Communities a user is a member of
     @Query("SELECT u.communities FROM User u WHERE u.username LIKE %:username%")
-    Page<Community> findCommunities(@Param("username") String username, Pageable pageable);
+    Page<Community> getUserCommunities(@Param("username") String username, Pageable pageable);
 
     // Communities a user is an admin of
     @Query("SELECT c FROM Community c WHERE c.admin.username LIKE %:username%")
@@ -49,4 +49,20 @@ public interface UserRepository extends JpaRepository<User, String> {
             "u.alias LIKE %:query% OR " +
             "u.description LIKE %:query% ORDER BY u.fullCreationDate DESC")
     Page<User> engineSearchUsersOrderByCreationDate(@Param("query") String query, Pageable pageable);
+
+    // Get the number of followers a user has
+    @Query("SELECT COUNT(u.followers) FROM User u WHERE u.username LIKE %:username%")
+    int getNumberOfFollowers(@Param("username") String username);
+
+    // Get the number of users a user is following
+    @Query("SELECT COUNT(u.following) FROM User u WHERE u.username LIKE %:username%")
+    int getNumberOfFollowing(@Param("username") String username);
+
+    // Get the users a user is following
+    @Query("SELECT u.followingList FROM User u WHERE u.username LIKE %:username%")
+    Page<User> getFollowing(@Param("username") String username, Pageable pageable);
+
+    // Get the users following a user
+    @Query("SELECT u.followersList FROM User u WHERE u.username LIKE %:username%")
+    Page<User> getFollowers(@Param("username") String username, Pageable pageable);
 }

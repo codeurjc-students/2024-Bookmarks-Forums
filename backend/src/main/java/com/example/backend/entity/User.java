@@ -23,6 +23,9 @@ public class User {
     public interface BasicInfo {
     }
 
+    public interface FollowersInfo {
+    }
+
     @JsonView(BasicInfo.class)
     @Id
     private String username;
@@ -44,9 +47,24 @@ public class User {
     @ElementCollection
     private List<String> roles;
 
+    @Setter
     @JsonIgnore // Do not serialize this field
     @Lob
     private Blob pfp;
+
+    @JsonView(BasicInfo.class)
+    private int followers = 0;
+
+    @JsonView(BasicInfo.class)
+    private int following = 0;
+
+    @JsonView(FollowersInfo.class)
+    @ManyToMany
+    private List<User> followersList = new ArrayList<>();
+
+    @JsonView(FollowersInfo.class)
+    @ManyToMany
+    private List<User> followingList = new ArrayList<>();
 
     // A user can have 0 or multiple posts
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
@@ -94,8 +112,24 @@ public class User {
         }
     }
 
-    public void setPfp(String pfp) throws SQLException {
-        this.pfp = new SerialBlob(pfp.getBytes());
+    public void addFollower(User user) {
+        this.followersList.add(user);
+        this.followers++;
+    }
+
+    public void removeFollower(User user) {
+        this.followersList.remove(user);
+        this.followers--;
+    }
+
+    public void addFollowing(User user) {
+        this.followingList.add(user);
+        this.following++;
+    }
+
+    public void removeFollowing(User user) {
+        this.followingList.remove(user);
+        this.following--;
     }
 
     public String toString() {
