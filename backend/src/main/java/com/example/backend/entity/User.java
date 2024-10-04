@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Setter
 @Getter
@@ -51,6 +52,9 @@ public class User {
     @JsonIgnore // Do not serialize this field
     @Lob
     private Blob pfp;
+
+    @JsonView(BasicInfo.class)
+    private String pfpString;
 
     @JsonView(BasicInfo.class)
     private int followers = 0;
@@ -102,14 +106,14 @@ public class User {
     public User() {
     }
 
-    public User(String username, String alias, String description, List<String> roles, String pfp) throws SQLException {
+    public User(String username, String alias, String description, String pfp, String email, String password, List<String> roles) {
         this.username = username;
         this.alias = alias;
         this.description = description;
         this.roles = roles;
-        if (pfp != null) {
-            this.pfp = new SerialBlob(pfp.getBytes());
-        }
+        this.email = email;
+        this.password = password;
+        this.pfpString = Objects.requireNonNullElse(pfp, "/assets/defaultProfilePicture.png");
     }
 
     public void addFollower(User user) {

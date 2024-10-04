@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 @Setter
 @Getter
@@ -69,9 +70,10 @@ public class Chat {
     public Chat() {
     }
 
-    public Chat(User user1, User user2) {
+    public Chat(User user1, User user2, String name) {
         this.user1 = user1;
         this.user2 = user2;
+        this.name = Objects.requireNonNullElseGet(name, () -> user1.getUsername() + " & " + user2.getUsername());
     }
 
     public void addMessage (Message message) {

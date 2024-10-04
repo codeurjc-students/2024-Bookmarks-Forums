@@ -88,17 +88,22 @@ public class UserService {
     }
 
     public void followUser(User follower, User following) {
-        follower.addFollowing(following);
-        following.addFollower(follower);
-        userRepository.save(follower);
-        userRepository.save(following);
+        // Can't follow yourself
+        if (!follower.equals(following)) {
+            follower.addFollowing(following);
+            following.addFollower(follower);
+            userRepository.save(follower);
+            userRepository.save(following);
+        }
     }
 
     public void unfollowUser(User follower, User following) {
-        follower.removeFollowing(following);
-        following.removeFollower(follower);
-        userRepository.save(follower);
-        userRepository.save(following);
+        if (follower.getFollowingList().contains(following)) {
+            follower.removeFollowing(following);
+            following.removeFollower(follower);
+            userRepository.save(follower);
+            userRepository.save(following);
+        }
     }
 
     public boolean isUserFollowing(String follower, String following) {

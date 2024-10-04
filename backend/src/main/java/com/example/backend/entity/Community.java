@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Setter
 @Getter
@@ -46,6 +47,9 @@ public class Community {
     @Lob
     private Blob banner;
 
+    @JsonView(BasicInfo.class)
+    private String bannerString;
+
     // A community can have multiple users
     @ManyToMany
     @JsonView(UsersInfo.class)
@@ -76,13 +80,13 @@ public class Community {
     public Community() {
     }
 
-    public Community(String name, String description, String banner) throws SQLException {
+    public Community(String name, String description, String banner, User admin) {
         this.name = name;
+        this.admin = admin;
+        this.members.add(admin);
         this.identifier = name.replace(" ", "_");
         this.description = description;
-        if (banner != null) {
-            this.banner = new SerialBlob(banner.getBytes());
-        }
+        this.bannerString = Objects.requireNonNullElse(banner, "default_community_banner.jpg");
     }
 
     public void addMember(User user) {

@@ -2,7 +2,9 @@ package com.example.backend.service;
 
 import com.example.backend.entity.Post;
 import com.example.backend.entity.User;
+import com.example.backend.repository.CommunityRepository;
 import com.example.backend.repository.PostRepository;
+import com.example.backend.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,8 +16,14 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    public PostService(PostRepository postRepository) {
+    private final CommunityRepository communityRepository;
+
+    private final UserRepository userRepository;
+
+    public PostService(PostRepository postRepository, CommunityRepository communityRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
+        this.communityRepository = communityRepository;
+        this.userRepository = userRepository;
     }
 
     public Page<Post> getPostsByAuthor(String author, Pageable pageable) {
@@ -71,7 +79,10 @@ public class PostService {
     }
 
     public void savePost(Post post) {
-        postRepository.save(post);
+        // only saves the post if it has a title and content, community is not null and the author is a member of the community
+        if (post.getTitle() != null && post.getContent() != null && post.getCommunity() != null && post.getAuthor() != null && post.getCommunity().getMembers().contains(post.getAuthor())) {
+            postRepository.save(post);
+        }
     }
 
     public Post getPostById(Long id) {
