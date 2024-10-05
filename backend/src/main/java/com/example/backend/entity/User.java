@@ -45,7 +45,7 @@ public class User {
 
     @Getter
     @JsonView(BasicInfo.class)
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER) // Eager fetch because roles should be loaded when user is loaded
     private List<String> roles;
 
     @Setter
