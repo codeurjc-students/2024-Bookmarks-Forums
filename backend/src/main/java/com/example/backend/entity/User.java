@@ -21,13 +21,19 @@ import java.util.Objects;
 @Entity
 public class User {
 
-    public interface BasicInfo {
+    public interface UsernameInfo {
+    }
+
+    public interface BasicInfo extends UsernameInfo{
     }
 
     public interface FollowersInfo {
     }
 
-    @JsonView(BasicInfo.class)
+    public interface CommunitiesInfo {
+    }
+
+    @JsonView(UsernameInfo.class)
     @Id
     private String username;
 
@@ -79,6 +85,7 @@ public class User {
     private List<Reply> replies = new ArrayList<>();
 
     // A user can join 0 or multiple communities
+    @JsonView(CommunitiesInfo.class)
     @ManyToMany(mappedBy = "members")
     private List<Community> communities = new ArrayList<>();
 
@@ -103,10 +110,21 @@ public class User {
     @JsonView(BasicInfo.class) // User creation date
     private LocalDateTime fullCreationDate = LocalDateTime.of(creationDate, creationTime);
 
+    // Username change date (migration from old user to new user)
+    @JsonView(BasicInfo.class)
+    private LocalDate usernameChangeDate = LocalDate.now();
+
+    @JsonView(BasicInfo.class)
+    private LocalTime usernameChangeTime = LocalTime.now();
+
+    @JsonView(BasicInfo.class) // Username change date
+    private LocalDateTime fullUsernameChangeDate = LocalDateTime.of(usernameChangeDate, usernameChangeTime);
+
     public User() {
     }
 
-    public User(String username, String alias, String description, String pfp, String email, String password, List<String> roles) {
+    public User(String username, String alias, String description, String pfp, String email, String password,
+            List<String> roles) {
         this.username = username;
         this.alias = alias;
         this.description = description;
@@ -140,4 +158,3 @@ public class User {
         return this.username;
     }
 }
-

@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.entity.Community;
+import com.example.backend.entity.Message;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -23,8 +24,8 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public Page<User> getUserByEmail(String email, Pageable pageable) {
-        return userRepository.findByEmail(email, pageable);
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public Page<User> getUserByAlias(String alias, Pageable pageable) {
@@ -50,11 +51,17 @@ public class UserService {
     }
 
     public int getNumberOfCommunities(String username) {
-        return userRepository.getNumberOfCommunities(username);
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            return user.getCommunities().size();
+        } else {
+            return -1;
+        }
     }
 
     public int getNumberOfAdminCommunities(String username) {
-        return userRepository.getNumberOfAdminCommunities(username);
+        int communitiesCount = userRepository.getNumberOfAdminCommunities(username);
+        return communitiesCount;
     }
 
     public int getNumberOfPosts(String username) {
@@ -118,9 +125,50 @@ public class UserService {
         return userRepository.findByUsername(username) == null;
     }
 
+    public boolean isEmailAvailable(String email){
+        return userRepository.findByEmail(email) == null;
+    }
+
     public void setUserImage(String username, Blob image) {
         User user = userRepository.findByUsername(username);
         user.setPfp(image);
+        userRepository.save(user);
+    }
+
+    public void removeUserReferences(User user) {
+        // Remove user from followers and following lists
+        for (User follower : user.getFollowersList()) {
+            follower.removeFollowing(user);
+            userRepository.save(follower);
+        }
+        for (User following : user.getFollowingList()) {
+            following.removeFollower(user);
+            userRepository.save(following);
+        }
+
+        // Clear the lists to avoid further issues
+        user.getFollowersList().clear();
+        user.getFollowingList().clear();
+
+        // Remove user from communities
+        for (Community community : user.getCommunities()) {
+            community.getMembers().remove(user);
+            // Save the community if you have a CommunityRepository
+            // communityRepository.save(community);
+        }
+        user.getCommunities().clear();
+
+        // Remove user from sent messages
+        for (Message message : user.getSentMessages()) {
+            message.setSender(null);
+            // Save the message if you have a MessageRepository
+            // messageRepository.save(message);
+        }
+
+        // Clear the list to avoid further issues
+        user.getSentMessages().clear();
+        
+        // Save the user
         userRepository.save(user);
     }
 }

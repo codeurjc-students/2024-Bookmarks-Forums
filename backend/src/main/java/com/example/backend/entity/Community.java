@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.sql.rowset.serial.SerialBlob;
 import java.sql.Blob;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -53,6 +51,11 @@ public class Community {
     // A community can have multiple users
     @ManyToMany
     @JsonView(UsersInfo.class)
+    @JoinTable(
+        name = "user_community",
+        joinColumns = @JoinColumn(name = "community_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private List<User> members = new ArrayList<>();
 
     // A community can have multiple posts
