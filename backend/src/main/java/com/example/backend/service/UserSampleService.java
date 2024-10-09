@@ -6,8 +6,12 @@ import org.springframework.stereotype.Service;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.sql.rowset.serial.SerialException;
 
 @Service
 public class UserSampleService {
@@ -24,7 +28,7 @@ public class UserSampleService {
     }
 
     @PostConstruct
-    public void init() {
+    public void init() throws IOException, SQLException {
         List<String> userRoles = List.of("USER");
         List<String> adminRoles = List.of("USER", "ADMIN");
 

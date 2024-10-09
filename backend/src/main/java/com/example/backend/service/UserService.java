@@ -3,6 +3,8 @@ package com.example.backend.service;
 import com.example.backend.entity.Community;
 import com.example.backend.entity.Message;
 import com.example.backend.entity.User;
+import com.example.backend.repository.CommunityRepository;
+import com.example.backend.repository.MessageRepository;
 import com.example.backend.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,10 +16,14 @@ import java.sql.Blob;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final CommunityRepository communityRepository;
+    private final MessageRepository messageRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, CommunityRepository communityRepository, MessageRepository messageRepository) {
 
         this.userRepository = userRepository;
+        this.communityRepository = communityRepository;
+        this.messageRepository = messageRepository;
     }
 
     public User getUserByUsername(String username) {
@@ -153,16 +159,14 @@ public class UserService {
         // Remove user from communities
         for (Community community : user.getCommunities()) {
             community.getMembers().remove(user);
-            // Save the community if you have a CommunityRepository
-            // communityRepository.save(community);
+            communityRepository.save(community);
         }
         user.getCommunities().clear();
 
         // Remove user from sent messages
         for (Message message : user.getSentMessages()) {
             message.setSender(null);
-            // Save the message if you have a MessageRepository
-            // messageRepository.save(message);
+            messageRepository.save(message);
         }
 
         // Clear the list to avoid further issues

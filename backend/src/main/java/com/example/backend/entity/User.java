@@ -7,6 +7,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialException;
+
+import java.io.IOException;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -24,7 +30,7 @@ public class User {
     public interface UsernameInfo {
     }
 
-    public interface BasicInfo extends UsernameInfo{
+    public interface BasicInfo extends UsernameInfo {
     }
 
     public interface FollowersInfo {
@@ -110,21 +116,11 @@ public class User {
     @JsonView(BasicInfo.class) // User creation date
     private LocalDateTime fullCreationDate = LocalDateTime.of(creationDate, creationTime);
 
-    // Username change date (migration from old user to new user)
-    @JsonView(BasicInfo.class)
-    private LocalDate usernameChangeDate = LocalDate.now();
-
-    @JsonView(BasicInfo.class)
-    private LocalTime usernameChangeTime = LocalTime.now();
-
-    @JsonView(BasicInfo.class) // Username change date
-    private LocalDateTime fullUsernameChangeDate = LocalDateTime.of(usernameChangeDate, usernameChangeTime);
-
     public User() {
     }
 
     public User(String username, String alias, String description, String pfp, String email, String password,
-            List<String> roles) {
+            List<String> roles) throws SerialException, IOException, SQLException {
         this.username = username;
         this.alias = alias;
         this.description = description;
@@ -132,6 +128,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.pfpString = Objects.requireNonNullElse(pfp, "/assets/defaultProfilePicture.png");
+        this.pfp = LocalImageToBlob(pfpString);
     }
 
     public void addFollower(User user) {
@@ -152,6 +149,27 @@ public class User {
     public void removeFollowing(User user) {
         this.followingList.remove(user);
         this.following--;
+    }
+
+    public Blob LocalImageToBlob(String imgPath) throws IOException, SerialException, SQLException {
+        imgPath = imgPath.replace("/assets", "backend/src/main/resources/static/assets");
+        String onDocker = System.getenv("RUNNING_IN_DOCKER");
+        Blob imgBlob = null;
+
+        if (onDocker != null && onDocker.equals("true")) {
+            try (InputStream imgStream = getClass()
+                    .getResourceAsStream(imgPath.replace("backend/src/main/resources/static", ""))) {
+                if (imgStream == null) {
+                    throw new IOException("Image not found");
+                }
+                imgBlob = new SerialBlob(imgStream.readAllBytes());
+            }
+        } else {
+            String baseDir = System.getProperty("user.dir").replace("\\", "/").replace("/backend", "");
+            File imgFile = new File(baseDir + "/" + imgPath);
+            imgBlob = new SerialBlob(Files.readAllBytes(imgFile.toPath()));
+        }
+        return imgBlob;
     }
 
     public String toString() {

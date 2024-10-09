@@ -1,18 +1,27 @@
 package com.example.backend.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+import javax.sql.rowset.serial.SerialException;
+
+import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.backend.entity.Community;
@@ -258,7 +267,7 @@ public class APIUserController {
     @JsonView(UserBasicView.class)
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/users")
-    public ResponseEntity<User> registerUser(@RequestBody Map<String, String> userInfo) {
+    public ResponseEntity<User> registerUser(@RequestBody Map<String, String> userInfo) throws SerialException, IOException, SQLException {
         if (userInfo == null || userInfo.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -326,8 +335,9 @@ public class APIUserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // Check if user is authorized
-        if (!request.getUserPrincipal().getName().equals(username) || !request.isUserInRole("ADMIN")) {
+        // Check if user is authorized (if user is admin or the user itself)
+        if (!principal.getName().equals(username)
+                && !userService.getUserByUsername(principal.getName()).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -428,6 +438,98 @@ public class APIUserController {
         }
 
         return new ResponseEntity<>(username + " has been deleted", HttpStatus.OK);
+    }
+
+    // Change Profile Picture
+    @Operation(summary = "Change user's profile picture")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Profile picture changed", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
+            }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+    })
+    @JsonView(UserBasicView.class)
+    @PutMapping("/users/{username}/pictures")
+    public ResponseEntity<Object> changeProfilePicture(HttpServletRequest request, @PathVariable String username,
+            @RequestParam MultipartFile file) throws IOException {
+
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Logged user = user or is admin?
+        if (!principal.getName().equals(username)
+                && !userService.getUserByUsername(principal.getName()).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (file == null || file.isEmpty()) {
+            return new ResponseEntity<>("File couldn't be uploaded, please try again.", HttpStatus.BAD_REQUEST);
+        }
+        
+        // Check file
+        try (InputStream is = file.getInputStream()) {
+            try {
+                ImageIO.read(is).toString();
+                long size = file.getSize() / 1024 / 1024; // MB
+                if (size >= 5) {
+                    return new ResponseEntity<>("File is too large. Max size is 5MB", HttpStatus.BAD_REQUEST);
+                }
+                user.setPfp(BlobProxy.generateProxy(file.getInputStream(), file.getSize()));
+                userService.saveUser(user);
+                
+                // Resource URL for the image (location header)
+                URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{username}/pictures")
+                        .buildAndExpand(user.getUsername()).toUri();
+
+                // Return response
+                return ResponseEntity.created(location).body(user);
+            } catch (Exception e) {
+                return new ResponseEntity<>("File is not an image", HttpStatus.BAD_REQUEST);
+            }
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Get Profile Picture
+    @Operation(summary = "Get user's profile picture")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Profile picture found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Profile picture not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+    })
+    @GetMapping("/users/{username}/pictures")
+    public ResponseEntity<Object> getProfilePicture(@PathVariable String username) {
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Blob image = user.getPfp();
+
+        if (image == null) {
+            return new ResponseEntity<>("Profile picture not found", HttpStatus.NOT_FOUND);
+        }
+
+        try {
+            int blobLength = (int) image.length();
+            byte[] blobAsBytes = image.getBytes(1, blobLength);
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(blobAsBytes);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // Exception handler for missing parameters
