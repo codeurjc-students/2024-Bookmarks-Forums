@@ -8,7 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+import javax.xml.stream.events.Comment;
 
 @Service
 public class CommunityService {
@@ -21,10 +24,6 @@ public class CommunityService {
         this.userRepository = userRepository;
     }
 
-    public Page<Community> getCommunityByName(String name, Pageable pageable) {
-        return communityRepository.findByName(name, pageable);
-    }
-
     public Community getCommunityById(String id) {
         return communityRepository.findByIdentifier(id);
     }
@@ -33,33 +32,34 @@ public class CommunityService {
         return communityRepository.findByDescription(description, pageable);
     }
 
-    public Page<User> getMembers(String name, Pageable pageable) {
-        return communityRepository.getMembers(name, pageable);
+    public Page<User> getMembers(String identifier, Pageable pageable) {
+        return communityRepository.getMembers(identifier, pageable);
     }
 
-    public int getNumberOfUsers(String name) {
-        return communityRepository.getMembersCount(name);
+    public int getNumberOfUsers(String identifier) {
+        return communityRepository.getMembersCount(identifier);
     }
 
-    public int getNumberOfPosts(String name) {
-        return communityRepository.getPostsCount(name);
+    public int getNumberOfPosts(String identifier) {
+        return communityRepository.getPostsCount(identifier);
     }
 
     public Page<Community> engineSearchCommunities(String query, String sortCriteria, Pageable pageable) {
         return switch (sortCriteria) {
             case "creationDate" -> communityRepository.engineSearchCommunitiesOrderByCreationDate(query, pageable);
             case "members" -> communityRepository.engineSearchCommunitiesOrderByMembers(query, pageable);
-            case "posts" -> communityRepository.engineSearchCommunitiesOrderByLastPostDate(query, pageable);
+            case "lastPostDate" -> communityRepository.engineSearchCommunitiesOrderByLastPostDate(query, pageable);
             default -> communityRepository.engineSearchCommunities(query, pageable);
         };
     }
 
-    public Page<Community> getCommunities(boolean sortByCreationDate, Pageable pageable) {
-        if (sortByCreationDate) {
-            return communityRepository.findCommunitiesOrderByCreationDate(pageable);
-        } else {
-            return communityRepository.findCommunitiesOrderByLastPostDate(pageable);
-        }
+    public Page<Community> getCommunities(String sortCriteria, Pageable pageable) {
+        return switch (sortCriteria) {
+            case "creationDate" -> communityRepository.findCommunitiesOrderByCreationDate(pageable);
+            case "members" -> communityRepository.findCommunitiesOrderByMembers(pageable);
+            case "lastPostDate" -> communityRepository.findCommunitiesOrderByLastPostDate(pageable);
+            default -> communityRepository.findAll(pageable);
+        };
     }
 
     public Page<Community> getCommunitiesByAdmin(String username, Pageable pageable) {
@@ -68,9 +68,19 @@ public class CommunityService {
 
     public Page<Community> getCommunitiesByName(String name, String sortCriteria, Pageable pageable) {
         return switch (sortCriteria) {
-            case "name" -> communityRepository.findByNameOrderByLastPostDate(name, pageable);
-            case "posts" -> communityRepository.findByDescriptionOrderByLastPostDate(name, pageable);
+            case "creationDate" -> communityRepository.findByNameOrderByCreationDate(name, pageable);
+            case "members" -> communityRepository.findByNameOrderByMembers(name, pageable);
+            case "lastPostDate" -> communityRepository.findByNameOrderByLastPostDate(name, pageable);
             default -> communityRepository.findByName(name, pageable);
+        };
+    }
+
+    public Page<Community> getCommunitiesByDescription(String description, String sortCriteria, Pageable pageable) {
+        return switch (sortCriteria) {
+            case "creationDate" -> communityRepository.findByDescriptionOrderByCreationDate(description, pageable);
+            case "members" -> communityRepository.findByDescriptionOrderByMembers(description, pageable);
+            case "lastPostDate" -> communityRepository.findByDescriptionOrderByLastPostDate(description, pageable);
+            default -> communityRepository.findByDescription(description, pageable);
         };
     }
 
@@ -134,6 +144,58 @@ public class CommunityService {
         if (user != null && community != null && isUserAdminOfCommunity(username, communityId)) {
             community.setAdmin(null);
             communityRepository.save(community);
+        }
+    }
+
+    // Get the admin of a community
+    public User getAdmin(String communityId) {
+        return communityRepository.getAdmin(communityId);
+    }
+
+    // Get the moderators of a community
+    public Page<User> getModerators(String communityId, Pageable pageable) {
+        return communityRepository.getModerators(communityId, pageable);
+    }
+
+    // Given username and communityId, user becomes a moderator of the community
+    public void promoteUserToModerator(String username, String communityId) {
+        User user = userRepository.findByUsername(username);
+        Community community = communityRepository.findByIdentifier(communityId);
+        if (user != null && community != null && !community.getModerators().contains(user)) {
+            community.addModerator(user);
+            communityRepository.save(community);
+        }
+    }
+
+    // Given username and communityId, user is no longer a moderator of the community
+    public void demoteUserFromModerator(String username, String communityId) {
+        User user = userRepository.findByUsername(username);
+        Community community = communityRepository.findByIdentifier(communityId);
+        if (user != null && community != null && community.getModerators().contains(user)) {
+            community.removeModerator(user);
+            communityRepository.save(community);
+        }
+    }
+
+    // Ban a user from a community
+    public void banUserFromCommunity(String username, String communityId, int duration, String reason) {
+        User user = userRepository.findByUsername(username);
+        Community community = communityRepository.findByIdentifier(communityId);
+        if (user != null && community != null && isUserMemberOfCommunity(username, communityId)) {
+            // transform duratio into LocalDateTime format from now
+            LocalDateTime timeNow = LocalDateTime.now();
+            switch (duration) {
+                case 1 -> timeNow = timeNow.plusDays(1);
+                case 7 -> timeNow = timeNow.plusDays(7);
+                case 14 -> timeNow = timeNow.plusDays(14);
+                case 30 -> timeNow = timeNow.plusDays(30);
+                case 180 -> timeNow = timeNow.plusDays(180);
+                case 365 -> timeNow = timeNow.plusDays(365);
+                case -1 -> timeNow = timeNow.plusYears(100); // forever
+                default -> throw new IllegalArgumentException("Invalid duration: " + duration);
+            }
+            
+            community.banUser(user, timeNow, reason);
         }
     }
 

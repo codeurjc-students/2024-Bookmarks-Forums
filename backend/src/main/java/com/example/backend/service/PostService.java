@@ -42,10 +42,6 @@ public class PostService {
         return postRepository.findByContent(content, pageable);
     }
 
-    public Page<Post> getPostsByCommunityName(String communityName, Pageable pageable) {
-        return postRepository.findByCommunityName(communityName, pageable);
-    }
-
     public Page<Post> getPostsByAuthor(User author, Pageable pageable) {
         return postRepository.findByAuthor(author, pageable);
     }
@@ -60,20 +56,22 @@ public class PostService {
         };
     }
 
-    public Page<Post> searchPostsByCommunityName (String communityName, String query, Pageable pageable, String order, boolean searchOnContent) {
+    public Page<Post> searchPostsByCommunityIdentifier (String communityIdentifier, String query, Pageable pageable, String order, boolean searchOnContent) {
         if (searchOnContent) {
             return switch (order) {
-                case "creationDate" -> postRepository.findByCommunityNameAndQueryOrderByCreationDate(communityName, query, pageable);
-                case "lastModifiedDate" -> postRepository.findByCommunityNameAndQueryOrderByLastModifiedDate(communityName, query, pageable);
-                case "likes" -> postRepository.findByCommunityNameAndQueryOrderByLikes(communityName, query, pageable);
-                default -> postRepository.findByCommunityNameAndQuery(communityName, query, pageable);
+                case "creationDate" -> postRepository.findByCommunityIdentifierAndQueryOrderByCreationDate(communityIdentifier, query, pageable);
+                case "lastModifiedDate" -> postRepository.findByCommunityIdentifierAndQueryOrderByLastModifiedDate(communityIdentifier, query, pageable);
+                case "likes" -> postRepository.findByCommunityIdentifierAndQueryOrderByLikes(communityIdentifier, query, pageable);
+                case "replies" -> postRepository.findByCommunityIdentifierAndQueryOrderByReplies(communityIdentifier, query, pageable);
+                default -> postRepository.findByCommunityIdentifierAndQuery(communityIdentifier, query, pageable);
             };
         } else {
             return switch (order) {
-                case "creationDate" -> postRepository.findByCommunityNameOrderByCreationDate(communityName, pageable);
-                case "lastModifiedDate" -> postRepository.findByCommunityNameOrderByLastModifiedDate(communityName, pageable);
-                case "likes" -> postRepository.findByCommunityNameOrderByLikes(communityName, pageable);
-                default -> postRepository.findByCommunityName(communityName, pageable);
+                case "creationDate" -> postRepository.findByCommunityIdentifierOrderByCreationDate(communityIdentifier, pageable);
+                case "lastModifiedDate" -> postRepository.findByCommunityIdentifierOrderByLastModifiedDate(communityIdentifier, pageable);
+                case "likes" -> postRepository.findByCommunityIdentifierOrderByLikes(communityIdentifier, pageable);
+                case "replies" -> postRepository.findByCommunityIdentifierOrderByReplies(communityIdentifier, pageable);
+                default -> postRepository.findByCommunityIdentifier(communityIdentifier, pageable);
             };
         }
     }
@@ -81,6 +79,18 @@ public class PostService {
     public void savePost(Post post) {
         // only saves the post if it has a title and content, community is not null and the author is a member of the community
         if (post.getTitle() != null && post.getContent() != null && post.getCommunity() != null && post.getAuthor() != null && post.getCommunity().getMembers().contains(post.getAuthor())) {
+            postRepository.save(post);
+        }
+    }
+
+    /*
+     * In order to be able to edit a post, it has to have the status "not edited" or have been edited more than a week ago
+     */
+    public void editPost(Post post, String title, String content) {
+        if (!post.isEdited() || post.getFullLastEditDate().plusDays(7).isBefore(post.getFullCreationDate())) {
+            post.setTitle(title);
+            post.setContent(content);
+            post.setEdited(true);
             postRepository.save(post);
         }
     }

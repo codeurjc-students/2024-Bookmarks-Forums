@@ -31,15 +31,12 @@ public class Post {
     public interface CommunityInfo {
     }
 
-    public interface UserInfo {
-    }
-
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
     @JsonView(BasicInfo.class)
     private Long identifier;
 
-    @JsonView(UserInfo.class)
+    @JsonView(BasicInfo.class)
     @ManyToOne
     private User author;
 
@@ -61,32 +58,44 @@ public class Post {
     @JsonView(CommunityInfo.class)
     private Community community;
 
-    @JsonView(DetailedInfo.class)
+    @JsonView(BasicInfo.class)
     private int upvotes;
 
-    @JsonView(DetailedInfo.class)
+    @JsonView(BasicInfo.class)
     private int downvotes;
 
-    @JsonView(DetailedInfo.class) // Number of comments
+    @JsonView(BasicInfo.class) // Number of comments
     private int comments;
 
-    @JsonView(BasicInfo.class)
+    @JsonView(DetailedInfo.class)
     private LocalDate creationDate = LocalDate.now();
 
-    @JsonView(BasicInfo.class)
+    @JsonView(DetailedInfo.class)
     private LocalTime creationTime = LocalTime.now();
 
     @JsonView(BasicInfo.class) // Post creation date
     private LocalDateTime fullCreationDate = LocalDateTime.of(creationDate, creationTime);
 
-    @JsonView(BasicInfo.class)
+    @JsonView(DetailedInfo.class)
     private LocalDate lastReplyDate = LocalDate.now();
 
-    @JsonView(BasicInfo.class)
+    @JsonView(DetailedInfo.class)
     private LocalTime lastReplyTime = LocalTime.now();
 
-    @JsonView(BasicInfo.class) // Post modification date (last reply)
+    @JsonView(BasicInfo.class) // Post last reply date
     private LocalDateTime fullLastReplyDate = LocalDateTime.of(lastReplyDate, lastReplyTime);
+
+    @JsonView(DetailedInfo.class)
+    private boolean isEdited = false;
+
+    @JsonView(DetailedInfo.class)
+    private LocalDate lastEditDate = LocalDate.now();
+
+    @JsonView(DetailedInfo.class)
+    private LocalTime lastEditTime = LocalTime.now();
+
+    @JsonView(BasicInfo.class) // Post last edit date
+    private LocalDateTime fullLastEditDate = LocalDateTime.of(lastEditDate, lastEditTime);
 
     @JsonView(Replies.class) // List of comments
     @OneToMany(mappedBy = "post", cascade = jakarta.persistence.CascadeType.ALL)

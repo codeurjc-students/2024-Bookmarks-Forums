@@ -11,7 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Setter
@@ -19,13 +21,45 @@ import java.util.Objects;
 @Entity
 public class Community {
 
+    @Embeddable
+    public class BanInfo {
+
+        private LocalDateTime banUntil;
+        private String banReason;
+
+        public BanInfo() {
+        }
+
+        public BanInfo(LocalDateTime banUntil, String banReason) {
+            this.banUntil = banUntil;
+            this.banReason = banReason;
+        }
+
+        public LocalDateTime getBanUntil() {
+            return banUntil;
+        }
+
+        public void setBanUntil(LocalDateTime banUntil) {
+            this.banUntil = banUntil;
+        }
+
+        public String getBanReason() {
+            return banReason;
+        }
+
+        public void setBanReason(String banReason) {
+            this.banReason = banReason;
+        }
+    }
+
     public interface BasicInfo {
     }
 
     public interface UsersInfo {
     }
 
-    // The community ID is the same as the community name but with spaces replaced by underscores
+    // The community ID is the same as the community name but with spaces replaced
+    // by underscores
     @Id
     @JsonView(BasicInfo.class)
     private String identifier;
@@ -40,6 +74,12 @@ public class Community {
     @ManyToOne
     private User admin;
 
+    // Moderators list
+    @JsonView(UsersInfo.class)
+    @ManyToMany
+    @JoinTable(name = "moderator_community", joinColumns = @JoinColumn(name = "community_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> moderators = new ArrayList<>();
+
     // Banner image
     @JsonIgnore
     @Lob
@@ -51,11 +91,7 @@ public class Community {
     // A community can have multiple users
     @ManyToMany
     @JsonView(UsersInfo.class)
-    @JoinTable(
-        name = "user_community",
-        joinColumns = @JoinColumn(name = "community_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
+    @JoinTable(name = "user_community", joinColumns = @JoinColumn(name = "community_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> members = new ArrayList<>();
 
     // A community can have multiple posts
@@ -80,6 +116,12 @@ public class Community {
     @JsonView(BasicInfo.class) // Modification date (last post)
     private LocalDateTime fullLastPostDate = LocalDateTime.of(lastPostDate, lastPostTime);
 
+    @JsonView(UsersInfo.class) // banned users map: username - localdatetime (ban until) - String (reason)
+    @ElementCollection
+    @CollectionTable(name = "banned_users", joinColumns = @JoinColumn(name = "community_id"))
+    @MapKeyJoinColumn(name = "user_id")
+    private Map<User, BanInfo> bannedUsers = new HashMap<>();
+
     public Community() {
     }
 
@@ -100,9 +142,21 @@ public class Community {
         this.members.remove(user);
     }
 
+    public void addModerator(User user) {
+        this.moderators.add(user);
+    }
+
+    public void removeModerator(User user) {
+        this.moderators.remove(user);
+    }
+
     public String toString() {
         return this.name;
     }
 
+    public void banUser(User user, LocalDateTime duration, String reason) {
+        this.bannedUsers.put(user, new BanInfo(duration, reason));
+
+    }
 
 }
