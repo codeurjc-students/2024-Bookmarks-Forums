@@ -27,79 +27,79 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         Page<Post> findByAuthorUsername(String authorUsername, Pageable pageable);
 
         // Search post by community identifier
-        @Query("SELECT p FROM Post p WHERE p.community.identifier LIKE %:communityIdentifier%")
-        Page<Post> findByCommunityIdentifier(@Param("communityIdentifier") String communityIdentifier,
+        @Query("SELECT p FROM Post p WHERE p.community.identifier = :communityIdentifier")
+        Page<Post> findByCommunityIdentifier(@Param("communityIdentifier") Long communityIdentifier,
                         Pageable pageable);
 
         // Search post by community identifier and sort by latest modified date
-        @Query("SELECT p FROM Post p WHERE p.community.identifier LIKE %:communityIdentifier% ORDER BY p.fullLastReplyDate DESC")
+        @Query("SELECT p FROM Post p WHERE p.community.identifier = :communityIdentifier ORDER BY p.fullLastReplyDate DESC")
         Page<Post> findByCommunityIdentifierOrderByLastModifiedDate(
-                        @Param("communityIdentifier") String communityIdentifier,
+                        @Param("communityIdentifier") Long communityIdentifier,
                         Pageable pageable);
 
         // Search post by community identifier and sort by creation date
-        @Query("SELECT p FROM Post p WHERE p.community.identifier LIKE %:communityIdentifier% ORDER BY p.fullCreationDate DESC")
+        @Query("SELECT p FROM Post p WHERE p.community.identifier = :communityIdentifier ORDER BY p.fullCreationDate DESC")
         Page<Post> findByCommunityIdentifierOrderByCreationDate(
-                        @Param("communityIdentifier") String communityIdentifier,
+                        @Param("communityIdentifier") Long communityIdentifier,
                         Pageable pageable);
 
         // Search post by community identifier and sort by number of likes
-        @Query("SELECT p FROM Post p WHERE p.community.identifier LIKE %:communityIdentifier% ORDER BY p.upvotes DESC")
-        Page<Post> findByCommunityIdentifierOrderByLikes(@Param("communityIdentifier") String communityIdentifier,
+        @Query("SELECT p FROM Post p WHERE p.community.identifier = :communityIdentifier ORDER BY p.upvotes DESC")
+        Page<Post> findByCommunityIdentifierOrderByLikes(@Param("communityIdentifier") Long communityIdentifier,
                         Pageable pageable);
 
-        //Search post by community identifier and sort by number of replies
-        @Query("SELECT p FROM Post p LEFT JOIN p.replyList r WHERE p.community.identifier LIKE %:communityIdentifier% GROUP BY p ORDER BY COUNT(r) DESC")
-        Page<Post> findByCommunityIdentifierOrderByReplies(@Param("communityIdentifier") String communityIdentifier,
+        // Search post by community identifier and sort by number of replies
+        @Query("SELECT p FROM Post p LEFT JOIN p.replyList r WHERE p.community.identifier = :communityIdentifier GROUP BY p ORDER BY COUNT(r) DESC")
+        Page<Post> findByCommunityIdentifierOrderByReplies(@Param("communityIdentifier") Long communityIdentifier,
                         Pageable pageable);
-
 
         // Search post by community identifier and title or content text
         @Query("SELECT p FROM Post p WHERE " +
-                        "p.community.identifier LIKE %:communityIdentifier% AND " +
+                        "p.community.identifier = :communityIdentifier AND " +
                         "(p.title LIKE %:query% OR " +
                         "p.content LIKE %:query%)")
-        Page<Post> findByCommunityIdentifierAndQuery(@Param("communityIdentifier") String communityIdentifier,
+        Page<Post> findByCommunityIdentifierAndQuery(@Param("communityIdentifier") Long communityIdentifier,
                         @Param("query") String query, Pageable pageable);
 
         // Search post by community identifier and title or content text and sort by
         // modified date
         @Query("SELECT p FROM Post p WHERE " +
-                        "p.community.identifier LIKE %:communityIdentifier% AND " +
+                        "p.community.identifier = :communityIdentifier AND " +
                         "(p.title LIKE %:query% OR " +
                         "p.content LIKE %:query%) ORDER BY p.fullLastReplyDate DESC")
         Page<Post> findByCommunityIdentifierAndQueryOrderByLastModifiedDate(
-                        @Param("communityIdentifier") String communityIdentifier,
+                        @Param("communityIdentifier") Long communityIdentifier,
                         @Param("query") String query, Pageable pageable);
 
         // Search post by community identifier and title or content text and sort by
         // creation date
         @Query("SELECT p FROM Post p WHERE " +
-                        "p.community.identifier LIKE %:communityIdentifier% AND " +
+                        "p.community.identifier = :communityIdentifier AND " +
                         "(p.title LIKE %:query% OR " +
                         "p.content LIKE %:query%) ORDER BY p.fullCreationDate DESC")
         Page<Post> findByCommunityIdentifierAndQueryOrderByCreationDate(
-                        @Param("communityIdentifier") String communityIdentifier,
+                        @Param("communityIdentifier") Long communityIdentifier,
                         @Param("query") String query, Pageable pageable);
 
         // Search post by community identifier and title or content text and sort by
         // number of likes
         @Query("SELECT p FROM Post p WHERE " +
-                        "p.community.identifier LIKE %:communityIdentifier% AND " +
+                        "p.community.identifier = :communityIdentifier AND " +
                         "(p.title LIKE %:query% OR " +
                         "p.content LIKE %:query%) ORDER BY p.upvotes DESC")
         Page<Post> findByCommunityIdentifierAndQueryOrderByLikes(
-                        @Param("communityIdentifier") String communityIdentifier, @Param("query") String query,
+                        @Param("communityIdentifier") Long communityIdentifier, @Param("query") String query,
                         Pageable pageable);
 
-        // Search post by community identifier and title or content text and sort by number of replies
+        // Search post by community identifier and title or content text and sort by
+        // number of replies
         @Query("SELECT p FROM Post p LEFT JOIN p.replyList r WHERE " +
-                        "p.community.identifier LIKE %:communityIdentifier% AND " +
+                        "p.community.identifier = :communityIdentifier AND " +
                         "(p.title LIKE %:query% OR " +
                         "p.content LIKE %:query%) GROUP BY p ORDER BY COUNT(r) DESC")
-        Page<Post> findByCommunityIdentifierAndQueryOrderByReplies(@Param("communityIdentifier") String communityIdentifier,
+        Page<Post> findByCommunityIdentifierAndQueryOrderByReplies(
+                        @Param("communityIdentifier") Long communityIdentifier,
                         @Param("query") String query, Pageable pageable);
-        
 
         // Search post by title or content
         @Operation(summary = "Search posts by title or content. Search Engine's default behaviour")

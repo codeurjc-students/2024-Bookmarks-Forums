@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.entity.Ban;
 import com.example.backend.entity.Community;
 import com.example.backend.entity.User;
 import com.example.backend.repository.CommunityRepository;
@@ -24,7 +25,7 @@ public class CommunityService {
         this.userRepository = userRepository;
     }
 
-    public Community getCommunityById(String id) {
+    public Community getCommunityById(Long id) {
         return communityRepository.findByIdentifier(id);
     }
 
@@ -32,16 +33,16 @@ public class CommunityService {
         return communityRepository.findByDescription(description, pageable);
     }
 
-    public Page<User> getMembers(String identifier, Pageable pageable) {
+    public Page<User> getMembers(Long identifier, Pageable pageable) {
         return communityRepository.getMembers(identifier, pageable);
     }
 
-    public int getNumberOfUsers(String identifier) {
-        return communityRepository.getMembersCount(identifier);
+    public int getNumberOfUsers(Long identifier) {
+        return communityRepository.getMembersList(identifier).size();
     }
 
-    public int getNumberOfPosts(String identifier) {
-        return communityRepository.getPostsCount(identifier);
+    public int getNumberOfPosts(Long identifier) {
+        return communityRepository.getPostsList(identifier).size();
     }
 
     public Page<Community> engineSearchCommunities(String query, String sortCriteria, Pageable pageable) {
@@ -95,20 +96,20 @@ public class CommunityService {
     }
 
     // Given username and communityId, check if the user is a member of the community
-    public boolean isUserMemberOfCommunity(String username, String communityId) {
+    public boolean isUserMemberOfCommunity(String username, Long communityId) {
         List<User> members = communityRepository.getMembersList(communityId);
         return members.contains(userRepository.findByUsername(username));
 
     }
 
     // Given username and communityId, check if the user is an admin of the community
-    public boolean isUserAdminOfCommunity(String username, String communityId) {
+    public boolean isUserAdminOfCommunity(String username, Long communityId) {
         User communityAdmin = communityRepository.getAdmin(communityId);
         return communityAdmin.getUsername().equals(username);
     }
 
     // Given username and communityId, user joins the community
-    public void joinCommunity(String username, String communityId) {
+    public void joinCommunity(String username, Long communityId) {
         User user = userRepository.findByUsername(username);
         Community community = communityRepository.findByIdentifier(communityId);
         if (user != null && community != null && !isUserMemberOfCommunity(username, communityId)) {
@@ -118,7 +119,7 @@ public class CommunityService {
     }
 
     // Given username and communityId, user leaves the community
-    public void leaveCommunity(String username, String communityId) {
+    public void leaveCommunity(String username, Long communityId) {
         User user = userRepository.findByUsername(username);
         Community community = communityRepository.findByIdentifier(communityId);
         if (user != null && community != null && isUserMemberOfCommunity(username, communityId)) {
@@ -128,7 +129,7 @@ public class CommunityService {
     }
 
     // Given username and communityId, user becomes an admin of the community
-    public void promoteUserToAdmin(String username, String communityId) {
+    public void promoteUserToAdmin(String username, long communityId) {
         User user = userRepository.findByUsername(username);
         Community community = communityRepository.findByIdentifier(communityId);
         if (user != null && community != null && !isUserAdminOfCommunity(username, communityId)) {
@@ -138,7 +139,7 @@ public class CommunityService {
     }
 
     // Given username and communityId, user is no longer an admin of the community
-    public void demoteUserFromAdmin(String username, String communityId) {
+    public void demoteUserFromAdmin(String username, Long communityId) {
         User user = userRepository.findByUsername(username);
         Community community = communityRepository.findByIdentifier(communityId);
         if (user != null && community != null && isUserAdminOfCommunity(username, communityId)) {
@@ -148,17 +149,24 @@ public class CommunityService {
     }
 
     // Get the admin of a community
-    public User getAdmin(String communityId) {
+    public User getAdmin(Long communityId) {
         return communityRepository.getAdmin(communityId);
     }
 
     // Get the moderators of a community
-    public Page<User> getModerators(String communityId, Pageable pageable) {
+    public Page<User> getModerators(Long communityId, Pageable pageable) {
         return communityRepository.getModerators(communityId, pageable);
     }
 
+    // Is user a moderator of the community
+    public boolean isUserModeratorOfCommunity(String username, Long communityId) {
+        User user = userRepository.findByUsername(username);
+        Community community = communityRepository.findByIdentifier(communityId);
+        return user != null && community != null && community.getModerators().contains(user);
+    }
+
     // Given username and communityId, user becomes a moderator of the community
-    public void promoteUserToModerator(String username, String communityId) {
+    public void promoteUserToModerator(String username, Long communityId) {
         User user = userRepository.findByUsername(username);
         Community community = communityRepository.findByIdentifier(communityId);
         if (user != null && community != null && !community.getModerators().contains(user)) {
@@ -168,7 +176,7 @@ public class CommunityService {
     }
 
     // Given username and communityId, user is no longer a moderator of the community
-    public void demoteUserFromModerator(String username, String communityId) {
+    public void demoteUserFromModerator(String username, Long communityId) {
         User user = userRepository.findByUsername(username);
         Community community = communityRepository.findByIdentifier(communityId);
         if (user != null && community != null && community.getModerators().contains(user)) {
@@ -178,10 +186,10 @@ public class CommunityService {
     }
 
     // Ban a user from a community
-    public void banUserFromCommunity(String username, String communityId, int duration, String reason) {
+    public void banUserFromCommunity(String username, Long communityId, int duration, String reason) {
         User user = userRepository.findByUsername(username);
         Community community = communityRepository.findByIdentifier(communityId);
-        if (user != null && community != null && isUserMemberOfCommunity(username, communityId)) {
+        if (user != null && community != null) {
             // transform duratio into LocalDateTime format from now
             LocalDateTime timeNow = LocalDateTime.now();
             switch (duration) {
@@ -196,7 +204,88 @@ public class CommunityService {
             }
             
             community.banUser(user, timeNow, reason);
+            // remove user from community
+            community.removeMember(user);
+            communityRepository.save(community);
         }
+    }
+
+    // Does community already exist by name
+    public boolean doesCommunityExist(String name) {
+        return !communityRepository.findAllByName(name).isEmpty();
+    }
+
+    // Get ban reason of a user in a community
+    public String getBanReason(String username, Long communityId) {
+        User user = userRepository.findByUsername(username);
+        Community community = communityRepository.findByIdentifier(communityId);
+        if (user != null && community != null){
+            Ban ban = communityRepository.getBan(communityId, user.getUsername());
+            if (ban != null) {
+                return ban.getBanReason();
+            }
+        }
+        return null;
+    }
+
+    // Get ban duration of a user in a community
+    public LocalDateTime getBanDuration(String username, Long communityId) {
+        User user = userRepository.findByUsername(username);
+        Community community = communityRepository.findByIdentifier(communityId);
+        if (user != null && community != null){
+            Ban ban = communityRepository.getBan(communityId, user.getUsername());
+            if (ban != null) {
+                return ban.getBanUntil();
+            }
+        }
+        return null;
+    }
+
+    // Get banned users of a community
+    public Page<Ban> getBannedUsers(Long communityId, Pageable pageable) {
+        return communityRepository.getBannedUsers(communityId, pageable);
+    }
+
+    // Given username and communityId, user is no longer banned from the community
+    public void unbanUserFromCommunity(String username, Long communityId) {
+        User user = userRepository.findByUsername(username);
+        Community community = communityRepository.findByIdentifier(communityId);
+        if (user != null && community != null) {
+            Ban ban = communityRepository.getBan(communityId, user.getUsername());
+            if (ban != null) {
+                community.unbanUser(user);
+                communityRepository.save(community);
+            }
+        }
+    }
+
+    // Given username and communityId, check if the user is banned from the community
+    public boolean isUserBannedFromCommunity(String username, Long communityId) {
+        User user = userRepository.findByUsername(username);
+        Community community = communityRepository.findByIdentifier(communityId);
+        if (user != null && community != null) {
+            Ban ban = communityRepository.getBan(communityId, user.getUsername());
+            
+            if (ban != null) {
+                // is ban over?
+                if (ban.getBanUntil().isBefore(LocalDateTime.now())) {
+                    // unban user
+                    community.unbanUser(user);
+                    communityRepository.save(community);
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    // Given username and communityId, return the ban of the user in the community
+    public Ban getBan(String username, Long communityId) {
+        return communityRepository.getBan(communityId, username);
     }
 
 }

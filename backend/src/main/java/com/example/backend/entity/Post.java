@@ -28,7 +28,7 @@ public class Post {
 
     }
 
-    public interface CommunityInfo {
+    public interface CommunityInfo extends BasicInfo {
     }
 
     @Id
@@ -45,9 +45,6 @@ public class Post {
 
     @JsonView(BasicInfo.class)
     private String content;
-
-    @JsonView(BasicInfo.class)
-    private String communityNameString;
 
     @JsonIgnore
     @Lob
@@ -121,7 +118,6 @@ public class Post {
         this.content = content;
         this.author = author;
         this.community = community;
-        this.communityNameString = community.getName();
     }
 
 }

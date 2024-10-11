@@ -1,6 +1,8 @@
 package com.example.backend.repository;
 
+import com.example.backend.entity.Ban;
 import com.example.backend.entity.Community;
+import com.example.backend.entity.Post;
 import com.example.backend.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Page;
@@ -9,11 +11,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Map;
 
-public interface CommunityRepository extends JpaRepository<Community, String> {
+public interface CommunityRepository extends JpaRepository<Community, Long> {
+        @Query("SELECT c FROM Community c WHERE c.name LIKE %:name%")
         Page<Community> findByName(String name, Pageable pageable);
 
-        Community findByIdentifier(String communityId);
+        Community findByIdentifier(long communityId);
 
         Page<Community> findByAdminUsername(String username, Pageable pageable);
 
@@ -79,25 +83,41 @@ public interface CommunityRepository extends JpaRepository<Community, String> {
 
         // Return members count of a community
         @Query("SELECT COUNT(c.members) FROM Community c WHERE c.identifier = :communityId")
-        int getMembersCount(String communityId);
+        int getMembersCount(long communityId);
 
         // Return posts count of a community
         @Query("SELECT COUNT(c.posts) FROM Community c WHERE c.identifier = :communityId")
-        int getPostsCount(String communityId);
+        int getPostsCount(long communityId);
 
         // Get members of a community
         @Query("SELECT c.members FROM Community c WHERE c.identifier = :communityId")
-        Page<User> getMembers(String communityId, Pageable pageable);
+        Page<User> getMembers(long communityId, Pageable pageable);
 
         @Query("SELECT c.members FROM Community c WHERE c.identifier = :communityId")
-        List<User> getMembersList(String communityId);
+        List<User> getMembersList(long communityId);
+
+        // Get Posts List of a community
+        @Query("SELECT c.posts FROM Community c WHERE c.identifier = :communityId")
+        List<Post> getPostsList(long communityId);
 
         // Get admin of a community
         @Query("SELECT c.admin FROM Community c WHERE c.identifier = :communityId")
-        User getAdmin(String communityId);
+        User getAdmin(long communityId);
 
         // Get moderators of a community
         @Query("SELECT c.moderators FROM Community c WHERE c.identifier = :communityId")
-        Page<User> getModerators(String communityId, Pageable pageable);
+        Page<User> getModerators(long communityId, Pageable pageable);
+
+        // Find all communities by name
+        @Query("SELECT c FROM Community c WHERE c.name LIKE %:name%")
+        List<Community> findAllByName(String name);
+
+        //Get banned users of a community
+        @Query("SELECT c.bannedUsers FROM Community c WHERE c.identifier = :communityId")
+        Page<Ban> getBannedUsers(long communityId, Pageable pageable);
+
+        // Get a specific ban of a community given the user username and community identifier
+        @Query("SELECT b FROM Ban b WHERE b.community.identifier = :communityId AND b.user.username = :username")
+        Ban getBan(long communityId, String username);
 
 }

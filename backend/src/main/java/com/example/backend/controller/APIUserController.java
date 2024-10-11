@@ -67,6 +67,29 @@ public class APIUserController {
         this.mailService = mailService;
     }
 
+    // Get current user
+    @JsonView(UserBasicView.class)
+    @Operation(summary = "Get current user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserBasicView.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+    })
+    @GetMapping("/users/me")
+    public ResponseEntity<User> getCurrentUser(HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // No user logged in
+        }
+        User user = userService.getUserByUsername(principal.getName());
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
+    }
+
     // Get User Info by username
     @JsonView(UserBasicView.class)
     @Operation(summary = "Get user by username or email")

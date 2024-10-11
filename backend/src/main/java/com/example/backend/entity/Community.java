@@ -21,38 +21,10 @@ import java.util.Objects;
 @Entity
 public class Community {
 
-    @Embeddable
-    public class BanInfo {
-
-        private LocalDateTime banUntil;
-        private String banReason;
-
-        public BanInfo() {
-        }
-
-        public BanInfo(LocalDateTime banUntil, String banReason) {
-            this.banUntil = banUntil;
-            this.banReason = banReason;
-        }
-
-        public LocalDateTime getBanUntil() {
-            return banUntil;
-        }
-
-        public void setBanUntil(LocalDateTime banUntil) {
-            this.banUntil = banUntil;
-        }
-
-        public String getBanReason() {
-            return banReason;
-        }
-
-        public void setBanReason(String banReason) {
-            this.banReason = banReason;
-        }
+    public interface NameInfo {
     }
 
-    public interface BasicInfo {
+    public interface BasicInfo  extends NameInfo {
     }
 
     public interface UsersInfo {
@@ -62,9 +34,10 @@ public class Community {
     // by underscores
     @Id
     @JsonView(BasicInfo.class)
-    private String identifier;
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
+    private Long identifier;
 
-    @JsonView(BasicInfo.class)
+    @JsonView(NameInfo.class)
     private String name;
 
     @JsonView(BasicInfo.class)
@@ -116,11 +89,9 @@ public class Community {
     @JsonView(BasicInfo.class) // Modification date (last post)
     private LocalDateTime fullLastPostDate = LocalDateTime.of(lastPostDate, lastPostTime);
 
-    @JsonView(UsersInfo.class) // banned users map: username - localdatetime (ban until) - String (reason)
-    @ElementCollection
-    @CollectionTable(name = "banned_users", joinColumns = @JoinColumn(name = "community_id"))
-    @MapKeyJoinColumn(name = "user_id")
-    private Map<User, BanInfo> bannedUsers = new HashMap<>();
+    @JsonView(UsersInfo.class) // banned users List of Ban Entities
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
+    private List<Ban> bannedUsers = new ArrayList<>();
 
     public Community() {
     }
@@ -129,7 +100,6 @@ public class Community {
         this.name = name;
         this.admin = admin;
         this.members.add(admin);
-        this.identifier = name.replace(" ", "_");
         this.description = description;
         this.bannerString = Objects.requireNonNullElse(banner, "default_community_banner.jpg");
     }
@@ -155,8 +125,11 @@ public class Community {
     }
 
     public void banUser(User user, LocalDateTime duration, String reason) {
-        this.bannedUsers.put(user, new BanInfo(duration, reason));
-
+        Ban ban = new Ban(user, this, reason, duration);
+        this.bannedUsers.add(ban);
     }
 
+    public void unbanUser(User user) {
+        this.bannedUsers.removeIf(ban -> ban.getUser().equals(user));
+    }
 }

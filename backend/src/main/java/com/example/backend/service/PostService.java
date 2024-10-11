@@ -30,7 +30,7 @@ public class PostService {
         return postRepository.findByAuthorUsername(author, pageable);
     }
 
-    public Page<Post> getPostsByCommunity(String community, Pageable pageable) {
+    public Page<Post> getPostsByCommunity(Long community, Pageable pageable) {
         return postRepository.findByCommunityIdentifier(community, pageable);
     }
 
@@ -56,7 +56,7 @@ public class PostService {
         };
     }
 
-    public Page<Post> searchPostsByCommunityIdentifier (String communityIdentifier, String query, Pageable pageable, String order, boolean searchOnContent) {
+    public Page<Post> searchPostsByCommunityIdentifier (Long communityIdentifier, String query, Pageable pageable, String order, boolean searchOnContent) {
         if (searchOnContent) {
             return switch (order) {
                 case "creationDate" -> postRepository.findByCommunityIdentifierAndQueryOrderByCreationDate(communityIdentifier, query, pageable);

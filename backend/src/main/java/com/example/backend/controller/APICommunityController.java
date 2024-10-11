@@ -2,7 +2,6 @@ package com.example.backend.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.classfile.constantpool.StringEntry;
 import java.net.URI;
 import java.security.Principal;
 import java.sql.Blob;
@@ -16,12 +15,9 @@ import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -38,8 +34,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import com.example.backend.entity.Ban;
 import com.example.backend.entity.Community;
-import com.example.backend.entity.Community.BanInfo;
 import com.example.backend.entity.User;
 import com.example.backend.entity.Post;
 
@@ -56,7 +52,10 @@ public class APICommunityController {
     interface CommunityUsersInfo extends Community.UsersInfo, User.BasicInfo {
     }
 
-    interface CommunityPostsBasicInfo extends Post.BasicInfo, User.UsernameInfo {
+    interface CommunityPostsBasicInfo extends Post.CommunityInfo, User.UsernameInfo, Community.NameInfo {
+    }
+
+    interface CommunityBanInfo extends Ban.BasicInfo {
     }
 
     public APICommunityController(CommunityService communityService, PostService postService, UserService userService) {
@@ -76,7 +75,7 @@ public class APICommunityController {
             @ApiResponse(responseCode = "404", description = "Community not found", content = @Content)
     })
     @GetMapping("/communities/{id}")
-    public ResponseEntity<Community> getCommunityById(@PathVariable String id) {
+    public ResponseEntity<Community> getCommunityById(@PathVariable Long id) {
         Community community = communityService.getCommunityById(id);
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -89,11 +88,11 @@ public class APICommunityController {
     // description, admin, default, general) DEFAULT = by name and description
     @JsonView(CommunityBasicInfo.class)
     @Operation(summary = "Get communities by specified criteria and sort:\n"
-            + "Default: search by name and description. Sortings: creationDate, members, lastPostDate\n"
-            + "General: get all communities (no query). Sortings: creationDate, lastPostDate, members\n"
+            + "Default: search by name and description. Sortings: creationDate, members, lastPostDate, alphabetical (default)\n"
+            + "General: get all communities (no query). Sortings: creationDate, lastPostDate, members, alphabetical (default)\n"
             + "Admin: get communities by admin username. Sortings: NONE\n"
-            + "Name: search by name. Sortings: creationDate, lastPostDate, members\n"
-            + "Description: search by description. Sortings: creationDate, lastPostDate, members\n")
+            + "Name: search by name. Sortings: creationDate, lastPostDate, members, alphabetical (default)\n"
+            + "Description: search by description. Sortings: creationDate, lastPostDate, members, alphabetical (default)\n")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found communities", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBasicInfo.class))
@@ -103,7 +102,8 @@ public class APICommunityController {
             @ApiResponse(responseCode = "400", description = "Missing parameter", content = @Content)
     })
     @GetMapping("/communities")
-    public ResponseEntity<List<Community>> getCommunitiesByName(@RequestParam String query, @RequestParam int page,
+    public ResponseEntity<List<Community>> getCommunitiesByName(@RequestParam(required = false) String query,
+            @RequestParam int page,
             @RequestParam int size, @RequestParam(required = false) String sort,
             @RequestParam(required = true) String by) {
         Pageable pageable = PageRequest.of(page, size);
@@ -137,24 +137,28 @@ public class APICommunityController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found members", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
-
             }),
             @ApiResponse(responseCode = "404", description = "Community not found", content = @Content),
             @ApiResponse(responseCode = "400", description = "Missing parameter", content = @Content)
     })
     @JsonView(CommunityUsersInfo.class)
     @GetMapping("/communities/{id}/users")
-    public ResponseEntity<Object> getMembers(@PathVariable String id, @RequestParam int page, @RequestParam int size,
+    public ResponseEntity<Object> getMembers(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "false") boolean count) {
+
         Pageable pageable = PageRequest.of(page, size);
         if (count) {
-            return new ResponseEntity<>(communityService.getNumberOfUsers(id), HttpStatus.OK);
+            int numberOfUsers = communityService.getNumberOfUsers(id);
+            return new ResponseEntity<>(numberOfUsers, HttpStatus.OK);
         } else {
             Page<User> members = communityService.getMembers(id, pageable);
             if (members.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
-                return new ResponseEntity<>(members, HttpStatus.OK);
+                return new ResponseEntity<>(members.getContent(), HttpStatus.OK);
             }
         }
     }
@@ -171,11 +175,11 @@ public class APICommunityController {
     })
     @JsonView(CommunityUsersInfo.class)
     @GetMapping("/communities/{id}/moderators")
-    public ResponseEntity<List<User>> getModerators(@PathVariable String id, @RequestParam int page,
+    public ResponseEntity<List<User>> getModerators(@PathVariable Long id, @RequestParam int page,
             @RequestParam int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<User> moderators = communityService.getModerators(id, pageable);
-        if (moderators.isEmpty()) {
+        if (communityService.getCommunityById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(moderators.getContent(), HttpStatus.OK);
@@ -186,21 +190,23 @@ public class APICommunityController {
     @Operation(summary = "Get admin of a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the admin", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Community not found", content = @Content)
     })
+    @JsonView(CommunityUsersInfo.class)
     @GetMapping("/communities/{id}/admins")
-    public ResponseEntity<User> getAdmin(@PathVariable String id) {
+    public ResponseEntity<User> getAdmin(@PathVariable Long id) {
         User admin = communityService.getAdmin(id);
-        if (admin == null) {
+        if (communityService.getCommunityById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(admin, HttpStatus.OK);
         }
     }
 
+    // Get posts of a community
     @Operation(summary = "Get posts of a community using its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the posts", content = {
@@ -209,14 +215,15 @@ public class APICommunityController {
             }),
             @ApiResponse(responseCode = "404", description = "Community not found", content = @Content)
     })
+    @JsonView(CommunityPostsBasicInfo.class)
     @GetMapping("/communities/{communityID}/posts")
     public ResponseEntity<Object> getCommunityPosts( // Search for posts inside a community (all variants of searching
                                                      // posts by community ID)
-            @PathVariable String communityID,
+            @PathVariable Long communityID,
             @RequestParam(value = "count", required = false, defaultValue = "false") boolean count,
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
-            @RequestParam(value = "sort", required = false, defaultValue = "latest") String sort,
+            @RequestParam(value = "sort", required = false, defaultValue = "lastModifiedDate") String sort,
             @RequestParam(value = "query", required = false) String query) {
 
         Community community = communityService.getCommunityById(communityID);
@@ -238,7 +245,7 @@ public class APICommunityController {
             if (posts.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
-                return new ResponseEntity<>(posts, HttpStatus.OK);
+                return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
             }
         }
     }
@@ -257,11 +264,23 @@ public class APICommunityController {
     })
     @JsonView(CommunityBasicInfo.class)
     @PutMapping("/communities/{id}")
-    public ResponseEntity<Community> updateCommunity(HttpServletRequest request, @PathVariable String id,
+    public ResponseEntity<Community> updateCommunity(HttpServletRequest request, @PathVariable Long id,
             @RequestBody Map<String, String> body) {
         Community community = communityService.getCommunityById(id);
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // is user logged in
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is user the admin of the community? or a site admin?
+        String username = request.getUserPrincipal().getName();
+        if (!community.getAdmin().getUsername().equals(username)
+                && !userService.getUserByUsername(username).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         if (body.containsKey("name")) {
@@ -272,7 +291,6 @@ public class APICommunityController {
         }
         if (body.containsKey("admin")) {
             // check that the user performing the request is the admin of the community
-            String username = request.getUserPrincipal().getName();
             if (!community.getAdmin().getUsername().equals(username)) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
@@ -299,15 +317,22 @@ public class APICommunityController {
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
     @DeleteMapping("/communities/{id}")
-    public ResponseEntity<String> deleteCommunity(HttpServletRequest request, @PathVariable String id) {
+    public ResponseEntity<String> deleteCommunity(HttpServletRequest request, @PathVariable Long id) {
         Community community = communityService.getCommunityById(id);
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // check that the user performing the request is the admin of the community
+        // is user logged in
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // check that the user performing the request is the admin of the community or a
+        // site admin
         String username = request.getUserPrincipal().getName();
-        if (!community.getAdmin().getUsername().equals(username)) {
+        if (!community.getAdmin().getUsername().equals(username)
+                && !userService.getUserByUsername(username).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -324,12 +349,19 @@ public class APICommunityController {
             }),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Conflict", content = @Content)
     })
     @JsonView(CommunityBasicInfo.class)
     @PostMapping("/communities")
     public ResponseEntity<Community> createCommunity(HttpServletRequest request,
             @RequestBody Map<String, String> body) {
+
+        // is user logged in
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         String username = request.getUserPrincipal().getName();
         User admin = userService.getUserByUsername(username);
         if (admin == null) {
@@ -340,11 +372,13 @@ public class APICommunityController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        // Does a community with the same name already exist?
+        if (communityService.doesCommunityExist(body.get("name"))) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
         // Create community
-        Community community = new Community();
-        community.setName(body.get("name"));
-        community.setDescription(body.get("description"));
-        community.setAdmin(admin);
+        Community community = new Community(body.get("name"), body.get("description"), null, admin);
         communityService.saveCommunity(community);
 
         // Resource URL (location header)
@@ -355,11 +389,12 @@ public class APICommunityController {
         return ResponseEntity.created(location).body(community);
     }
 
-    // Add user to community (join)
-    @Operation(summary = "Add a user to a community")
+    // Manage users in community (add, remove, ban, unban)
+    // ban durations: day, week, 2weeks, month, 6months, year, forever
+    @Operation(summary = "Add, remove or ban a user from a community")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Added the user to the community", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
+            @ApiResponse(responseCode = "200", description = "Action succesfully performed", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
@@ -367,16 +402,49 @@ public class APICommunityController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
     })
     @PutMapping("/communities/{id}/users/{username}")
-    public ResponseEntity<Community> addUserToCommunity(HttpServletRequest request, @PathVariable String id,
-            @PathVariable String username) {
+    @JsonView(CommunityUsersInfo.class)
+    public ResponseEntity<Community> manageCommunityUsers(HttpServletRequest request, @PathVariable Long id,
+            @PathVariable String username, @RequestParam(required = true) String action,
+            @RequestParam(required = false) String duration, @RequestParam(required = false) String reason) {
         Community community = communityService.getCommunityById(id);
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         // check that the user performing the request is logged in
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is action valid?
+        if (action == null || (!action.equals("join") && !action.equals("leave") && !action.equals("ban")
+                && !action.equals("unban"))) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        switch (action) {
+            case "join":
+                return addUserToCommunity(request, community, username);
+            case "leave":
+                return removeUserFromCommunity(request, community, username);
+            case "ban":
+                return banUserFromCommunity(request, community, username, duration, reason);
+            case "unban":
+                return unbanUserFromCommunity(request, community, username);
+            default:
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private ResponseEntity<Community> addUserToCommunity(HttpServletRequest request, Community community,
+            String username) {
+
+        // check that the user performing the request is the user being added or a site
+        // admin
         String requesterUsername = request.getUserPrincipal().getName();
-        if (!requesterUsername.equals(username)) {
+
+        if (!requesterUsername.equals(username)
+                && !userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -386,8 +454,7 @@ public class APICommunityController {
         }
 
         // check ban
-        Map<User, BanInfo> bannedUsers = community.getBannedUsers();
-        if (bannedUsers.containsKey(user)) {
+        if (communityService.isUserBannedFromCommunity(user.getUsername(), community.getIdentifier())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -395,28 +462,13 @@ public class APICommunityController {
         return new ResponseEntity<>(community, HttpStatus.OK);
     }
 
-    // Remove user from community (leave)
-    @Operation(summary = "Remove a user from a community")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Removed the user from the community", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
-
-            }),
-            @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
-    })
-    @DeleteMapping("/communities/{id}/users/{username}")
-    public ResponseEntity<Community> removeUserFromCommunity(HttpServletRequest request, @PathVariable String id,
-            @PathVariable String username) {
-        Community community = communityService.getCommunityById(id);
-        if (community == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        // check that the user performing the request is logged in
+    private ResponseEntity<Community> removeUserFromCommunity(HttpServletRequest request, Community community,
+            String username) {
+        // check that the user performing the request is the user being removed or a
+        // site admin
         String requesterUsername = request.getUserPrincipal().getName();
-        if (!requesterUsername.equals(username)) {
+        if (!requesterUsername.equals(username)
+                && !userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -429,11 +481,84 @@ public class APICommunityController {
         return new ResponseEntity<>(community, HttpStatus.OK);
     }
 
-    // Add moderator to community
-    @Operation(summary = "Add a moderator to a community")
+    // Ban user from community (can be banned for a day, 1 week, 2 weeks, 1 month, 6
+    // months, a year or forever)
+    private ResponseEntity<Community> banUserFromCommunity(HttpServletRequest request, Community community,
+            String username, String duration, String reason) {
+        // check that the user performing the request is the admin or a moderator of the
+        // community
+        String requesterUsername = request.getUserPrincipal().getName();
+        if (!community.getAdmin().getUsername().equals(requesterUsername)
+                && !communityService.isUserModeratorOfCommunity(requesterUsername, community.getIdentifier())
+                && !userService
+                        .getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        switch (duration) {
+            case "day":
+                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 1, reason);
+                break;
+            case "week":
+                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 7, reason);
+                break;
+            case "2weeks":
+                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 14, reason);
+                break;
+            case "month":
+                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 30, reason);
+                break;
+            case "6months":
+                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 180, reason);
+                break;
+            case "year":
+                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 365, reason);
+                break;
+            case "forever":
+                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), -1, reason);
+                break;
+            default:
+                return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        return new ResponseEntity<>(community, HttpStatus.OK);
+    }
+
+    // Unban user from community
+    private ResponseEntity<Community> unbanUserFromCommunity(HttpServletRequest request, Community community,
+            String username) {
+        // check that the user performing the request is the admin or a moderator of the
+        // community
+        String requesterUsername = request.getUserPrincipal().getName();
+        if (!community.getAdmin().getUsername().equals(requesterUsername)
+                && !communityService.isUserModeratorOfCommunity(requesterUsername, community.getIdentifier())
+                && !userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        // check if user is banned
+        if (!communityService.isUserBannedFromCommunity(user.getUsername(), community.getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        communityService.unbanUserFromCommunity(user.getUsername(), community.getIdentifier());
+        return new ResponseEntity<>(community, HttpStatus.OK);
+    }
+
+    // Modify moderators
+    @Operation(summary = "Add or remove a moderator from a community")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Added the moderator to the community", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
+            @ApiResponse(responseCode = "200", description = "Action succesfully performed", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
@@ -441,16 +566,19 @@ public class APICommunityController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
     })
     @PutMapping("/communities/{id}/moderators/{username}")
-    public ResponseEntity<Community> addModeratorToCommunity(HttpServletRequest request, @PathVariable String id,
-            @PathVariable String username) {
+    @JsonView(CommunityUsersInfo.class)
+    public ResponseEntity<Community> manageModerators(HttpServletRequest request, @PathVariable Long id,
+            @PathVariable String username, @RequestParam(required = true) String action) {
         Community community = communityService.getCommunityById(id);
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // check that the user performing the request is the admin of the community
+        // check that the user performing the request is the admin of the community or a
+        // site admin
         String requesterUsername = request.getUserPrincipal().getName();
-        if (!community.getAdmin().getUsername().equals(requesterUsername)) {
+        if (!community.getAdmin().getUsername().equals(requesterUsername) && !userService
+                .getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -459,41 +587,16 @@ public class APICommunityController {
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        communityService.promoteUserToModerator(user.getUsername(), community.getIdentifier());
-        return new ResponseEntity<>(community, HttpStatus.OK);
-    }
-
-    // Remove moderator from community
-    @Operation(summary = "Remove a moderator from a community")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Removed the moderator from the community", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
-
-            }),
-            @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
-    })
-    @DeleteMapping("/communities/{id}/moderators/{username}")
-    public ResponseEntity<Community> removeModeratorFromCommunity(HttpServletRequest request, @PathVariable String id,
-            @PathVariable String username) {
-        Community community = communityService.getCommunityById(id);
-        if (community == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        switch (action) {
+            case "add":
+                communityService.promoteUserToModerator(user.getUsername(), community.getIdentifier());
+                break;
+            case "remove":
+                communityService.demoteUserFromModerator(user.getUsername(), community.getIdentifier());
+                break;
+            default:
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        // check that the user performing the request is the admin of the community
-        String requesterUsername = request.getUserPrincipal().getName();
-        if (!community.getAdmin().getUsername().equals(requesterUsername)) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
-        User user = userService.getUserByUsername(username);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-
-        communityService.demoteUserFromModerator(user.getUsername(), community.getIdentifier());
         return new ResponseEntity<>(community, HttpStatus.OK);
     }
 
@@ -511,7 +614,7 @@ public class APICommunityController {
     })
     @JsonView(CommunityBasicInfo.class)
     @PutMapping("/communities/{id}/pictures")
-    public ResponseEntity<Object> uploadCommunityBanner(HttpServletRequest request, @PathVariable String id,
+    public ResponseEntity<Object> uploadCommunityBanner(HttpServletRequest request, @PathVariable Long id,
             @RequestParam MultipartFile file) throws IOException {
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
@@ -524,8 +627,14 @@ public class APICommunityController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // is user the admin of the community?
-        if (!community.getAdmin().getUsername().equals(principal.getName())) {
+        // is user logged in
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is user the admin of the community? or a site admin?
+        if (!community.getAdmin().getUsername().equals(principal.getName()) && !userService
+                .getUserByUsername(principal.getName()).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -570,7 +679,7 @@ public class APICommunityController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
     })
     @GetMapping("/communities/{id}/pictures")
-    public ResponseEntity<Object> getCommunityBanner(@PathVariable String id) {
+    public ResponseEntity<Object> getCommunityBanner(@PathVariable Long id) {
         Community community = communityService.getCommunityById(id);
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -590,29 +699,37 @@ public class APICommunityController {
         }
     }
 
-    // Ban user from community (can be banned for a day, 1 week, 2 weeks, 1 month, 6
-    // months, a year or forever)
-    @Operation(summary = "Ban a user from a community")
+    // Get ban info of a user in a community
+    @Operation(summary = "Get ban info of a user in a community")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Banned the user from the community", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
+            @ApiResponse(responseCode = "200", description = "Found the ban info", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBanInfo.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
     })
-    @PutMapping("/communities/{id}/bans/{username}")
-    public ResponseEntity<Community> banUserFromCommunity(HttpServletRequest request, @PathVariable String id,
-            @PathVariable String username, @RequestParam String duration, @RequestParam String reason) {
+    @JsonView(CommunityBanInfo.class)
+    @GetMapping("/communities/{id}/bans/{username}")
+    public ResponseEntity<Object> getBanInfo(HttpServletRequest request, @PathVariable Long id,
+            @PathVariable String username, @RequestParam(required = false) String banInfo) {
         Community community = communityService.getCommunityById(id);
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // is user logged in
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
-        // check that the user performing the request is the admin of the community
+        // check that the user performing the request is the admin of the community, a
+        // mod or the user being banned
         String requesterUsername = request.getUserPrincipal().getName();
-        if (!community.getAdmin().getUsername().equals(requesterUsername)) {
+        if (!requesterUsername.equals(username)
+                && !userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN") && !communityService
+                        .isUserModeratorOfCommunity(requesterUsername, id) && !community.getAdmin().getUsername()
+                                .equals(requesterUsername)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -621,32 +738,75 @@ public class APICommunityController {
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        switch (duration) {
-            case "day":
-                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 1, reason);
-                break;
-            case "week":
-                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 7, reason);
-                break;
-            case "2weeks":
-                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 14, reason);
-                break;
-            case "month":
-                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 30, reason);
-                break;
-            case "6months":
-                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 180, reason);
-                break;
-            case "year":
-                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 365, reason);
-                break;
-            case "forever":
-                communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), -1, reason);
-                break;
-            default:
-                return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        // does ban exist?
+        if (!communityService.isUserBannedFromCommunity(user.getUsername(), id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(community, HttpStatus.OK);
+
+        String banReason = communityService.getBanReason(user.getUsername(), id);
+        LocalDateTime banUntil = communityService.getBanDuration(user.getUsername(), id);
+
+        // is ban over?
+        if (banUntil != null && banUntil.isBefore(LocalDateTime.now())) {
+            communityService.unbanUserFromCommunity(user.getUsername(), id);
+            banReason = null;
+            banUntil = null;
+        }
+
+        if (banReason == null || banUntil == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        switch (banInfo) {
+            case "reason":
+                return new ResponseEntity<>(banReason, HttpStatus.OK);
+            case "duration":
+                return new ResponseEntity<>(banUntil, HttpStatus.OK);
+            case "status": // true = banned, false = not banned
+                return new ResponseEntity<>(true, HttpStatus.OK);
+            default:
+                // return a Ban
+                return new ResponseEntity<>(communityService.getBan(user.getUsername(), id), HttpStatus.OK);
+
+        }
+
     }
 
+    // Get all banned users in a community (pageable)
+    @Operation(summary = "Get all banned users in a community")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the banned users", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
+
+            }),
+            @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
+    })
+    @JsonView(CommunityUsersInfo.class)
+    @GetMapping("/communities/{id}/users/banned")
+    public ResponseEntity<List<Ban>> getBannedUsers(HttpServletRequest request, @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        // is user logged in
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // check that the user performing the request is the admin or a moderator of the
+        // community
+        String requesterUsername = request.getUserPrincipal().getName();
+        if (!communityService.getCommunityById(id).getAdmin().getUsername().equals(requesterUsername)
+                && !communityService.isUserModeratorOfCommunity(requesterUsername, id) && !userService
+                        .getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Ban> bans = communityService.getBannedUsers(id, pageable);
+        if (bans.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(bans.getContent(), HttpStatus.OK);
+        }
+    }
 }
