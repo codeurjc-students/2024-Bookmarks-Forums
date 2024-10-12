@@ -259,6 +259,17 @@ public class CommunityService {
         }
     }
 
+    // Given the ban id, unban the user
+    public void unbanUserFromCommunityById(Long banId) {
+        Ban ban = communityRepository.getBanById(banId);
+        if (ban != null) {
+            Community community = ban.getCommunity();
+            User user = ban.getUser();
+            community.unbanUser(user);
+            communityRepository.save(community);
+        }
+    }
+
     // Given username and communityId, check if the user is banned from the community
     public boolean isUserBannedFromCommunity(String username, Long communityId) {
         User user = userRepository.findByUsername(username);
@@ -286,6 +297,11 @@ public class CommunityService {
     // Given username and communityId, return the ban of the user in the community
     public Ban getBan(String username, Long communityId) {
         return communityRepository.getBan(communityId, username);
+    }
+
+    // Get ban by id
+    public Ban getBanById(Long id) {
+        return communityRepository.getBanById(id);
     }
 
 }

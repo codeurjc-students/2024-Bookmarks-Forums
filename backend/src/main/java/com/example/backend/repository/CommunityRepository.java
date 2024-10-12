@@ -120,4 +120,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         @Query("SELECT b FROM Ban b WHERE b.community.identifier = :communityId AND b.user.username = :username")
         Ban getBan(long communityId, String username);
 
+        // Get a specific ban of a community given the ban id
+        @Query("SELECT b FROM Ban b WHERE b.id = :banId")
+        Ban getBanById(long banId);
+
 }

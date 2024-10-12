@@ -66,5 +66,17 @@ public class Ban {
     public void setBanUntil(LocalDateTime banUntil) {
         this.banUntil = banUntil;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Community getCommunity() {
+        return community;
+    }
+
+    public void setCommunity(Community community) {
+        this.community = community;
+    }
     
 }

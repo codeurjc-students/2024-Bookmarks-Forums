@@ -417,8 +417,7 @@ public class APICommunityController {
         }
 
         // is action valid?
-        if (action == null || (!action.equals("join") && !action.equals("leave") && !action.equals("ban")
-                && !action.equals("unban"))) {
+        if (action == null || (!action.equals("join") && !action.equals("leave"))) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -427,10 +426,6 @@ public class APICommunityController {
                 return addUserToCommunity(request, community, username);
             case "leave":
                 return removeUserFromCommunity(request, community, username);
-            case "ban":
-                return banUserFromCommunity(request, community, username, duration, reason);
-            case "unban":
-                return unbanUserFromCommunity(request, community, username);
             default:
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -483,20 +478,46 @@ public class APICommunityController {
 
     // Ban user from community (can be banned for a day, 1 week, 2 weeks, 1 month, 6
     // months, a year or forever)
-    private ResponseEntity<Community> banUserFromCommunity(HttpServletRequest request, Community community,
-            String username, String duration, String reason) {
+    @Operation(summary = "Ban a user from a community")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Banned the user from the community", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Ban.class))
+
+            }),
+            @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
+    })
+    @PostMapping("/bans")
+    @JsonView(Ban.BasicInfo.class)
+    public ResponseEntity<Ban> banUser(HttpServletRequest request, @RequestParam Long communityID,
+            @RequestParam String username, @RequestParam String duration, @RequestParam String reason) {
+        Community community = communityService.getCommunityById(communityID);
+        if (community == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // is user logged in
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // check that the user performing the request is the admin or a moderator of the
         // community
         String requesterUsername = request.getUserPrincipal().getName();
         if (!community.getAdmin().getUsername().equals(requesterUsername)
                 && !communityService.isUserModeratorOfCommunity(requesterUsername, community.getIdentifier())
-                && !userService
-                        .getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
+                && !userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         User user = userService.getUserByUsername(username);
         if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        // check if user is already banned
+        if (communityService.isUserBannedFromCommunity(user.getUsername(), community.getIdentifier())) {
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
@@ -525,33 +546,42 @@ public class APICommunityController {
             default:
                 return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        return new ResponseEntity<>(community, HttpStatus.OK);
+
+        Ban ban = communityService.getBan(user.getUsername(), community.getIdentifier());
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(ban.getId()).toUri();
+        return ResponseEntity.created(location).body(ban);
     }
 
     // Unban user from community
-    private ResponseEntity<Community> unbanUserFromCommunity(HttpServletRequest request, Community community,
-            String username) {
+    @Operation(summary = "Unban a user from a community")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Unbanned the user from the community", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
+
+            }),
+            @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
+    })
+    @DeleteMapping("/bans/{id}")
+    public ResponseEntity<String> unbanUser(HttpServletRequest request, @PathVariable Long id) {
+        Ban ban = communityService.getBanById(id);
+        if (ban == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         // check that the user performing the request is the admin or a moderator of the
         // community
         String requesterUsername = request.getUserPrincipal().getName();
-        if (!community.getAdmin().getUsername().equals(requesterUsername)
-                && !communityService.isUserModeratorOfCommunity(requesterUsername, community.getIdentifier())
+        if (!communityService.isUserModeratorOfCommunity(requesterUsername, ban.getCommunity().getIdentifier())
+                && !ban.getCommunity().getAdmin().getUsername().equals(requesterUsername)
                 && !userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        User user = userService.getUserByUsername(username);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-
-        // check if user is banned
-        if (!communityService.isUserBannedFromCommunity(user.getUsername(), community.getIdentifier())) {
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-
-        communityService.unbanUserFromCommunity(user.getUsername(), community.getIdentifier());
-        return new ResponseEntity<>(community, HttpStatus.OK);
+        communityService.unbanUserFromCommunityById(id);
+        return new ResponseEntity<>("Ban removed", HttpStatus.OK);
     }
 
     // Modify moderators
@@ -711,44 +741,44 @@ public class APICommunityController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
     })
     @JsonView(CommunityBanInfo.class)
-    @GetMapping("/communities/{id}/bans/{username}")
+    @GetMapping("/bans/{id}")
     public ResponseEntity<Object> getBanInfo(HttpServletRequest request, @PathVariable Long id,
-            @PathVariable String username, @RequestParam(required = false) String banInfo) {
-        Community community = communityService.getCommunityById(id);
-        if (community == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+            @RequestParam(required = false) String banInfo) {
+
         // is user logged in
         if (request.getUserPrincipal() == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        // check that the user performing the request is the admin of the community, a
-        // mod or the user being banned
-        String requesterUsername = request.getUserPrincipal().getName();
-        if (!requesterUsername.equals(username)
-                && !userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN") && !communityService
-                        .isUserModeratorOfCommunity(requesterUsername, id) && !community.getAdmin().getUsername()
-                                .equals(requesterUsername)) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
-        User user = userService.getUserByUsername(username);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-
         // does ban exist?
-        if (!communityService.isUserBannedFromCommunity(user.getUsername(), id)) {
+        if (communityService.getBanById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        String banReason = communityService.getBanReason(user.getUsername(), id);
-        LocalDateTime banUntil = communityService.getBanDuration(user.getUsername(), id);
+        Ban ban = communityService.getBanById(id);
+
+        Community community = communityService.getCommunityById(ban.getCommunity().getIdentifier());
+        if (community == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // check that the user performing the request is the admin of the community, a
+        // mod or the user being banned
+        String requesterUsername = request.getUserPrincipal().getName();
+        if (!requesterUsername.equals(ban.getUser().getUsername())
+                && !userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN") && !communityService
+                        .isUserModeratorOfCommunity(requesterUsername, community.getIdentifier())
+                && !community.getAdmin().getUsername()
+                        .equals(requesterUsername)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String banReason = ban.getBanReason();
+        LocalDateTime banUntil = ban.getBanUntil();
 
         // is ban over?
         if (banUntil != null && banUntil.isBefore(LocalDateTime.now())) {
-            communityService.unbanUserFromCommunity(user.getUsername(), id);
+            communityService.unbanUserFromCommunityById(id);
             banReason = null;
             banUntil = null;
         }
@@ -757,16 +787,18 @@ public class APICommunityController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        String banUntilFormatted = banUntil.toString();
+
         switch (banInfo) {
             case "reason":
                 return new ResponseEntity<>(banReason, HttpStatus.OK);
             case "duration":
-                return new ResponseEntity<>(banUntil, HttpStatus.OK);
+                return new ResponseEntity<>(banUntilFormatted, HttpStatus.OK);
             case "status": // true = banned, false = not banned
                 return new ResponseEntity<>(true, HttpStatus.OK);
             default:
                 // return a Ban
-                return new ResponseEntity<>(communityService.getBan(user.getUsername(), id), HttpStatus.OK);
+                return new ResponseEntity<>(communityService.getBanById(id), HttpStatus.OK);
 
         }
 
@@ -776,20 +808,25 @@ public class APICommunityController {
     @Operation(summary = "Get all banned users in a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the banned users", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBanInfo.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
     })
-    @JsonView(CommunityUsersInfo.class)
-    @GetMapping("/communities/{id}/users/banned")
+    @JsonView(CommunityBanInfo.class)
+    @GetMapping("/bans/communities/{id}")
     public ResponseEntity<List<Ban>> getBannedUsers(HttpServletRequest request, @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         // is user logged in
         if (request.getUserPrincipal() == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // does community exist?
+        if (communityService.getCommunityById(id) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         // check that the user performing the request is the admin or a moderator of the
