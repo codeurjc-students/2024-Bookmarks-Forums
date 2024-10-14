@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.xml.stream.events.Comment;
-
 @Service
 public class CommunityService {
 

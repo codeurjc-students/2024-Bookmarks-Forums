@@ -2,9 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.entity.Post;
 import com.example.backend.entity.User;
-import com.example.backend.repository.CommunityRepository;
 import com.example.backend.repository.PostRepository;
-import com.example.backend.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,14 +14,8 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    private final CommunityRepository communityRepository;
-
-    private final UserRepository userRepository;
-
-    public PostService(PostRepository postRepository, CommunityRepository communityRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository) {
         this.postRepository = postRepository;
-        this.communityRepository = communityRepository;
-        this.userRepository = userRepository;
     }
 
     public Page<Post> getPostsByAuthor(String author, Pageable pageable) {

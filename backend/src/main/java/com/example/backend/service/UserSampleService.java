@@ -11,8 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.rowset.serial.SerialException;
-
 @Service
 public class UserSampleService {
     /*

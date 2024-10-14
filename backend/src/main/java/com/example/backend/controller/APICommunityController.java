@@ -206,50 +206,6 @@ public class APICommunityController {
         }
     }
 
-    // Get posts of a community
-    @Operation(summary = "Get posts of a community using its ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Found the posts", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityPostsBasicInfo.class))
-
-            }),
-            @ApiResponse(responseCode = "404", description = "Community not found", content = @Content)
-    })
-    @JsonView(CommunityPostsBasicInfo.class)
-    @GetMapping("/communities/{communityID}/posts")
-    public ResponseEntity<Object> getCommunityPosts( // Search for posts inside a community (all variants of searching
-                                                     // posts by community ID)
-            @PathVariable Long communityID,
-            @RequestParam(value = "count", required = false, defaultValue = "false") boolean count,
-            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size,
-            @RequestParam(value = "sort", required = false, defaultValue = "lastModifiedDate") String sort,
-            @RequestParam(value = "query", required = false) String query) {
-
-        Community community = communityService.getCommunityById(communityID);
-        if (community == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        if (count) {
-            return new ResponseEntity<>(communityService.getNumberOfPosts(communityID), HttpStatus.OK);
-        } else {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Post> posts = null;
-            if (query == null || query.isEmpty()) {
-                posts = postService.searchPostsByCommunityIdentifier(communityID, "", pageable, sort, false);
-            } else {
-                posts = postService.searchPostsByCommunityIdentifier(communityID, query, pageable, sort, true);
-            }
-
-            if (posts.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            } else {
-                return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
-            }
-        }
-    }
-
     // Update community (format this as the UserController update method)
     @Operation(summary = "Update a community")
     @ApiResponses(value = {
