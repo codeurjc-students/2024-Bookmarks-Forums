@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import com.example.backend.dto.PostDTO;
 import com.example.backend.entity.Community;
 import com.example.backend.entity.User;
 import com.example.backend.entity.Post;
@@ -161,13 +162,18 @@ public class APIPostController {
     })
     @JsonView(PostInfo.class)
     @PostMapping("/communities/{communityID}/posts")
-    public ResponseEntity<Post> createPost(HttpServletRequest request, @RequestBody Map<String, String> body,
-            @PathVariable Long communityID, @RequestParam(required = false) MultipartFile image) {
+    public ResponseEntity<Post> createPost(HttpServletRequest request, @ModelAttribute PostDTO postDTO,
+            @PathVariable Long communityID) {
 
         // is user logged in?
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // does the community exist?
+        if (communityService.getCommunityById(communityID) == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         // is the user a member of the community?
@@ -178,15 +184,15 @@ public class APIPostController {
         }
 
         // does the post have a title and content?
-        String title = body.get("title");
-        String content = body.get("content");
-        if (title == null || title.isEmpty() || content == null || content.isEmpty()) {
+        if (postDTO.getTitle() == null || postDTO.getTitle().isEmpty() || postDTO.getContent() == null
+                || postDTO.getContent().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Post post = new Post(title, content, author, community);
+        Post post = new Post(postDTO.getTitle(), postDTO.getContent(), author, community);
 
-        // image
+        // image (optional)
+        MultipartFile image = postDTO.getImage();
         if (image != null) {
             try (InputStream is = image.getInputStream()) {
                 try {
@@ -225,7 +231,7 @@ public class APIPostController {
     @JsonView(PostInfo.class)
     @PutMapping("/posts/{postId}")
     public ResponseEntity<Post> editPost(HttpServletRequest request, @PathVariable Long postId,
-            @RequestBody Map<String, String> body, @RequestParam(required = true) String action) {
+            @ModelAttribute PostDTO postDTO, @RequestParam(required = true) String action) {
 
         // is user logged in?
         Principal principal = request.getUserPrincipal();
@@ -242,29 +248,54 @@ public class APIPostController {
         // upvote or downvote
         switch (action) {
             case "upvote":
-            postService.upvotePost(post);
-            return new ResponseEntity<>(post, HttpStatus.OK);
+            // TODO: check if the user has already upvoted the post
+                postService.upvotePost(post);
+                return new ResponseEntity<>(post, HttpStatus.OK);
             case "downvote":
-            postService.downvotePost(post);
-            return new ResponseEntity<>(post, HttpStatus.OK);
+            // TODO: check if the user has already downvoted the post
+                postService.downvotePost(post);
+                return new ResponseEntity<>(post, HttpStatus.OK);
             case "edit":
-            // is the user the author of the post?
-            User author = userService.getUserByUsername(principal.getName());
-            if (!post.getAuthor().equals(author)) {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-            }
+                // is the user the author of the post?
+                User author = userService.getUserByUsername(principal.getName());
+                if (!post.getAuthor().equals(author)) {
+                    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                }
 
-            // does the post have a title and content?
-            String title = body.get("title");
-            String content = body.get("content");
-            if (title == null || title.isEmpty() || content == null || content.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
+                // does the post have a title and content?
+                if (postDTO.getTitle() == null || postDTO.getTitle().isEmpty() || postDTO.getContent() == null
+                        || postDTO.getContent().isEmpty()) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
 
-            postService.editPost(post, title, content);
-            return new ResponseEntity<>(post, HttpStatus.OK);
+                post.setTitle(postDTO.getTitle());
+                post.setContent(postDTO.getContent());
+
+                // image (optional)
+                MultipartFile image = postDTO.getImage();
+                if (image != null) {
+                    try (InputStream is = image.getInputStream()) {
+                        try {
+                            ImageIO.read(is).toString();
+                            long size = image.getSize() / 1024 / 1024; // MB
+                            if (size >= 5) {
+                                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                            }
+                            post.setImage(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
+                        } catch (IOException e) {
+                            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                        }
+                    } catch (IOException e) {
+                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                    }
+                } else {
+                    post.setImage(null);
+                }
+
+                postService.updatePost(post);
+                return new ResponseEntity<>(post, HttpStatus.OK);
             default:
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
     }
