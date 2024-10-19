@@ -27,11 +27,11 @@ public class ChatService {
         return chatRepository.findByIdentifier(id);
     }
 
-    public Page<Chat> getChatByName(String name, boolean sorted, Pageable pageable) {
+    public Page<Chat> getChatByName(String name, String username, boolean sorted, Pageable pageable) {
         if (sorted) {
-            return chatRepository.findByNameOrderByLastMessageDate(name, pageable);
+            return chatRepository.findByNameAndUserOrderByLastMessageDate(name, username, pageable);
         } else {
-            return chatRepository.findByName(name, pageable);
+            return chatRepository.findByNameAndUser(name, username, pageable);
         }
     }
 

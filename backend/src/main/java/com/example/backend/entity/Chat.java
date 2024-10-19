@@ -24,9 +24,6 @@ public class Chat {
     public interface Messages {
     }
 
-    public interface UserInfo {
-    }
-
     @Id
     @JsonView(BasicInfo.class)
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
@@ -37,11 +34,11 @@ public class Chat {
 
     // A chat can only be between two users
     @ManyToOne
-    @JsonView(UserInfo.class)
+    @JsonView(BasicInfo.class)
     private User user1;
 
     @ManyToOne
-    @JsonView(UserInfo.class)
+    @JsonView(BasicInfo.class)
     private User user2;
 
     // A chat has multiple messages

@@ -26,4 +26,12 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     // Find chats with a given title and sort by latest updated date (lastMessageDate)
     @Query("SELECT c FROM Chat c WHERE c.name LIKE %:name% ORDER BY c.fullLastMessageDate DESC")
     Page<Chat> findByNameOrderByLastMessageDate(String name, Pageable pageable);
+
+    // Find chats with a given title and a given username as a member (regardless of it's the user1 or user2) and sort by latest updated date (lastMessageDate)
+    @Query("SELECT c FROM Chat c WHERE c.name LIKE %:name% AND (c.user1.username LIKE %:username% OR c.user2.username LIKE %:username%) ORDER BY c.fullLastMessageDate DESC")
+    Page<Chat> findByNameAndUserOrderByLastMessageDate(String name, String username, Pageable pageable);
+
+    // Find chats with a given title and a given username as a member (regardless of it's the user1 or user2)
+    @Query("SELECT c FROM Chat c WHERE c.name LIKE %:name% AND (c.user1.username LIKE %:username% OR c.user2.username LIKE %:username%)")
+    Page<Chat> findByNameAndUser(String name, String username, Pageable pageable);
 }
