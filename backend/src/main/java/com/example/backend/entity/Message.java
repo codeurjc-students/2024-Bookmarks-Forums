@@ -16,14 +16,15 @@ import java.time.LocalTime;
 @Entity
 public class Message {
 
-    public interface BasicInfo {
+    public interface ExtraInfo {
     }
 
-    public interface ChatInfo {
+    public interface BasicInfo extends ExtraInfo {
     }
+
 
     @Id
-    @JsonView(BasicInfo.class)
+    @JsonView(ExtraInfo.class)
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
     private Long identifier;
 
@@ -36,21 +37,21 @@ public class Message {
 
     // Sender
     @ManyToOne
-    @JsonView(BasicInfo.class)
+    @JsonView(ExtraInfo.class)
     private User sender;
 
     // Chat ID to which the message belongs
     @ManyToOne
-    @JsonView(ChatInfo.class)
+    @JsonView(ExtraInfo.class)
     private Chat chat;
 
-    @JsonView(BasicInfo.class)
+    @JsonView(ExtraInfo.class)
     private LocalDate creationDate = LocalDate.now();
 
-    @JsonView(BasicInfo.class)
+    @JsonView(ExtraInfo.class)
     private LocalTime creationTime = LocalTime.now();
 
-    @JsonView(BasicInfo.class) // Message creation date
+    @JsonView(ExtraInfo.class) // Message creation date
     private LocalDateTime fullCreationDate = LocalDateTime.of(creationDate, creationTime);
 
     public Message() {

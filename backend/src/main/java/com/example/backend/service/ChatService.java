@@ -53,5 +53,16 @@ public class ChatService {
         }
     }
 
+    public void leaveChat(Chat chat, String username) {
+        if (chat != null) {
+            if (chat.getUser1().getUsername().equals(username)) {
+                chat.setUser1(null);
+            } else if (chat.getUser2().getUsername().equals(username)) {
+                chat.setUser2(null);
+            }
+            chatRepository.save(chat);
+        }
+    }
+
 
 }

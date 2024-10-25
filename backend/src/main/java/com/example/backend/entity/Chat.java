@@ -18,14 +18,17 @@ import java.util.Objects;
 @Entity
 public class Chat {
 
-    public interface BasicInfo {
+    public interface idInfo {
+    }
+
+    public interface BasicInfo extends idInfo {
     }
 
     public interface Messages {
     }
 
     @Id
-    @JsonView(BasicInfo.class)
+    @JsonView(idInfo.class)
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
     private Long identifier;
 
