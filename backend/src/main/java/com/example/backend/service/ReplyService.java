@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.entity.Reply;
+import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.ReplyRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,9 +11,11 @@ import org.springframework.stereotype.Service;
 public class ReplyService {
 
     private final ReplyRepository replyRepository;
+    private final UserRepository userRepository;
 
-    public ReplyService(ReplyRepository replyRepository) {
+    public ReplyService(ReplyRepository replyRepository, UserRepository userRepository) {
         this.replyRepository = replyRepository;
+        this.userRepository = userRepository;
     }
 
     public boolean existsByPostIDAndAuthorUsername(Long postID, String authorUsername) {
@@ -20,12 +23,7 @@ public class ReplyService {
     }
 
     public Reply saveReply(Reply reply) {
-        if (!existsByPostIDAndAuthorUsername(reply.getPost().getIdentifier(), reply.getAuthor().getUsername())) {
-            replyRepository.save(reply);
-            return reply;
-        } else {
-            return null;
-        }
+        return replyRepository.save(reply);
     }
 
     public void deleteReply(Reply reply) {
@@ -64,5 +62,22 @@ public class ReplyService {
 
     public Page<Reply> searchRepliesByPost(Long postId, String query, Pageable pageable) {
         return replyRepository.findByPostAndQuery(postId, query, pageable);
+    }
+
+    public void likeReply(Reply reply, String username) {
+        reply.setLikes(reply.getLikes() + 1);
+        reply.addLikedBy(userRepository.findByUsername(username));
+        replyRepository.save(reply);
+    }
+
+    public void unlikeReply(Reply reply, String username) {
+        reply.setLikes(reply.getLikes() - 1);
+        reply.removeLikedBy(userRepository.findByUsername(username));
+        replyRepository.save(reply);
+    }
+
+    // Has the given user liked the given reply?
+    public boolean hasUserLikedReply(String username, Long replyId) {
+        return userRepository.getLikedReplies(username).contains(replyRepository.findByIdentifier(replyId));
     }
 }

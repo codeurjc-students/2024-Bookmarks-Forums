@@ -82,6 +82,18 @@ public class User {
     @ManyToMany
     private List<User> followingList = new ArrayList<>();
 
+    // A user may have upvoted 0 or multiple posts
+    @ManyToMany(mappedBy = "upvotedBy")
+    private List<Post> upvotedPosts = new ArrayList<>();
+
+    // A user may have downvoted 0 or multiple posts
+    @ManyToMany(mappedBy = "downvotedBy")
+    private List<Post> downvotedPosts = new ArrayList<>();
+
+    // A user may have liked 0 or multiple replies
+    @ManyToMany(mappedBy = "likedBy")
+    private List<Reply> likedReplies = new ArrayList<>();
+
     // A user can have 0 or multiple posts
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
@@ -149,6 +161,30 @@ public class User {
     public void removeFollowing(User user) {
         this.followingList.remove(user);
         this.following--;
+    }
+
+    public void addLikedReply(Reply reply) {
+        this.likedReplies.add(reply);
+    }
+
+    public void removeLikedReply(Reply reply) {
+        this.likedReplies.remove(reply);
+    }
+
+    public void addUpvotedPost(Post post) {
+        this.upvotedPosts.add(post);
+    }
+
+    public void removeUpvotedPost(Post post) {
+        this.upvotedPosts.remove(post);
+    }
+
+    public void addDownvotedPost(Post post) {
+        this.downvotedPosts.add(post);
+    }
+
+    public void removeDownvotedPost(Post post) {
+        this.downvotedPosts.remove(post);
     }
 
     public Blob LocalImageToBlob(String imgPath) throws IOException, SerialException, SQLException {

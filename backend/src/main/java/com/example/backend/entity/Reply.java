@@ -4,20 +4,26 @@ import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
 public class Reply {
 
-    public interface BasicInfo {
+    public interface LikesInfo {
     }
 
     public interface PostInfo {
@@ -26,8 +32,11 @@ public class Reply {
     public interface UserInfo {
     }
 
-    @JsonView(BasicInfo.class)
+    public interface BasicInfo extends Post.IdInfo, UserInfo, PostInfo {
+    }
+
     @Id
+    @JsonView(BasicInfo.class)
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
     private Long identifier;
 
@@ -43,6 +52,12 @@ public class Reply {
 
     @JsonView(BasicInfo.class)
     private int likes = 0;
+
+    // Users who liked the reply (a reply can be liked by multiple users)
+    @JsonView(LikesInfo.class)
+    @ManyToMany
+    @JoinTable(name = "reply_liked_by", joinColumns = @JoinColumn(name = "reply_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> likedBy = new ArrayList<>();
 
     @JsonView(UserInfo.class)
     @ManyToOne
@@ -79,5 +94,13 @@ public class Reply {
                 ", creationTime=" + creationTime +
                 ", fullCreationDate=" + fullCreationDate +
                 '}';
+    }
+
+    public void addLikedBy(User user) {
+        likedBy.add(user);
+    }
+
+    public void removeLikedBy(User user) {
+        likedBy.remove(user);
     }
 }

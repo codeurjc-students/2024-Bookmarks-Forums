@@ -1,8 +1,13 @@
 package com.example.backend.repository;
 
 import com.example.backend.entity.Community;
+import com.example.backend.entity.Post;
+import com.example.backend.entity.Reply;
 import com.example.backend.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -67,4 +72,17 @@ public interface UserRepository extends JpaRepository<User, String> {
         // Get the users following a user
         @Query("SELECT u.followersList FROM User u WHERE u.username LIKE %:username%")
         Page<User> getFollowers(@Param("username") String username, Pageable pageable);
+
+        // Get liked replies
+        @Query("SELECT u.likedReplies FROM User u WHERE u.username LIKE %:username%")
+        List<Reply> getLikedReplies(@Param("username") String username);
+
+        // Get upvoted posts
+        @Query("SELECT u.upvotedPosts FROM User u WHERE u.username LIKE %:username%")
+        List<Post> getUpvotedPosts(@Param("username") String username);
+
+        // Get downvoted posts
+        @Query("SELECT u.downvotedPosts FROM User u WHERE u.username LIKE %:username%")
+        List<Post> getDownvotedPosts(@Param("username") String username);
+        
 }

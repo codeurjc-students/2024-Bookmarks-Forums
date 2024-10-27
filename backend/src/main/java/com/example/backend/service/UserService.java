@@ -2,15 +2,19 @@ package com.example.backend.service;
 
 import com.example.backend.entity.Community;
 import com.example.backend.entity.Message;
+import com.example.backend.entity.Reply;
 import com.example.backend.entity.User;
 import com.example.backend.repository.CommunityRepository;
 import com.example.backend.repository.MessageRepository;
+import com.example.backend.repository.PostRepository;
+import com.example.backend.repository.ReplyRepository;
 import com.example.backend.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Blob;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -18,12 +22,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final CommunityRepository communityRepository;
     private final MessageRepository messageRepository;
+    private final ReplyRepository replyRepository;
+    private final PostRepository postRepository;
 
-    public UserService(UserRepository userRepository, CommunityRepository communityRepository, MessageRepository messageRepository) {
+    public UserService(UserRepository userRepository, CommunityRepository communityRepository,
+            MessageRepository messageRepository, ReplyRepository replyRepository, PostRepository postRepository) {
 
         this.userRepository = userRepository;
         this.communityRepository = communityRepository;
         this.messageRepository = messageRepository;
+        this.replyRepository = replyRepository;
+        this.postRepository = postRepository;
     }
 
     public User getUserByUsername(String username) {
@@ -120,18 +129,20 @@ public class UserService {
     }
 
     public boolean isUserFollowing(String follower, String following) {
-        return userRepository.findByUsername(follower).getFollowingList().contains(userRepository.findByUsername(following));
+        return userRepository.findByUsername(follower).getFollowingList()
+                .contains(userRepository.findByUsername(following));
     }
 
     public boolean isUserFollower(String follower, String following) {
-        return userRepository.findByUsername(following).getFollowersList().contains(userRepository.findByUsername(follower));
+        return userRepository.findByUsername(following).getFollowersList()
+                .contains(userRepository.findByUsername(follower));
     }
 
-    public boolean isUsernameAvailable(String username){
+    public boolean isUsernameAvailable(String username) {
         return userRepository.findByUsername(username) == null;
     }
 
-    public boolean isEmailAvailable(String email){
+    public boolean isEmailAvailable(String email) {
         return userRepository.findByEmail(email) == null;
     }
 
@@ -171,8 +182,9 @@ public class UserService {
 
         // Clear the list to avoid further issues
         user.getSentMessages().clear();
-        
+
         // Save the user
         userRepository.save(user);
     }
+    
 }

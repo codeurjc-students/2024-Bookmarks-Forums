@@ -18,7 +18,10 @@ import java.util.List;
 @Entity
 public class Post {
 
-    public interface BasicInfo {
+    public interface IdInfo {
+    }
+
+    public interface BasicInfo extends IdInfo {
     }
 
     public interface DetailedInfo extends BasicInfo {
@@ -33,7 +36,7 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
-    @JsonView(BasicInfo.class)
+    @JsonView(IdInfo.class)
     private Long identifier;
 
     @JsonView(BasicInfo.class)
@@ -58,8 +61,20 @@ public class Post {
     @JsonView(BasicInfo.class)
     private int upvotes;
 
+    // Users who upvoted the post
+    @JsonView(DetailedInfo.class)
+    @ManyToMany
+    @JoinTable(name = "post_upvoted_by", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> upvotedBy = new ArrayList<>();
+
     @JsonView(BasicInfo.class)
     private int downvotes;
+
+    // Users who downvoted the post
+    @JsonView(DetailedInfo.class)
+    @ManyToMany
+    @JoinTable(name = "post_downvoted_by", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> downvotedBy = new ArrayList<>();
 
     @JsonView(BasicInfo.class) // Number of comments
     private int comments;
@@ -101,12 +116,14 @@ public class Post {
     public Post() {
     }
 
-    public void upvote() {
+    public void upvote(User user) {
         this.upvotes++;
+        this.upvotedBy.add(user);
     }
 
-    public void downvote() {
+    public void downvote(User user) {
         this.downvotes++;
+        this.downvotedBy.add(user);
     }
 
     public void addImage(Blob image) {

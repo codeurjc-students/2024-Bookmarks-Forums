@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
 import java.sql.Blob;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.backend.service.CommunityService;
 import com.example.backend.service.PostService;
+import com.example.backend.service.ReplyService;
 import com.example.backend.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -36,6 +38,7 @@ import com.example.backend.dto.PostDTO;
 import com.example.backend.entity.Community;
 import com.example.backend.entity.User;
 import com.example.backend.entity.Post;
+import com.example.backend.entity.Reply;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -44,14 +47,20 @@ public class APIPostController {
     private final CommunityService communityService;
     private final PostService postService;
     private final UserService userService;
+    private final ReplyService replyService;
 
     interface PostInfo extends Post.BasicInfo, User.UsernameInfo, Community.NameInfo {
     }
 
-    public APIPostController(CommunityService communityService, PostService postService, UserService userService) {
+    interface ReplyInfo extends User.UsernameInfo, Reply.BasicInfo {
+    }
+
+    public APIPostController(CommunityService communityService, PostService postService, UserService userService,
+            ReplyService replyService) {
         this.communityService = communityService;
         this.postService = postService;
         this.userService = userService;
+        this.replyService = replyService;
     }
 
     // Get post by ID
@@ -159,6 +168,7 @@ public class APIPostController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
     })
     @JsonView(PostInfo.class)
     @PostMapping("/communities/{communityID}/posts")
@@ -181,6 +191,11 @@ public class APIPostController {
         Community community = communityService.getCommunityById(communityID);
         if (!community.getMembers().contains(author)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        // is the user banned from the community?
+        if (communityService.isUserBannedFromCommunity(author.getUsername(), community.getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         // does the post have a title and content?
@@ -227,6 +242,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Post not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
     })
     @JsonView(PostInfo.class)
     @PutMapping("/posts/{postId}")
@@ -245,19 +261,33 @@ public class APIPostController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        User author = userService.getUserByUsername(principal.getName());
+
+        // is the user banned from the community?
+        if (communityService.isUserBannedFromCommunity(author.getUsername(), post.getCommunity().getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // upvote or downvote
         switch (action) {
             case "upvote":
-            // TODO: check if the user has already upvoted the post
-                postService.upvotePost(post);
+                // has the user already upvoted the post?
+                if (postService.hasUserUpvotedPost(author.getUsername(), postId)) {
+                    postService.removeUpvote(post, author.getUsername());
+                } else {
+                    postService.upvotePost(post, author.getUsername());
+                }
                 return new ResponseEntity<>(post, HttpStatus.OK);
             case "downvote":
-            // TODO: check if the user has already downvoted the post
-                postService.downvotePost(post);
+                // has the user already downvoted the post?
+                if (postService.hasUserDownvotedPost(author.getUsername(), postId)) {
+                    postService.removeDownvote(post, author.getUsername());
+                } else {
+                    postService.downvotePost(post, author.getUsername());
+                }
                 return new ResponseEntity<>(post, HttpStatus.OK);
             case "edit":
                 // is the user the author of the post?
-                User author = userService.getUserByUsername(principal.getName());
                 if (!post.getAuthor().equals(author)) {
                     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
                 }
@@ -333,6 +363,11 @@ public class APIPostController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
+        // is the user banned from the community?
+        if (communityService.isUserBannedFromCommunity(author.getUsername(), post.getCommunity().getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // delete image
         if (action != null && action.equals("delete")) {
             post.setImage(null);
@@ -391,6 +426,11 @@ public class APIPostController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
+        // is the user banned from the community?
+        if (communityService.isUserBannedFromCommunity(author.getUsername(), post.getCommunity().getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         postService.deletePost(post);
 
         return new ResponseEntity<>("Post deleted", HttpStatus.OK);
@@ -425,4 +465,230 @@ public class APIPostController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // REPLIES ----------------------------------------------------------------
+
+    // Get replies of a post
+    @Operation(summary = "Get replies of a post")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Replies found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Replies not found"),
+    })
+    @JsonView(ReplyInfo.class)
+    @GetMapping("/posts/{postId}/replies")
+    public ResponseEntity<List<Reply>> getRepliesOfPost(@PathVariable Long postId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "creationDate") String order) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Reply> replies = replyService.getRepliesByPost(postId, pageable, order);
+        if (replies.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(replies.getContent(), HttpStatus.OK);
+    }
+
+    // Get reply by ID
+    @Operation(summary = "Get reply by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reply found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Reply.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Reply not found"),
+    })
+    @JsonView(ReplyInfo.class)
+    @GetMapping("/replies/{replyId}")
+    public ResponseEntity<Reply> getReplyById(@PathVariable Long replyId) {
+        Reply reply = replyService.getReplyById(replyId);
+        if (reply == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(reply, HttpStatus.OK);
+    }
+
+    // Search replies
+    /*
+     * Possible search criteria:
+     * - title
+     * - content
+     * - author
+     */
+    @Operation(summary = "Search replies")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Replies found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Replies not found"),
+    })
+    @JsonView(ReplyInfo.class)
+    @GetMapping("/replies")
+    public ResponseEntity<List<Reply>> searchReplies(@RequestParam String criteria, @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Reply> replies = null;
+        switch (criteria) {
+            case "title":
+                replies = replyService.getRepliesByTitle(query, pageable);
+                break;
+            case "content":
+                replies = replyService.getReplyByContent(query, pageable);
+                break;
+            case "author":
+                replies = replyService.getRepliesByAuthor(query, pageable);
+                break;
+            default:
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if (replies.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(replies.getContent(), HttpStatus.OK);
+    }
+
+    // Create a reply
+    @Operation(summary = "Create a reply")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Reply created", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Reply.class)),
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+    })
+    @JsonView(ReplyInfo.class)
+    @PostMapping("/posts/{postId}/replies")
+    public ResponseEntity<Reply> createReply(HttpServletRequest request, @PathVariable Long postId,
+            @RequestBody Map<String, String> replyData) {
+
+        // is user logged in?
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the post found?
+        Post post = postService.getPostById(postId);
+        if (post == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // does the reply have a title and content?
+        if (!replyData.containsKey("title") || !replyData.containsKey("content")) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // is the user a member of the community?
+        User author = userService.getUserByUsername(principal.getName());
+        if (!post.getCommunity().getMembers().contains(author)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        // is the user banned from the community?
+        if (communityService.isUserBannedFromCommunity(author.getUsername(), post.getCommunity().getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Reply reply = new Reply(replyData.get("title"), replyData.get("content"), author, post);
+        replyService.saveReply(reply);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(reply.getIdentifier()).toUri();
+
+        return ResponseEntity.created(location).body(reply);
+    }
+
+    // Like a reply
+    @Operation(summary = "Modify a reply (like)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reply liked", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Reply.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Reply not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+    })
+    @JsonView(ReplyInfo.class)
+    @PutMapping("/replies/{replyId}")
+    public ResponseEntity<Reply> likeReply(HttpServletRequest request, @PathVariable Long replyId,
+            @RequestParam String action) {
+
+        // is user logged in?
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the reply found?
+        Reply reply = replyService.getReplyById(replyId);
+        if (reply == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // is the user banned from the community?
+        if (communityService.isUserBannedFromCommunity(principal.getName(),
+                reply.getPost().getCommunity().getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        User user = userService.getUserByUsername(principal.getName());
+
+        // like or unlike
+        if ("like".equals(action)) {
+            // if user has not liked the reply yet
+            if (!replyService.hasUserLikedReply(user.getUsername(), replyId)) {
+                replyService.likeReply(reply, user.getUsername());
+                return new ResponseEntity<>(reply, HttpStatus.OK);
+            } else {
+                replyService.unlikeReply(reply, user.getUsername());
+                return new ResponseEntity<>(reply, HttpStatus.OK);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Delete a reply
+    @Operation(summary = "Delete a reply")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Reply deleted"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Reply not found"),
+    })
+    @DeleteMapping("/replies/{replyId}")
+    public ResponseEntity<String> deleteReply(HttpServletRequest request, @PathVariable Long replyId) {
+
+        // is user logged in?
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the reply found?
+        Reply reply = replyService.getReplyById(replyId);
+        if (reply == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // is the user the author of the reply, the post author, an admin community,
+        // moderator or a site admin?
+        User author = userService.getUserByUsername(principal.getName());
+        if (!reply.getAuthor().equals(author) && !reply.getPost().getAuthor().equals(author)
+                && !communityService.isUserAdminOfCommunity(author.getUsername(),
+                        reply.getPost().getCommunity().getIdentifier())
+                && !communityService.isUserModeratorOfCommunity(author.getUsername(),
+                        reply.getPost().getCommunity().getIdentifier())
+                && !userService.getUserByUsername(author.getUsername()).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        // is the user banned from the community?
+        if (communityService.isUserBannedFromCommunity(author.getUsername(),
+                reply.getPost().getCommunity().getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        replyService.deleteReply(reply);
+
+        return new ResponseEntity<>("Reply deleted", HttpStatus.OK);
+    }
+
 }
