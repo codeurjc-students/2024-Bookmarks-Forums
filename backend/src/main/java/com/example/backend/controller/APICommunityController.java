@@ -43,7 +43,6 @@ import com.example.backend.entity.Post;
 @RequestMapping("/api/v1")
 public class APICommunityController {
     private final CommunityService communityService;
-    private final PostService postService;
     private final UserService userService;
 
     interface CommunityBasicInfo extends Community.BasicInfo, User.UsernameInfo {
@@ -58,10 +57,9 @@ public class APICommunityController {
     interface CommunityBanInfo extends Ban.BasicInfo {
     }
 
-    public APICommunityController(CommunityService communityService, PostService postService, UserService userService) {
+    public APICommunityController(CommunityService communityService, UserService userService) {
         this.communityService = communityService;
         this.userService = userService;
-        this.postService = postService;
     }
 
     // Get communities by ID

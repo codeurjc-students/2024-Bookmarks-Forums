@@ -110,8 +110,8 @@ public class UserService {
     }
 
     public void followUser(User follower, User following) {
-        // Can't follow yourself
-        if (!follower.equals(following)) {
+        // Can't follow yourself or someone you're already following
+        if (!follower.equals(following) && !follower.getFollowingList().contains(following)) {
             follower.addFollowing(following);
             following.addFollower(follower);
             userRepository.save(follower);
@@ -120,7 +120,8 @@ public class UserService {
     }
 
     public void unfollowUser(User follower, User following) {
-        if (follower.getFollowingList().contains(following)) {
+        // Can't unfollow someone you're not following or yourself
+        if (follower.getFollowingList().contains(following) && !follower.equals(following)) {
             follower.removeFollowing(following);
             following.removeFollower(follower);
             userRepository.save(follower);

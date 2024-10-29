@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.sql.rowset.serial.SerialException;
-
 import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
@@ -75,12 +73,13 @@ public class APIUserController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = UserBasicView.class)),
             }),
             @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
     })
     @GetMapping("/users/me")
     public ResponseEntity<User> getCurrentUser(HttpServletRequest request) {
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // No user logged in
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // Not logged in
         }
         User user = userService.getUserByUsername(principal.getName());
         if (user == null) {
@@ -290,7 +289,8 @@ public class APIUserController {
     @JsonView(UserBasicView.class)
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/users")
-    public ResponseEntity<User> registerUser(@RequestBody Map<String, String> userInfo) throws SerialException, IOException, SQLException {
+    public ResponseEntity<User> registerUser(@RequestBody Map<String, String> userInfo)
+            throws IOException, SQLException {
         if (userInfo == null || userInfo.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -346,7 +346,9 @@ public class APIUserController {
     @JsonView(UserBasicView.class)
     @PutMapping("/users/{username}")
     public ResponseEntity<User> updateUser(HttpServletRequest request, @PathVariable String username,
-            @RequestBody Map<String, String> userInfo) throws IOException {
+            @RequestParam String action,
+            @RequestParam(required = false) String otherUsername,
+            @RequestBody(required = false) Map<String, String> userInfo) throws IOException {
 
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
@@ -364,43 +366,59 @@ public class APIUserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        // Old username and email
-        String oldUsername = user.getUsername();
-        String oldEmail = user.getEmail();
+        if (action.equals("edit")) {
+            // Old username and email
+            String oldUsername = user.getUsername();
+            String oldEmail = user.getEmail();
 
-        if (userInfo.containsKey("alias")) {
-            user.setAlias(userInfo.get("alias"));
-        }
-        if (userInfo.containsKey("description")) {
-            user.setDescription(userInfo.get("description"));
-        }
-        if (userInfo.containsKey("email")) {
-            String email = userInfo.get("email");
-            if (!mailService.isCorrectEmail(email)) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            if (userInfo.containsKey("alias")) {
+                user.setAlias(userInfo.get("alias"));
             }
-            user.setEmail(email);
-            try {
-                mailService.sendEmail(oldEmail, oldUsername, "Email changed",
-                        "Your email has been changed successfully to " + email);
-            } catch (MessagingException e) {
-                return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+            if (userInfo.containsKey("description")) {
+                user.setDescription(userInfo.get("description"));
             }
-        }
-        if (userInfo.containsKey("password")) {
-            // Check that the password complies with the requirements
-            String newPassword = userInfo.get("password");
-            if (newPassword != null && !isValidPassword(newPassword)) {
-                throw new InvalidPasswordException("Password does not meet the requirements");
-            } else {
+            if (userInfo.containsKey("email")) {
+                String email = userInfo.get("email");
+                if (!mailService.isCorrectEmail(email)) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+                user.setEmail(email);
                 try {
-                    user.setPassword(passwordEncoder.encode(newPassword));
-                    mailService.sendEmail(oldEmail, oldUsername, "Password changed",
-                            "Your password has been changed successfully");
+                    mailService.sendEmail(oldEmail, oldUsername, "Email changed",
+                            "Your email has been changed successfully to " + email);
                 } catch (MessagingException e) {
                     return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
                 }
             }
+            if (userInfo.containsKey("password")) {
+                // Check that the password complies with the requirements
+                String newPassword = userInfo.get("password");
+                if (newPassword != null && !isValidPassword(newPassword)) {
+                    throw new InvalidPasswordException("Password does not meet the requirements");
+                } else {
+                    try {
+                        user.setPassword(passwordEncoder.encode(newPassword));
+                        mailService.sendEmail(oldEmail, oldUsername, "Password changed",
+                                "Your password has been changed successfully");
+                    } catch (MessagingException e) {
+                        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+                    }
+                }
+            }
+        } else if (action.equals("follow")){
+            User following = userService.getUserByUsername(otherUsername);
+            if (following == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            userService.followUser(user, following);
+        } else if (action.equals("unfollow")) {
+            User following = userService.getUserByUsername(otherUsername);
+            if (following == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            userService.unfollowUser(user, following);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         // Save changes
@@ -498,7 +516,7 @@ public class APIUserController {
         if (file == null || file.isEmpty()) {
             return new ResponseEntity<>("File couldn't be uploaded, please try again.", HttpStatus.BAD_REQUEST);
         }
-        
+
         // Check file
         try (InputStream is = file.getInputStream()) {
             try {
@@ -509,7 +527,7 @@ public class APIUserController {
                 }
                 user.setPfp(BlobProxy.generateProxy(file.getInputStream(), file.getSize()));
                 userService.saveUser(user);
-                
+
                 // Resource URL for the image (location header)
                 URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{username}/pictures")
                         .buildAndExpand(user.getUsername()).toUri();
