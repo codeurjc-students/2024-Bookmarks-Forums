@@ -49,7 +49,7 @@ public class APIPostController {
     private final UserService userService;
     private final ReplyService replyService;
 
-    interface PostInfo extends Post.BasicInfo, User.UsernameInfo, Community.NameInfo {
+    interface PostInfo extends Post.BasicInfo {
     }
 
     interface ReplyInfo extends User.UsernameInfo, Reply.BasicInfo {
@@ -98,7 +98,7 @@ public class APIPostController {
     })
     @JsonView(PostInfo.class)
     @GetMapping("/posts")
-    public ResponseEntity<Page<Post>> searchPosts(@RequestParam String query,
+    public ResponseEntity<List<Post>> searchPosts(@RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "creationDate") String order) {
         Pageable pageable = PageRequest.of(page, size);
@@ -106,7 +106,7 @@ public class APIPostController {
         if (posts.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(posts);
+        return ResponseEntity.ok(posts.getContent());
     }
 
     // Search posts by community identifier
@@ -691,4 +691,138 @@ public class APIPostController {
         return new ResponseEntity<>("Reply deleted", HttpStatus.OK);
     }
 
+    // Get the most liked posts of the most followed users the user follows (sorting the posts by upvotes)
+    @Operation(summary = "Get the most liked posts of the most followed users the user follows")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Posts not found"),
+    })
+    @JsonView(PostInfo.class)
+    @GetMapping("/users/me/following/posts/most-liked")
+    public ResponseEntity<List<Post>> getMostLikedPostsOfMostFollowedUsers(HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postService.getMostLikedPostsOfMostFollowedUsers(principal.getName(), pageable);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
+    }
+
+    // Get the most liked posts of the user's communities (sorting the posts by upvotes)
+    @Operation(summary = "Get the most liked posts of the user's communities")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Posts not found"),
+    })
+    @JsonView(PostInfo.class)
+    @GetMapping("/users/me/communities/posts/most-liked")
+    public ResponseEntity<List<Post>> getMostLikedPostsOfUserCommunities(HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postService.getMostLikedPostsOfUserCommunities(principal.getName(), pageable);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
+    }
+
+    // Get the most recent posts of the user's communities (sorting the posts by creation date)
+    @Operation(summary = "Get the most recent posts of the user's communities")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Posts not found"),
+    })
+    @JsonView(PostInfo.class)
+    @GetMapping("/users/me/communities/posts/most-recent")
+    public ResponseEntity<List<Post>> getMostRecentPostsOfUserCommunities(HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postService.getMostRecentPostsOfFollowedCommunities(principal.getName(), pageable);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
+    }
+
+    // Get the most liked posts of all communities
+    @Operation(summary = "Get the most liked posts of the most followed (popular) communities")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Posts not found"),
+    })
+    @JsonView(PostInfo.class)
+    @GetMapping("/communities/most-popular/posts/most-liked")
+    public ResponseEntity<List<Post>> getMostLikedPostsOfAllCommunities(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postService.getMostLikedPostsOfMostFollowedCommunities(pageable);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
+    }
+
+    // Get the most liked posts of the most followed users
+    @Operation(summary = "Get the most liked posts of the most followed users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Posts not found"),
+    })
+    @JsonView(PostInfo.class)
+    @GetMapping("/users/posts/most-liked")
+    public ResponseEntity<List<Post>> getMostLikedPostsOfMostFollowedUsers(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postService.getMostLikedPostsOfMostFollowedUsersGeneral(pageable);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
+    }
+
+    // Get the most recent posts of the most followed communities
+    @Operation(summary = "Get the most recent posts of the most followed communities")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Posts not found"),
+    })
+    @JsonView(PostInfo.class)
+    @GetMapping("/communities/most-popular/posts/most-recent")
+    public ResponseEntity<List<Post>> getMostRecentPostsOfMostFollowedCommunities(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postService.getMostRecentPostsOfMostFollowedCommunities(pageable);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
+    }
 }

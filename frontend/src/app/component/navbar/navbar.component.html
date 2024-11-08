@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap" rel="stylesheet">
 </head>
 
-<nav class="bm-navbar bm-navbar-expand-lg bm-navbar-light bm-bg-white">
+<nav class="bm-navbar bm-navbar-expand-lg bm-navbar-light bm-bg-dark bm-bg-backdrop-filter navbar-floating">
   <div class="bm-container bm-navbar-px-4 bm-navbar-px-lg-5">
     <!-- Navbar brand (is an image) and has alternative text for when the image does not load-->
     <a class="bm-navbar-brand" [routerLink]="['/']">
@@ -18,7 +18,7 @@
             aria-label="Toggle navigation"><span class="bm-navbar-toggler-icon"></span></button>
     <div class="bm-collapse bm-navbar-collapse bm-navbar-menu" id="navbarSupportedContent">
       <!-- Has to be centered -->
-      <ul class="bm-navbar-nav bm-me-auto bm-mb-lg-0 bm-ms-auto">
+      <ul class="bm-navbar-nav bm-me-auto bm-mb-auto bm-mt-auto bm-ms-auto">
         <!-- Main page option (has little house icon on the left)-->
         <li class="bm-nav-item" style="cursor: pointer">
           <a class="bm-nav-link" [routerLink]="['/']" routerLinkActive="underline-active" [routerLinkActiveOptions]="{exact: true}">

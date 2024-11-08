@@ -132,14 +132,18 @@ public class User {
     }
 
     public User(String username, String alias, String description, String pfp, String email, String password,
-            List<String> roles) throws SerialException, IOException, SQLException {
+            List<String> roles) throws IOException, SQLException {
         this.username = username;
         this.alias = alias;
         this.description = description;
         this.roles = roles;
         this.email = email;
         this.password = password;
-        this.pfpString = Objects.requireNonNullElse(pfp, "/assets/defaultProfilePicture.png");
+        if (pfp == null || pfp.isEmpty()) {
+            this.pfpString = "/assets/defaultProfilePicture.png";
+        } else {
+            this.pfpString = pfp;
+        }
         this.pfp = LocalImageToBlob(pfpString);
     }
 
@@ -187,7 +191,7 @@ public class User {
         this.downvotedPosts.remove(post);
     }
 
-    public Blob LocalImageToBlob(String imgPath) throws IOException, SerialException, SQLException {
+    public Blob LocalImageToBlob(String imgPath) throws IOException, SQLException {
         imgPath = imgPath.replace("/assets", "backend/src/main/resources/static/assets");
         String onDocker = System.getenv("RUNNING_IN_DOCKER");
         Blob imgBlob = null;
@@ -203,6 +207,9 @@ public class User {
         } else {
             String baseDir = System.getProperty("user.dir").replace("\\", "/").replace("/backend", "");
             File imgFile = new File(baseDir + "/" + imgPath);
+            if (!imgFile.exists() || !imgFile.canRead()) {
+                throw new IOException("Cannot access image file: " + imgFile.getAbsolutePath());
+            }
             imgBlob = new SerialBlob(Files.readAllBytes(imgFile.toPath()));
         }
         return imgBlob;

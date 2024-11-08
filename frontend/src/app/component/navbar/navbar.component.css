@@ -1,6 +1,6 @@
 .underline-active {
   position: relative;
-  color: #583E23;
+  color: #F8DDA4;
 }
 
 .underline-active::after {
@@ -10,9 +10,15 @@
   bottom: 0;
   height: 5px; /* Adjust as needed */
   width: 100%;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="5"><circle cx="4" cy="2.5" r="2.5" fill="%23583E23"/><circle cx="15" cy="2.5" r="2.5" fill="%23583E23"/><circle cx="26" cy="2.5" r="2.5" fill="%23583E23"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="5"><circle cx="4" cy="2.5" r="2.5" fill="%23F8DDA4"/><circle cx="15" cy="2.5" r="2.5" fill="%23F8DDA4"/><circle cx="26" cy="2.5" r="2.5" fill="%23F8DDA4"/></svg>');
   background-repeat: no-repeat;
   background-position: center; /* Center the background image */
   background-size: contain;
   margin-top: 5px; /* Adjust as needed */
+}
+
+.bm-navbar-menu{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -115,14 +115,15 @@ export class UserService {
       .pipe(catchError((error) => throwError(() => error)));
   }
 
-  signup(userInfo: {
-    username: string;
-    alias: string;
-    email: string;
-    password: string;
-  }): Observable<User> {
+  signup(userInfo: { username: string; alias: string; email: string; password: string }): Observable<User> {
+    const formData = new FormData();
+    formData.append('username', userInfo.username);
+    formData.append('alias', userInfo.alias);
+    formData.append('email', userInfo.email);
+    formData.append('password', userInfo.password);
+  
     return this.http
-      .post<User>(API_URL, userInfo)
+      .post<User>(API_URL, formData)
       .pipe(catchError((error) => throwError(() => error)));
   }
 

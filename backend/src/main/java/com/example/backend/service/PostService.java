@@ -164,4 +164,30 @@ public class PostService {
         return userRepository.getDownvotedPosts(username).contains(postRepository.findByIdentifier(postId));
     }
 
+    // User specific (recommendations' algorithms)
+    public Page<Post> getMostLikedPostsOfMostFollowedUsers(String username, Pageable pageable) {
+        return postRepository.getMostLikedPostsOfMostFollowedUsers(username, pageable);
+    }
+
+    public Page<Post> getMostLikedPostsOfUserCommunities(String username, Pageable pageable) {
+        return postRepository.getMostLikedPostsOfFollowedCommunities(username, pageable);
+    }
+
+    public Page<Post> getMostRecentPostsOfFollowedCommunities(String username, Pageable pageable) {
+        return postRepository.getMostRecentPostsOfFollowedCommunities(username, pageable);
+    }
+
+    // General (recommendations' algorithms)
+    public Page<Post> getMostLikedPostsOfMostFollowedCommunities(Pageable pageable) {
+        return postRepository.getMostLikedPostsOfMostFollowedCommunities(pageable);
+    }
+
+    public Page<Post> getMostLikedPostsOfMostFollowedUsersGeneral(Pageable pageable) {
+        return postRepository.getMostLikedPostsOfMostFollowedUsersGeneral(pageable);
+    }
+
+    public Page<Post> getMostRecentPostsOfMostFollowedCommunities(Pageable pageable) {
+        return postRepository.getMostRecentPostsOfMostFollowedCommunities(pageable);
+    }
+
 }

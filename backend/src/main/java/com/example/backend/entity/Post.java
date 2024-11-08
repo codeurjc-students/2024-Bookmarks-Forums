@@ -21,7 +21,7 @@ public class Post {
     public interface IdInfo {
     }
 
-    public interface BasicInfo extends IdInfo {
+    public interface BasicInfo extends IdInfo, User.UsernameInfo, Community.NameInfo {
     }
 
     public interface DetailedInfo extends BasicInfo {
@@ -55,7 +55,7 @@ public class Post {
 
     // A post can only be made in one community
     @ManyToOne
-    @JsonView(CommunityInfo.class)
+    @JsonView(BasicInfo.class)
     private Community community;
 
     @JsonView(BasicInfo.class)

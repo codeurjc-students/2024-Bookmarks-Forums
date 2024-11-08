@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.example.backend.dto.SignupRequestDTO;
 import com.example.backend.entity.Community;
 import com.example.backend.entity.User;
 import com.example.backend.service.MailService;
@@ -289,15 +290,17 @@ public class APIUserController {
     @JsonView(UserBasicView.class)
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/users")
-    public ResponseEntity<User> registerUser(@RequestBody Map<String, String> userInfo)
+    public ResponseEntity<User> registerUser(@ModelAttribute SignupRequestDTO userInfo)
             throws IOException, SQLException {
-        if (userInfo == null || userInfo.isEmpty()) {
+        if (userInfo == null || userInfo.getUsername() == null || userInfo.getEmail() == null
+                || userInfo.getAlias() == null
+                || userInfo.getPassword() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        String username = userInfo.get("username");
-        String email = userInfo.get("email");
-        String alias = userInfo.get("alias");
-        String password = userInfo.get("password");
+        String username = userInfo.getUsername();
+        String email = userInfo.getEmail();
+        String alias = userInfo.getAlias();
+        String password = userInfo.getPassword();
 
         if (username == null || username.isBlank()) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -405,7 +408,7 @@ public class APIUserController {
                     }
                 }
             }
-        } else if (action.equals("follow")){
+        } else if (action.equals("follow")) {
             User following = userService.getUserByUsername(otherUsername);
             if (following == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);

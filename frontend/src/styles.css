@@ -10,6 +10,12 @@
     --branding-white: #FFFFFC;
     --branding-light-grey: #efefef;
     --branding-sepia: #F8F4E8;
+    --branding-darkish-grey: #494a50;
+    --branding-dark-grey: #2a2b2e;
+    --branding-forums-dark-grey: #2a2b2e;
+    --branding-forums-dark-grey-bg: #131515;
+    --branding-forums-light-grey: #4e5056;
+    --branding-forums-taupe: #91818A;
     /* -------- */
     --bs-blue: #0d6efd;
     --bs-indigo: #6610f2;
@@ -77,6 +83,7 @@
     --bs-link-hover-color: #0a58ca;
     --bs-code-color: #d63384;
     --bs-highlight-bg: #fff3cd;
+    --navbar-gap: 3rem;
   }
   
   body {
@@ -87,7 +94,7 @@
     line-height: var(--bs-body-line-height);
     color: var(--bs-body-color);
     text-align: var(--bs-body-text-align);
-    background-color: var(--branding-sepia) !important;
+    background-color: var(--branding-forums-dark-grey-bg) !important;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -255,12 +262,18 @@
     --bs-navbar-toggler-border-radius: 0.375rem;
     --bs-navbar-toggler-focus-width: 0.25rem;
     --bs-navbar-toggler-transition: box-shadow 0.15s ease-in-out;
-    position: relative;
+    position: sticky !important;
+    top: 1rem !important; 
+    z-index: 1000 !important;
+    margin-top: 1rem !important; 
+    margin-bottom: 1rem !important;
+    height: auto !important;
+    min-height: 4rem !important;
+    width: fit-content !important; 
+    gap: var(--navbar-gap, 1rem) !important; 
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--bs-navbar-padding-y) var(--bs-navbar-padding-x);
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
   
   .bm-navbar > .bm-container,
@@ -274,10 +287,11 @@
     flex-wrap: inherit;
     align-items: center;
     justify-content: space-between;
+    gap: var(--navbar-gap, 1rem) !important; /* Apply the gap property */
   }
   
   .bm-navbar-brand {
-    width: 10rem;
+    width: 14rem;
     padding-top: var(--bs-navbar-brand-padding-y);
     padding-bottom: var(--bs-navbar-brand-padding-y);
     margin-right: var(--bs-navbar-brand-margin-end);
@@ -285,6 +299,9 @@
     color: var(--bs-navbar-brand-color);
     text-decoration: none;
     white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   
   .bm-navbar-profile-picture {
@@ -813,6 +830,11 @@
     --bs-bg-opacity: 1;
     background-color: var(--branding-peach) !important;
   }
+
+  .bm-bg-dark {
+    --bs-bg-opacity: 1;
+    background-color: var(--branding-forums-dark-grey) !important;
+  }
   
   .bm-collapse:not(.show) {
     display: none;
@@ -839,6 +861,14 @@
   
   .bm-ms-auto {
     margin-left: auto !important;
+  }
+
+  .bm-mt-auto {
+    margin-top: auto !important;
+  }
+
+  .bm-mb-auto {
+    margin-bottom: auto !important;
   }
   
   .bm-d-flex {
@@ -1217,7 +1247,7 @@
   }
   
   .bm-bg-footer {
-    background-color: var(--branding-peach) !important;
+    background-color: var(--branding-forums-dark-grey) !important;
   }
   
   .bm-m-0 {
@@ -1226,8 +1256,8 @@
   
   .bm-text-footer {
     text-align: end !important;
-    --bs-text-opacity: 1;
-    color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
+    color: var(--branding-white) !important;
+    opacity: 0.5 !important;
     margin-top: 1rem !important;
   }
   
@@ -1288,9 +1318,9 @@
   
   .bm-navbar { /* must be always on top and has to drop a shadow when scrolling */
     position: sticky !important;
-    top: 0 !important;
+    top: 1rem !important; /* Adjust the value to set the desired gap */
     z-index: 1000 !important;
-  
+    margin-top: 1rem !important; /* Ensure the gap is maintained */
   }
   
   .bm-navbar-scrolled {
@@ -1435,4 +1465,23 @@
   html{
     scroll-behavior: auto !important;
   }
-  
+
+  .bm-footer-logo{
+    width: 12rem;
+  }
+
+  .bm-bg-backdrop-filter {
+    --bs-bg-opacity: 0.8 !important;
+    --bg-dark-grey: 42, 43, 46;
+    background-color: rgba(var(--bg-dark-grey), var(--bs-bg-opacity)) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+
+  .navbar-floating {
+    margin-top: 1rem; 
+    margin-left: 1rem;
+    margin-right: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    border-radius: 0.8rem !important;
+}

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Bookmarks - Registrarse</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <link rel="stylesheet" href="/css/signupPageStyles.css" />
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+
+    <!-- NEEDED FOR THE NAVBAR AND FOOTER BRANDING -->
+    <link href="/css/navbarAndBranding.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap"
+      rel="stylesheet"
+    />
+    <!-- ----------------------------------------------------------------- -->
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  </head>
+
+  <body class="img js-fullheight">
+    <div class="img js-fullheight main-container">
+      <section class="ftco-section">
+        <div class="container">
+          <div class="row justify-content-center sitelogo">
+            <div class="col-md-6 text-center mb-5">
+              <img src="/assets/imagotipoLight.svg" alt="Logo" />
+            </div>
+          </div>
+          <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4 form-card">
+              <div class="login-wrap p-0">
+                <h3 class="mb-4 text-center login-greeting-text">
+                  Crea una cuenta
+                </h3>
+                <form action="/signup/done" class="signin-form" method="post">
+                  <!--TODO: Borrar el action de la api-->
+                  <div class="form-group">
+                    <input
+                      [formControl]="usernameControl"
+                      #userName
+                      id="inputUsername"
+                      name="inputUsername"
+                      type="text"
+                      class="form-control"
+                      placeholder="Username"
+                      required
+                    />
+                    <p
+                      id="userError"
+                      style="color: indianred"
+                      *ngIf="usernameNotAvailable"
+                    >
+                      Ese nombre de usuario ya está en uso
+                    </p>
+                  </div>
+                  <div class="form-group">
+                    <input
+                      #userAlias
+                      name="inputAlias"
+                      type="text"
+                      class="form-control"
+                      placeholder="Alias"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <input
+                      #userEmail
+                      name="inputEmail"
+                      type="email"
+                      class="form-control"
+                      placeholder="Email"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <div class="form-group">
+                      <input
+                        #userPassword
+                        [formControl]="passwordControl"
+                        id="inputPassword"
+                        name="password-field"
+                        type="password"
+                        class="form-control"
+                        placeholder="Contraseña"
+                        required
+                      />
+                      <span
+                        toggle="#password-field"
+                        class="fa fa-fw fa-eye field-icon toggle-password"
+                      ></span>
+                    </div>
+                    <div class="form-group">
+                      <input
+                        id="inputConfirmPassword"
+                        [formControl]="confirmPasswordControl"
+                        name="password-field-Confirm"
+                        type="password"
+                        class="form-control"
+                        placeholder="Confirmar contraseña"
+                        required
+                      />
+                      <span
+                        toggle="#password-field"
+                        class="fa fa-fw fa-eye field-icon toggle-password"
+                      ></span>
+                    </div>
+                    <p
+                      id="passwordsNotMatching"
+                      style="color: #ffffff"
+                      *ngIf="passwordsDontMatch && confirmPasswordTouched"
+                    >
+                      Las contraseñas no coinciden
+                    </p>
+                    <p
+                      id="passwordRequirements"
+                      style="color: #ffffff"
+                      *ngIf="passwordMissingRequirements"
+                    >
+                      La contraseña debe incluir al menos 4 caracteres y un
+                      número
+                    </p>
+
+                    <p
+                      id="wrongEmailMessage"
+                      style="color: #ffffff"
+                      *ngIf="emailNotValid"
+                    >
+                      El email no es válido
+                    </p>
+                  </div>
+
+                  <div class="form-group">
+                    <button
+                      type="submit"
+                      id="submit"
+                      [disabled]="
+                        this.usernameNotAvailable ||
+                        this.passwordsDontMatch ||
+                        this.passwordMissingRequirements
+                      "
+                      class="form-control btn btn-primary submit px-3 pill-button"
+                      (click)="
+                        signUp(
+                          userName.value,
+                          userAlias.value,
+                          userEmail.value,
+                          userPassword.value
+                        )
+                      "
+                    >
+                      Registrarse
+                    </button>
+                  </div>
+                </form>
+                <div class="form-group">
+                  <a>
+                    <button
+                      type="button"
+                      class="form-control btn btn-secondary submit px-3 pill-button"
+                      [routerLink]="['/login']"
+                    >
+                      Volver
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="background-smoke"></div>
+      </section>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="/js/signUp.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

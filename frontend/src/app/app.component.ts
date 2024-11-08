@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { slideInAnimation } from './animations/animations';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
+  animations: [slideInAnimation]
 })
 export class AppComponent {
   title = 'Bookmarks Forums';
@@ -20,5 +22,9 @@ export class AppComponent {
       this.showNavbarFooter = !(this.activatedRoute.firstChild?.snapshot.routeConfig?.path === 'login' ||
         this.activatedRoute.firstChild?.snapshot.routeConfig?.path === 'signup');
     });
+  }
+
+  prepareRoute(outlet: RouterOutlet) {
+    return outlet?.activatedRouteData?.['animation'];
   }
 }

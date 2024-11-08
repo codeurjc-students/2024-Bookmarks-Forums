@@ -127,4 +127,41 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                         "p.title LIKE %:query% OR " +
                         "p.content LIKE %:query% ORDER BY p.upvotes DESC")
         Page<Post> engineSearchPostsOrderByLikes(@Param("query") String query, Pageable pageable);
+
+        // Return the most liked posts of the most followed users a user follows
+        @Query("SELECT p FROM Post p WHERE p.author IN " +
+                        "(SELECT u.followingList FROM User u WHERE u.username = :username) " +
+                        "ORDER BY p.upvotes DESC")
+        Page<Post> getMostLikedPostsOfMostFollowedUsers(@Param("username") String username, Pageable pageable);
+
+        // Return the most liked posts of the communities a user follows
+        @Query("SELECT p FROM Post p WHERE p.community IN " +
+                        "(SELECT u.communities FROM User u WHERE u.username = :username) " +
+                        "ORDER BY p.upvotes DESC")
+        Page<Post> getMostLikedPostsOfFollowedCommunities(@Param("username") String username, Pageable pageable);
+
+        // Return the most recent posts of the communities a user follows
+        @Query("SELECT p FROM Post p WHERE p.community IN " +
+                        "(SELECT u.communities FROM User u WHERE u.username = :username) " +
+                        "ORDER BY p.fullCreationDate DESC")
+        Page<Post> getMostRecentPostsOfFollowedCommunities(@Param("username") String username, Pageable pageable);
+
+        // Return the most liked posts of the most followed communities
+        @Query("SELECT p FROM Post p WHERE p.community IN " +
+                        "(SELECT c FROM Community c ORDER BY SIZE(c.members) DESC) " +
+                        "ORDER BY p.upvotes DESC")
+        Page<Post> getMostLikedPostsOfMostFollowedCommunities(Pageable pageable);
+
+        // Return the most recent posts of the most followed communities
+        @Query("SELECT p FROM Post p WHERE p.community IN " +
+                        "(SELECT c FROM Community c ORDER BY SIZE(c.members) DESC) " +
+                        "ORDER BY p.fullCreationDate DESC")
+        Page<Post> getMostRecentPostsOfMostFollowedCommunities(Pageable pageable);
+
+        // Return the most liked posts of the most followed users
+        @Query("SELECT p FROM Post p WHERE p.author IN " +
+                        "(SELECT u FROM User u ORDER BY SIZE(u.followersList) DESC) " +
+                        "ORDER BY p.upvotes DESC")
+        Page<Post> getMostLikedPostsOfMostFollowedUsersGeneral(Pageable pageable);
+
 }

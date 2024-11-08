@@ -1,4 +1,4 @@
-export interface User{
+export interface User {
   username: string;
   roles: string[];
   alias: string;
@@ -8,6 +8,6 @@ export interface User{
   followers: number;
   following: number;
   fullCreationDate: string;
-  creationDate: string;
-  creationTime: string;
+  creationDate?: string;
+  creationTime?: string;
 }
