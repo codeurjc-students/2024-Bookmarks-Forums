@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Blob;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -186,6 +187,23 @@ public class UserService {
 
         // Save the user
         userRepository.save(user);
+    }
+
+    public Page<User> getMostPopularUsers(Pageable pageable) {
+        return userRepository.getUsersWithMostLikedContent(pageable);
+    }
+
+    public List<Object[]> getMostPopularUsersCount(int size) {
+        List<Object[]> userList = userRepository.getUsersWithMostLikedContentCount();
+        if (userList != null) {
+            if (size > userList.size()) {
+                return userList;
+            } else {
+                return userList.subList(0, size);
+            }
+        } else {
+            return Collections.emptyList();
+        }
     }
     
 }

@@ -217,6 +217,7 @@ public class APIPostController {
                         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                     }
                     post.setImage(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
+                    post.setHasImage(true);
                 } catch (IOException e) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
@@ -312,6 +313,7 @@ public class APIPostController {
                                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                             }
                             post.setImage(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
+                            post.setHasImage(true);
                         } catch (IOException e) {
                             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                         }
@@ -320,6 +322,7 @@ public class APIPostController {
                     }
                 } else {
                     post.setImage(null);
+                    post.setHasImage(false);
                 }
 
                 postService.updatePost(post);
@@ -371,6 +374,7 @@ public class APIPostController {
         // delete image
         if (action != null && action.equals("delete")) {
             post.setImage(null);
+            post.setHasImage(false);
             postService.updatePost(post);
             return new ResponseEntity<>(post, HttpStatus.OK);
         }
@@ -385,6 +389,7 @@ public class APIPostController {
                         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                     }
                     post.setImage(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
+                    post.setHasImage(true);
                 } catch (IOException e) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
@@ -697,7 +702,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found"),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/users/me/following/posts/most-liked")
@@ -711,7 +716,7 @@ public class APIPostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> posts = postService.getMostLikedPostsOfMostFollowedUsers(principal.getName(), pageable);
         if (posts.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }
@@ -722,7 +727,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found"),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/users/me/communities/posts/most-liked")
@@ -736,7 +741,7 @@ public class APIPostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> posts = postService.getMostLikedPostsOfUserCommunities(principal.getName(), pageable);
         if (posts.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }
@@ -747,7 +752,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found"),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/users/me/communities/posts/most-recent")
@@ -761,7 +766,7 @@ public class APIPostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> posts = postService.getMostRecentPostsOfFollowedCommunities(principal.getName(), pageable);
         if (posts.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }
@@ -772,7 +777,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found"),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/communities/most-popular/posts/most-liked")
@@ -781,7 +786,7 @@ public class APIPostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> posts = postService.getMostLikedPostsOfMostFollowedCommunities(pageable);
         if (posts.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }
@@ -792,7 +797,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found"),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/users/posts/most-liked")
@@ -801,7 +806,7 @@ public class APIPostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> posts = postService.getMostLikedPostsOfMostFollowedUsersGeneral(pageable);
         if (posts.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }
@@ -812,7 +817,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found"),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/communities/most-popular/posts/most-recent")
@@ -821,7 +826,7 @@ public class APIPostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> posts = postService.getMostRecentPostsOfMostFollowedCommunities(pageable);
         if (posts.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }

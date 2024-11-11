@@ -53,6 +53,9 @@ public class Post {
     @Lob
     private Blob image;
 
+    @JsonView(BasicInfo.class)
+    private boolean hasImage = false;
+
     // A post can only be made in one community
     @ManyToOne
     @JsonView(BasicInfo.class)
@@ -128,6 +131,7 @@ public class Post {
 
     public void addImage(Blob image) {
         this.image = image;
+        this.hasImage = true;
     }
 
     public Post(String title, String content, User author, Community community) {

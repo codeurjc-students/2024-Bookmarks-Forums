@@ -47,14 +47,6 @@
             <input type="hidden" name="_csrf" value=""/> <!-- CSRF token should go in value=""-->
           </form>
         </li>
-        <li class="bm-nav-item" style="display: flex; align-items: center">
-          <input type="checkbox" id="search-select" style="display: none; margin-left: 20px" [(ngModel)]="userSearch">
-          <label id="search-select-label" for="search-select" style="margin-left: 20px"></label>
-          <i (click)="toggleSearch('books')" class="fa-solid fa-book select-color" id="book-icon"
-             style="margin-left: 20px; cursor: pointer"></i>
-          <i (click)="toggleSearch('users')" class="fa-solid fa-user select-color" id="user-icon"
-             style="margin-left: 20px; cursor: pointer"></i>
-        </li>
       </ul>
       <!-- {{#user}} -->
       <form class="bm-d-flex" method="post" (submit)="logout()">

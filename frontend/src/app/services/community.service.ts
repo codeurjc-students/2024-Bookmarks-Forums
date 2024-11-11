@@ -4,6 +4,8 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Community } from '../models/community.model';
 
+type CommunitiesMembersCount = [number, string, number];
+
 const API_URL = '/api/v1/communities';
 
 @Injectable({
@@ -78,4 +80,12 @@ export class CommunityService {
             .get<Map<string, Object>>(`${API_URL}/${communityId}/posts`, { params: params })
             .pipe(catchError((error) => throwError(() => error)));
     }
+    
+    getMostPopularCommunitiesMembersCount(size: number): Observable<CommunitiesMembersCount[]> {
+        let params = new HttpParams().set('size', size);
+        return this.http
+            .get<CommunitiesMembersCount[]>(`${API_URL}/most-popular`, { params: params })
+            .pipe(catchError((error) => throwError(() => error)));
+    }
+
 }

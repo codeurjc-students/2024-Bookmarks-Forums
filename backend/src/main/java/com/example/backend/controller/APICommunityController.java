@@ -800,4 +800,22 @@ public class APICommunityController {
             return new ResponseEntity<>(bans.getContent(), HttpStatus.OK);
         }
     }
+
+    // Gets a list of community names and their respective member count
+    @Operation(summary = "Get a list of community names and their respective member count")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the community names and member counts", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBasicInfo.class))
+
+            }),
+            @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
+    })
+    @JsonView(CommunityBasicInfo.class)
+    @GetMapping("/communities/most-popular")
+    public ResponseEntity<List<Object[]>> getMostPopularCommunities(@RequestParam(defaultValue = "10") int size) {
+        List<Object[]> communities = communityService.getMostPopularCommunitiesCount(size);
+        return new ResponseEntity<>(communities, HttpStatus.OK);
+    }
 }

@@ -1,248 +1,425 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
 
-  <title>Bookmarks Forums - Inicio</title>
+    <title>Bookmarks Forums - Inicio</title>
 
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/8f3c0a721b.js"
+      crossorigin="anonymous"
+    ></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/8f3c0a721b.js" crossorigin="anonymous"></script>
+    <!-- Chart.js script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.js"></script>
 
-  <!-- Chart.js script -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.js"></script>
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-  <!-- jQuery library -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- ----------------------------------------------------------------- -->
+  </head>
+  <body>
+    <div class="main-body-container">
+      <header class="bg-branding-white py-1 page-hero">
+        <div class="container px-4 px-lg-5 my-5">
+          <div class="text-start text-dark">
+            <h1 class="display-4 fw-bolder header-welcome-text landing-hero">
+              <p *ngIf="heroNameVisible; else notLogged">
+                Muy buenas, {{ loggedUsername }}
+              </p>
+              <ng-template #notLogged>
+                <p>Presentamos Bookmarks Forums</p>
+              </ng-template>
+            </h1>
 
-  <!-- ----------------------------------------------------------------- -->
-</head>
-<body>
+            <p class="lead fw-normal text-white-50 mb-0">
+              El foro oficial de Bookmarks<br />
+            </p>
 
-<header class="bg-branding-white py-1">
-  <div class="container px-4 px-lg-5 my-5">
-    <div class="text-start text-dark">
-
-      <h1 class="display-4 fw-bolder header-welcome-text landing-hero">
-        <p>Bienvenido a Bookmarks</p>
-        <p *ngIf="heroNameVisible">,&nbsp;{{ loggedUsername }}</p>
-      </h1>
-
-      <p class="lead fw-normal text-white-50 mb-0">"Nuestras vidas se definen por las oportunidades,
-        incluso las
-        que perdemos"<br>- F. Scott Fitzgerald
-      <p *ngIf="isAdmin" class="isAdminText">Has iniciado sesión como administrador</p>
-    </div>
-  </div>
-</header>
-
-<!-- Page content-->
-<div class="container">
-  <div class="row">
-    <!-- Blog entries-->
-    <div class="col-lg-8">
-      <!-- Featured post header -->
-      <h3 class="fw-semibold mb-4">
-        <p *ngIf="loggedIn; else notLoggedRecommendedPost">Lo más popular para ti</p>
-        <ng-template #notLoggedRecommendedPost>
-          <p>Lo más popular del momento</p>
-        </ng-template>
-      </h3>
-      <!-- Featured post list -->
-      <div class="card mb-4 featured-book" *ngFor="let post of recommendedPostsPopular">
-        <div *ngIf="doesPostHaveImage(post.identifier)" class="img-container-featured">
-          <img class="card-img-top" [src]="bookImage(book.ID)" alt="bookImageURL goes here">
+            <p *ngIf="isAdmin" class="isAdminText">
+              Has iniciado sesión como administrador
+            </p>
+          </div>
         </div>
-        <div class="card-body">
-          // The ngFor is to iterate over the recommended books of the author (so if the list is empty, it won't give any errors, since it takes a bit for the REST API to respond to the request)
-          <div class="small text-muted">{{ book.releaseDate }}</div>
-          <h2 class="card-title">{{ book.title }}</h2>
-          <p class="card-text">{{ book.authorString }}</p>
-          <p class="card-text">{{ book.description }}</p>
-          <a class="btn btn-primary" [routerLink]="['book', book.ID]">Ver post</a>
-        </div>
-      </div>
+      </header>
 
+      <!-- Page content-->
+      <div class="container">
+        <div class="row justify-content-between">
+          <!-- Blog entries-->
+          <div class="col-lg-7">
+            <!-- Featured post header -->
+            <h3 class="fw-semibold mb-4">
+              <p
+                class="page-title"
+                *ngIf="loggedIn; else notLoggedRecommendedPost"
+              >
+                De los usuarios a los que sigues
+              </p>
+              <ng-template #notLoggedRecommendedPost>
+                <p class="page-title">De los usuarios más populares</p>
+              </ng-template>
+            </h3>
 
-      <!-- Nested row for non-featured blog posts. THESE POSTS MUST BE DYNAMICALLY LOADED (AJAX + SPRINGBOOT ,using templates) -->
-      <hr class="my-0"/>
-      <h3 class="fw-semibold mb-4 mt-4">
-        <p *ngIf="loggedIn; else notLoggedRecommendedGenre">Basado en tus géneros más leídos</p>
-        <ng-template #notLoggedRecommendedGenre>
-          <p>Basado en los géneros más leídos</p>
-        </ng-template>
-      </h3>
-      <!-- 
-      <div class="row" id="post-container">
-        <div class="col-lg-6" id="left-post-column">
-          <!-- Blog post LEFT SIDE 
-          <div class="card mb-4 blog-post" *ngFor="let genreLeftBook of recommendedBooksGenreLeft">
-            <div class="img-container">
-              <!-- Image goes here 
-              <a href="#"><img class="card-img-top"
-                               [src]="bookImage(genreLeftBook.ID)" alt="..."/></a>
+            <!-- Featured post list based on followed users -->
+            <div
+              class="post-card card mb-4 featured-post"
+              *ngFor="let post of recommendedPostsPopularUsers"
+            >
+              <a
+                [routerLink]="['/post', post.identifier]"
+                class="card-link"
+                [ngClass]="{
+                  'card-body-with-image': post.hasImage,
+                  'card-body': !post.hasImage
+                }"
+                [ngStyle]="
+                  post.hasImage
+                    ? {
+                        'background-image':
+                          'url(' + postImageURL(post.identifier) + ')'
+                      }
+                    : {}
+                "
+              >
+                <div [ngClass]="post.hasImage ? 'card-body-image-adapted' : ''">
+                  <div
+                    class="card-top-info d-flex justify-content-between align-items-center"
+                  >
+                    <a
+                      [routerLink]="['/profile', post.author.username]"
+                      class="card-link"
+                    >
+                      <div class="d-flex align-items-center card-user-info">
+                        <img
+                          [src]="profilePicture(post.author.username)"
+                          alt="Profile Picture"
+                          class="card-profile-picture me-2"
+                        />
+                        <p
+                          class="card-content card-text mb-0 card-user-username"
+                        >
+                          {{ post.author.username }}
+                        </p>
+                      </div>
+                    </a>
+                    <a
+                      class="card-link"
+                      [routerLink]="['/community', post.community.identifier]"
+                    >
+                      <div class="card-community-name-container">
+                        <p
+                          class="card-content card-text card-community-name-text mb-0"
+                        >
+                          {{ post.community.name }}
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+
+                  <div class="card-content small text-muted mb-1">
+                    {{
+                      post.fullCreationDate | date : "dd-MM-yyyy 'a las' HH:mm"
+                    }}
+                  </div>
+                  <h2 class="card-content card-title">{{ post.title }}</h2>
+                  <p class="card-content card-text">{{ post.content }}</p>
+                  <div
+                    class="card-bottom-action-bar d-flex justify-content-end"
+                  >
+                    <i class="fas fa-arrow-right"></i>
+                  </div>
+                </div>
+              </a>
             </div>
-            <div class="card-body">
-              <!-- Text and buttons go here 
-              <div class="small text-muted">{{ genreLeftBook.releaseDate }}</div>
-              <h2 class="card-title h4">{{ genreLeftBook.title }}</h2>
-              <p class="card-text">{{ genreLeftBook.authorString }}</p>
-              <p class="card-text">Género: {{ genreLeftBook.genre?.name }}</p>
-              <a class="btn btn-primary" [routerLink]="['book', genreLeftBook.ID]">Leer más</a>
+
+            <!-- LOAD MORE BUTTON -->
+            <nav aria-label="Pagination">
+              <ul
+                class="pagination justify-content-center my-4 load-more-container"
+              >
+                <!-- TODO: Load more button -->
+
+                <button
+                  class="btn btn-secondary load-more-btn"
+                  id="load-more-btn"
+                  (click)="loadMorePosts(0)"
+                  *ngIf="!noMorePostsUsers; else noMorePostsUsersMessage"
+                >
+                  <label
+                    id="load-more-label"
+                    *ngIf="
+                      !loadingMorePostsUsers;
+                      else loadingMorePostsUsersSpinner
+                    "
+                    >Cargar más</label
+                  >
+
+                  <ng-template #loadingMorePostsUsersSpinner>
+                    <div
+                      id="load-more-spinner"
+                      class="loader-in-btn"
+                      role="status"
+                    ></div>
+                  </ng-template>
+                </button>
+                <ng-template #noMorePostsUsersMessage>
+                  <p class="text-muted no-more-books-message">
+                    No hay más posts para mostrar
+                  </p>
+                </ng-template>
+              </ul>
+            </nav>
+
+            <hr class="my-0" />
+            <h3 class="fw-semibold mb-4 mt-4">
+              <p
+                *ngIf="loggedIn; else notLoggedRecommendedPostByCommunities"
+                class="page-title"
+              >
+                Lo último de tus comunidades
+              </p>
+              <ng-template #notLoggedRecommendedPostByCommunities>
+                <p class="page-title">
+                  Lo último de las comunidades más populares
+                </p>
+              </ng-template>
+            </h3>
+
+            <!-- Featured post list based on communities -->
+            <div
+              class="post-card card mb-4 featured-post"
+              *ngFor="let post of recommendedPostsPopularCommunities"
+            >
+              <a
+                [routerLink]="['/post', post.identifier]"
+                class="card-link"
+                [ngClass]="{
+                  'card-body-with-image': post.hasImage,
+                  'card-body': !post.hasImage
+                }"
+                [ngStyle]="
+                  post.hasImage
+                    ? {
+                        'background-image':
+                          'url(' + postImageURL(post.identifier) + ')'
+                      }
+                    : {}
+                "
+              >
+                <div [ngClass]="post.hasImage ? 'card-body-image-adapted' : ''">
+                  <div
+                    class="card-top-info d-flex justify-content-between align-items-center"
+                  >
+                    <a
+                      [routerLink]="['/profile', post.author.username]"
+                      class="card-link"
+                    >
+                      <div class="d-flex align-items-center card-user-info">
+                        <img
+                          [src]="profilePicture(post.author.username)"
+                          alt="Profile Picture"
+                          class="card-profile-picture me-2"
+                        />
+                        <p
+                          class="card-content card-text mb-0 card-user-username"
+                        >
+                          {{ post.author.username }}
+                        </p>
+                      </div>
+                    </a>
+                    <a
+                      class="card-link"
+                      [routerLink]="['/community', post.community.identifier]"
+                    >
+                      <div class="card-community-name-container">
+                        <p
+                          class="card-content card-text card-community-name-text mb-0"
+                        >
+                          {{ post.community.name }}
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+
+                  <div class="card-content small text-muted mb-1">
+                    {{
+                      post.fullCreationDate | date : "dd-MM-yyyy 'a las' HH:mm"
+                    }}
+                  </div>
+                  <h2 class="card-content card-title">{{ post.title }}</h2>
+                  <p class="card-content card-text">{{ post.content }}</p>
+                  <div
+                    class="card-bottom-action-bar d-flex justify-content-end"
+                  >
+                    <i class="fas fa-arrow-right"></i>
+                  </div>
+                </div>
+              </a>
             </div>
+
+            <!-- LOAD MORE BBUTTON -->
+            <nav aria-label="Pagination">
+              <ul
+                class="pagination justify-content-center my-4 load-more-container"
+              >
+                <!-- TODO: Load more button -->
+
+                <button
+                  class="btn btn-secondary load-more-btn"
+                  id="load-more-btn"
+                  (click)="loadMorePosts(1)"
+                  *ngIf="
+                    !noMorePostsCommunities;
+                    else noMorePostsCommunitiesMessage
+                  "
+                >
+                  <label
+                    id="load-more-label"
+                    *ngIf="
+                      !loadingMorePostsCommunities;
+                      else loadingMorePostsCommunitiesSpinner
+                    "
+                    >Cargar más</label
+                  >
+
+                  <ng-template #loadingMorePostsCommunitiesSpinner>
+                    <div
+                      id="load-more-spinner"
+                      class="loader-in-btn"
+                      role="status"
+                    ></div>
+                  </ng-template>
+                </button>
+                <ng-template #noMorePostsCommunitiesMessage>
+                  <p class="text-muted no-more-books-message">
+                    No hay más posts para mostrar
+                  </p>
+                </ng-template>
+              </ul>
+            </nav>
           </div>
 
-        </div>
-
-        <div class="col-lg-6" id="right-post-column">
-          <!-- Blog post RIGHT SIDE 
-          <div class="card mb-4 blog-post" *ngFor="let genreRightBook of recommendedBooksGenreRight">
-            <div class="img-container">
-              <!-- Image goes here 
-              <a href="#!"><img class="card-img-top"
-                                [src]="bookImage(genreRightBook.ID)" alt="..."/></a>
-
-            </div>
-            <div class="card-body">
-              <!-- Text and buttons go here 
-              <div class="small text-muted">{{ genreRightBook.releaseDate }}</div>
-              <h2 class="card-title h4">{{ genreRightBook.title }}</h2>
-              <p class="card-text">{{ genreRightBook.authorString }}</p>
-              <p class="card-text">Género: {{ genreRightBook.genre?.name }}</p>
-              <a class="btn btn-primary" [routerLink]="['book', genreRightBook.ID]">Leer más</a>
-            </div>
-          </div>
-
-        </div>
-      </div>
-      -->
-
-      <!-- LOAD MORE BBUTTON -->
-      <nav aria-label="Pagination">
-        <hr class="my-0"/>
-        <ul class="pagination justify-content-center my-4 load-more-container">
-          <!-- TODO: Load more button -->
-           <!--
-          <button class="btn btn-secondary" id="load-more-btn" (click)="loadMoreBooks()"
-                  *ngIf="!noMoreBooks; else noMoreBooksMessage">
-            <label id="load-more-label" *ngIf="!loadingMoreBooks; else loadingMoreBooksSpinner">Cargar más</label>
-
-            <ng-template #loadingMoreBooksSpinner>
-              <div id="load-more-spinner" class="loader-in-btn" role="status">
-              </div>
+          <!-- Side widgets-->
+          <div class="col-lg-4">
+            <h3
+              *ngIf="!loggedIn; else loggedProfilePanelMessage"
+              class="fw-semibold mb-4 page-title"
+            >
+              ¡Venga, anímate y únete a nosotros!
+            </h3>
+            <ng-template #loggedProfilePanelMessage>
+              <h3 class="fw-semibold mb-4 page-title">Tu perfil, y más</h3>
             </ng-template>
+            <!-- Users widget-->
+            <div class="card mb-4">
+              <ng-container *ngIf="!loggedIn; else loggedUserActionsPanel">
+                <div class="card-header">Acceso usuarios</div>
+                <div class="card-body">
+                  <p>
+                    ¡Publica, únete a comunidades interesantes y sigue a otros
+                    usuarios! Inicia sesión o crea una cuenta para empezar.
+                  </p>
+                  <div class="input-group">
+                    <a [routerLink]="['/login']">
+                      <button class="btn primary-btn" type="button">
+                        Iniciar sesión
+                      </button>
+                    </a>
+                    <a [routerLink]="['/signup']">
+                      <button class="btn primary-btn" type="button">
+                        Crear cuenta
+                      </button>
+                    </a>
+                  </div>
+                </div>
+              </ng-container>
 
-          </button>
-          -->
-          <ng-template
-            #noMoreBooksMessage>
-            <p class="text-muted
-            no-more-books-message">No hay más libros para mostrar</p>
-          </ng-template>
-        </ul>
-      </nav>
-    </div>
-
-
-    <!-- Side widgets-->
-    <div class="col-lg-4">
-      <h3 class="fw-semibold mb-4">Explora más</h3>
-      <!-- Users widget-->
-      <div class="card mb-4">
-        <ng-container *ngIf="!loggedIn; else loggedUserActionsPanel">
-          <div class="card-header">Acceso usuarios</div>
-          <div class="card-body">
-            <p>Encuentra nuevos libros, guarda los tuyos, ¡únete a Bookmarks!</p>
-            <div class="input-group">
-              <a [routerLink]="['/login']">
-                <button class="btn btn-primary" class="btn btn-primary" type="button">Iniciar sesión</button>
-              </a>
-              <a [routerLink]="['/signup']">
-                <button class="btn btn-primary" class="btn btn-primary" type="button">Crear cuenta</button>
-              </a>
+              <!-- User profile widget -->
+              <ng-template #loggedUserActionsPanel>
+                <div class="card-header">Acceso rápido a tu perfil</div>
+                <div class="card-body profile-card" *ngIf="userLoaded">
+                  <img
+                    class="profile-picture bm-rounded-circle"
+                    [src]="profilePicture(loggedUsername)"
+                    alt="Foto de perfil"
+                  />
+                  <p class="mt-2">{{ loggedUsername }}</p>
+                  <div class="input-group">
+                    <a [routerLink]="['profile', loggedUsername]">
+                      <button class="btn primary-btn" type="button">
+                        Ver perfil
+                      </button>
+                    </a>
+                  </div>
+                </div>
+              </ng-template>
             </div>
-          </div>
-        </ng-container>
 
-
-        <!-- User profile widget -->
-        <ng-template #loggedUserActionsPanel>
-          <div class="card-header">Acceso rápido a tu perfil</div>
-          <div class="card-body profile-card" *ngIf="userLoaded">
-            <img class="profile-picture bm-rounded-circle" [src]="profilePicture(loggedUsername)" alt="Foto de perfil"/>
-            <p class="mt-2">{{ loggedUsername }}</p>
-            <div class="input-group">
-              <a [routerLink]="['profile', loggedUsername]">
-                <button class="btn btn-primary" type="button">Ver perfil</button>
-              </a>
-
+            <!-- Side widget-->
+            <div class="card mb-4">
+              <div class="card-header">Lo están petando</div>
+              <div class="card-body">
+                <div id="mostReadGenresChartContainer">
+                  <canvas id="mostPopularUsersChart">{{ chart }}</canvas>
+                  <div
+                    id="mostReadGenresSpinner"
+                    class="loader-green"
+                    role="status"
+                    *ngIf="loadingChart"
+                  ></div>
+                </div>
+              </div>
             </div>
-          </div>
-        </ng-template>
-      </div>
 
-      <!-- TODO: Popular users widget-->
-       <!-- 
-      <div class="card mb-4">
-        <div class="card-header">Top 5 géneros más populares</div>
-        <div class="card-body">
-          <div id="mostReadGenresChartContainer">
-            <canvas id="mostReadGenresChart">{{ chart }}</canvas>
-            <div id="mostReadGenresSpinner" class="loader-green" role="status" *ngIf="loadingChart">
+            <!-- Side widget-->
+            <div class="card mb-4">
+              <div class="card-header">Las comunidades más populares</div>
+              <div class="card-body">
+                <div class="row">
+                  <ul class="list-styled mb-0 stats-list">
+                    <li class="stats-list-item">
+                      <h6 class="list-header">Nombre</h6>
+                      <h6 class="list-header">Miembros</h6>
+                    </li>
+                    <hr class="list-header-divider" />
+                    <li *ngFor="let community of communitiesMembersCount">
+                      <a
+                        [routerLink]="['/community', community[0]]"
+                        class="branding-link"
+                      >
+                        <div class="stats-list-item">
+                          <h6 class="fw-normal branding-link-text">
+                            {{ community[1] }}
+                          </h6>
+                          <h6 class="fw-bold stats-number branding-link-text">
+                            {{ community[2] }}
+                          </h6>
+                        </div>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-
-        </div>
-      </div>
-      -->
-      <!-- Side widget-->
-      <div class="card mb-4">
-        <div class="card-header">Más sobre Bookmarks</div>
-        <div class="card-body">
-          <div class="row">
-            <ul class="list-styled mb-0 stats-list">
-              <li>
-                <div class="stats-list-item">
-                  <h6 class="fw-normal">Libros totales: </h6>
-                  <h6 class="fw-bold stats-number">
-                    {{ totalSiteBooks }}
-                  </h6>
-                </div>
-              </li>
-              <li>
-                <div class="stats-list-item">
-                  <h6 class="fw-normal">Géneros totales: </h6>
-                  <h6 class="fw-bold stats-number">
-                    {{ totalSiteGenres }}
-                  </h6>
-                </div>
-              </li>
-              <li>
-                <div class="stats-list-item">
-                  <h6 class="fw-normal">Autores totales: </h6>
-                  <h6 class="fw-bold stats-number">
-                    {{ totalSiteAuthors }}
-                  </h6>
-                </div>
-              </li>
-              <li>
-                <div class="stats-list-item">
-                  <h6 class="fw-normal">Usuarios totales: </h6>
-                  <h6 class="fw-bold stats-number">
-                    {{ totalSiteUsers }}
-                  </h6>
-                </div>
-              </li>
-            </ul>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
-</body>
+  </body>
+</html>

@@ -4,6 +4,8 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { User } from '../models/user.model';
 
+type UsersLikesCount = [string, number];
+
 const API_URL = '/api/v1/users';
 
 const baseUrl = '/api/v1';
@@ -40,6 +42,10 @@ export class UserService {
     return this.http
       .get(API_URL + '/' + username + '/pictures', { responseType: 'blob' })
       .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  getPostImageURL(username: string): string {
+    return API_URL + '/' + username + '/pictures';
   }
 
   getCurrentUser(): Observable<User> {
@@ -181,6 +187,13 @@ export class UserService {
     formData.append('file', file);
     return this.http
       .post<User>(API_URL + '/' + username + '/pictures', formData)
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  getMostPopularUsersLikesCount(size: number): Observable<UsersLikesCount[]> {
+    let params = new HttpParams().set('size', size);
+    return this.http
+      .get<UsersLikesCount[]>(API_URL + '/most-popular', { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 }

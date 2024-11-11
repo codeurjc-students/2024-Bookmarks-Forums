@@ -50,6 +50,10 @@ public class CommunitySampleService {
             communities.get(i).addMember(user);
         }
 
+        // YourReader is a member of bookmarks forums
+        user = userRepository.findByUsername("YourReader");
+        communities.get(0).addMember(user);
+
         communityRepository.saveAll(communities);
     }
 }

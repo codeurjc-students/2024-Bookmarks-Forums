@@ -123,4 +123,12 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         @Query("SELECT b FROM Ban b WHERE b.id = :banId")
         Ban getBanById(long banId);
 
+        // Get communities with the most number of members and return both the community name and the total number of members
+        @Query("SELECT c.name, COUNT(m) as totalMembers FROM Community c LEFT JOIN c.members m GROUP BY c.name ORDER BY totalMembers DESC")
+        List<Object[]> getMostPopularCommunitiesCount();
+
+        // Get communities with the most number of members and return the community identifier, name, and the total number of members
+        @Query("SELECT c.identifier, c.name, COUNT(m) as totalMembers FROM Community c LEFT JOIN c.members m GROUP BY c.identifier ORDER BY totalMembers DESC")
+        List<Object[]> getMostPopularCommunitiesCountWithId();
+
 }

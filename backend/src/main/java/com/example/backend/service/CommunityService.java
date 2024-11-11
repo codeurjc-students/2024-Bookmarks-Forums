@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -300,6 +301,19 @@ public class CommunityService {
     // Get ban by id
     public Ban getBanById(Long id) {
         return communityRepository.getBanById(id);
+    }
+
+    public List<Object[]> getMostPopularCommunitiesCount(int size) {
+        List<Object[]> communities = communityRepository.getMostPopularCommunitiesCountWithId();
+        if (communities != null){
+            if (size > communities.size()) {
+                return communities;
+            } else {
+                return communities.subList(0, size);
+            }
+        } else {
+            return Collections.emptyList();
+        }
     }
 
 }

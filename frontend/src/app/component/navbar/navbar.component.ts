@@ -50,7 +50,7 @@ export class NavbarComponent implements OnInit {
   }
 
   profileImage(username: string) {
-    return this.userService.downloadProfilePicture(username);
+    return this.userService.getPostImageURL(username);
   }
 
   defaultImage() {

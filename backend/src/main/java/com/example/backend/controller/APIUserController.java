@@ -596,4 +596,19 @@ public class APIUserController {
             super(message);
         }
     }
+
+    // Get users with the most liked posts
+    @JsonView(UserBasicView.class)
+    @Operation(summary = "Get users with the most liked posts")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserBasicView.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Users not found"),
+    })
+    @GetMapping("/users/most-popular")
+    public ResponseEntity<List<Object[]>> getMostPopularUsers(@RequestParam(defaultValue = "10") int size) {
+            return new ResponseEntity<>(userService.getMostPopularUsersCount(size), HttpStatus.OK);
+
+    }
 }

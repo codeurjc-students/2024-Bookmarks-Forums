@@ -84,5 +84,14 @@ public interface UserRepository extends JpaRepository<User, String> {
         // Get downvoted posts
         @Query("SELECT u.downvotedPosts FROM User u WHERE u.username LIKE %:username%")
         List<Post> getDownvotedPosts(@Param("username") String username);
-        
+
+        // Get users with the most upvoted content
+        @Query("SELECT u FROM User u JOIN u.posts p ORDER BY p.upvotes DESC")
+        Page<User> getUsersWithMostLikedContent(Pageable pageable);
+
+        // Get users with the most upvoted content and return both the username and the
+        // total number of upvotes
+        @Query("SELECT u.username, SUM(p.upvotes) as totalUpvotes FROM User u JOIN u.posts p GROUP BY u.username ORDER BY totalUpvotes DESC")
+        List<Object[]> getUsersWithMostLikedContentCount();
+
 }

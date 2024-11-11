@@ -3,9 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { LoginService } from '../../services/session.service';
 import { PostService } from '../../services/post.service';
 import { UserService } from '../../services/user.service';
+import { CommunityService } from '../../services/community.service';
 import { User } from '../../models/user.model';
 import { Post } from '../../models/post.model';
+import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
+import { DatePipe } from '@angular/common';
 
 Chart.register(...registerables);
 
@@ -13,6 +16,7 @@ Chart.register(...registerables);
   selector: 'app-landing',
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css', '../../../animations.css'],
+  providers: [DatePipe],
 })
 export class LandingComponent implements OnInit {
   title = 'Bookmarks';
@@ -24,6 +28,8 @@ export class LandingComponent implements OnInit {
 
   userLoaded = false;
 
+  communitiesMembersCount: [number, string, number][] = [];
+
   recommendedPostsPopularUsers: Post[] = [];
   recommendedPostsPopularCommunities: Post[] = [];
 
@@ -32,13 +38,27 @@ export class LandingComponent implements OnInit {
   loggedIn: boolean = false;
   isAdmin: boolean = false;
 
+  loadingChart = true;
+  public chart: any;
+
+  size = 4;
+  pagePostUsers = 0;
+  pagePostCommunities = 0;
+
+  loadingMorePostsUsers = false;
+  loadingMorePostsCommunities = false;
+
+  noMorePostsUsers = false;
+  noMorePostsCommunities = false;
+
   latestGeneralPosts: Post[] = [];
 
   constructor(
     private http: HttpClient,
     public loginService: LoginService,
     public profileService: UserService,
-    public postService: PostService
+    public postService: PostService,
+    public communityService: CommunityService
   ) {}
 
   ngOnInit(): void {
@@ -46,9 +66,25 @@ export class LandingComponent implements OnInit {
     let url = window.location.href;
     url = url.substring(0, url.length - 1);
     history.pushState(null, '', url);
+    this.loadChart();
+    this.loadPopularCommunitiesList();
 
     // Check if user is logged in
     this.checkIfLoggedIn();
+  }
+
+  loadPopularCommunitiesList() {
+    this.communityService.getMostPopularCommunitiesMembersCount(10).subscribe({
+      next: (communities) => {
+        this.communitiesMembersCount = communities;
+      },
+      error: (r) => {
+        console.error(
+          'Error getting most popular communities members count: ' +
+            JSON.stringify(r)
+        );
+      },
+    });
   }
 
   loadUserData(user: User) {
@@ -83,22 +119,28 @@ export class LandingComponent implements OnInit {
   }
 
   algoUser(option: string) {
-    if (option === 'default') {
-      this.postService.getUserRecommendations('most-liked-users').subscribe({
-        next: (posts) => {
-          this.recommendedPostsPopularUsers = posts;
-        },
-        error: (r) => {
-          console.error(
-            'Error getting recommended posts: ' + JSON.stringify(r)
-          );
-        },
-      });
+    if (option === 'default' || option === 'most-liked-users') {
       this.postService
-        .getUserRecommendations('most-recent-communities')
+        .getUserRecommendations(
+          'most-liked-users',
+          this.pagePostUsers,
+          this.size
+        )
         .subscribe({
           next: (posts) => {
-            this.recommendedPostsPopularCommunities = posts;
+            if (!posts) {
+              this.noMorePostsUsers = true;
+              this.loadingMorePostsUsers = false;
+              return;
+            }
+            this.recommendedPostsPopularUsers =
+              this.recommendedPostsPopularUsers.concat(posts);
+            this.pagePostUsers += 1;
+            this.loadingMorePostsUsers = false;
+
+            if (posts.length < this.size) {
+              this.noMorePostsUsers = true;
+            }
           },
           error: (r) => {
             console.error(
@@ -106,22 +148,89 @@ export class LandingComponent implements OnInit {
             );
           },
         });
-    } else if (option === 'no-following') {
-      this.postService.getGeneralRecommendations('most-liked-users').subscribe({
-        next: (posts) => {
-          this.recommendedPostsPopularUsers = posts;
-        },
-        error: (r) => {
-          console.error(
-            'Error getting recommended posts: ' + JSON.stringify(r)
-          );
-        },
-      });
+    } else if (option === 'most-recent-communities' || option === 'default') {
       this.postService
-        .getUserRecommendations('most-recent-communities')
+        .getUserRecommendations(
+          'most-recent-communities',
+          this.pagePostCommunities,
+          this.size
+        )
         .subscribe({
           next: (posts) => {
-            this.recommendedPostsPopularCommunities = posts;
+            if (!posts) {
+              this.noMorePostsCommunities = true;
+              this.loadingMorePostsCommunities = false;
+              return;
+            }
+            this.recommendedPostsPopularCommunities =
+              this.recommendedPostsPopularCommunities.concat(posts);
+            this.pagePostCommunities += 1;
+            this.loadingMorePostsCommunities = false;
+
+            if (posts.length < this.size) {
+              this.noMorePostsCommunities = true;
+            }
+          },
+          error: (r) => {
+            console.error(
+              'Error getting recommended posts: ' + JSON.stringify(r)
+            );
+          },
+        });
+    } else if (option === 'no-following' || option === 'most-liked-users') {
+      this.postService
+        .getGeneralRecommendations(
+          'most-liked-users',
+          this.pagePostUsers,
+          this.size
+        )
+        .subscribe({
+          next: (posts) => {
+            if (!posts) {
+              this.noMorePostsUsers = true;
+              this.loadingMorePostsUsers = false;
+              return;
+            }
+            this.recommendedPostsPopularUsers =
+              this.recommendedPostsPopularUsers.concat(posts);
+            this.pagePostUsers += 1;
+            this.loadingMorePostsUsers = false;
+
+            if (posts.length < this.size) {
+              this.noMorePostsUsers = true;
+            }
+          },
+          error: (r) => {
+            console.error(
+              'Error getting recommended posts: ' + JSON.stringify(r)
+            );
+          },
+        });
+    } else if (
+      option === 'most-liked-communities' ||
+      option === 'no-following'
+    ) {
+      this.postService
+        .getUserRecommendations(
+          'most-recent-communities',
+          this.pagePostCommunities,
+          this.size
+        )
+        .subscribe({
+          next: (posts) => {
+            if (!posts) {
+              this.noMorePostsCommunities = true;
+              this.loadingMorePostsCommunities = false;
+              return;
+            }
+            this.recommendedPostsPopularCommunities =
+              this.recommendedPostsPopularCommunities.concat(posts);
+            this.pagePostCommunities += 1;
+            this.loadingMorePostsCommunities = false;
+
+            if (posts.length < this.size) {
+              this.noMorePostsCommunities = true;
+            }
           },
           error: (r) => {
             console.error(
@@ -131,10 +240,26 @@ export class LandingComponent implements OnInit {
         });
     } else {
       this.postService
-        .getUserRecommendations('most-liked-communities')
+        .getUserRecommendations(
+          'most-liked-communities',
+          this.pagePostCommunities,
+          this.size
+        )
         .subscribe({
           next: (posts) => {
-            this.recommendedPostsPopularCommunities = posts;
+            if (!posts) {
+              this.noMorePostsCommunities = true;
+              this.loadingMorePostsCommunities = false;
+              return;
+            }
+            this.recommendedPostsPopularCommunities =
+              this.recommendedPostsPopularCommunities.concat(posts);
+            this.pagePostCommunities += 1;
+            this.loadingMorePostsCommunities = false;
+
+            if (posts.length < this.size) {
+              this.noMorePostsCommunities = true;
+            }
           },
           error: (r) => {
             console.error(
@@ -146,21 +271,58 @@ export class LandingComponent implements OnInit {
   }
 
   algoGeneral(option: string) {
-    this.postService.getGeneralRecommendations('most-liked-users').subscribe({
-      next: (posts) => {
-        this.recommendedPostsPopularUsers = posts;
-      },
-      error: (r) => {
-        console.error('Error getting recommended posts: ' + JSON.stringify(r));
-      },
-    });
-
-    if (option === 'default') {
+    if (option === 'most-liked-users' || option === 'default') {
       this.postService
-        .getGeneralRecommendations('most-recent-communities')
+        .getGeneralRecommendations(
+          'most-liked-users', // default
+          this.pagePostUsers,
+          this.size
+        )
         .subscribe({
           next: (posts) => {
-            this.recommendedPostsPopularCommunities = posts;
+            // if response is 204, no posts were found
+            if (!posts) {
+              this.noMorePostsUsers = true;
+              this.loadingMorePostsUsers = false;
+              return;
+            }
+            this.recommendedPostsPopularUsers =
+              this.recommendedPostsPopularUsers.concat(posts);
+            this.pagePostUsers += 1;
+            this.loadingMorePostsUsers = false;
+
+            if (posts.length < this.size) {
+              this.noMorePostsUsers = true;
+            }
+          },
+          error: (r) => {
+            console.error(
+              'Error getting recommended posts: ' + JSON.stringify(r)
+            );
+          },
+        });
+    } else if (option === 'most-recent-communities' || option === 'default') {
+      this.postService
+        .getGeneralRecommendations(
+          'most-recent-communities', // default
+          this.pagePostCommunities,
+          this.size
+        )
+        .subscribe({
+          next: (posts) => {
+            if (!posts) {
+              this.noMorePostsCommunities = true;
+              this.loadingMorePostsCommunities = false;
+              return;
+            }
+            this.recommendedPostsPopularCommunities =
+              this.recommendedPostsPopularCommunities.concat(posts);
+            this.pagePostCommunities += 1;
+            this.loadingMorePostsCommunities = false;
+
+            if (posts.length < this.size) {
+              this.noMorePostsCommunities = true;
+            }
           },
           error: (r) => {
             console.error(
@@ -170,10 +332,26 @@ export class LandingComponent implements OnInit {
         });
     } else {
       this.postService
-        .getGeneralRecommendations('most-liked-communities')
+        .getGeneralRecommendations(
+          'most-liked-communities',
+          this.pagePostCommunities,
+          this.size
+        )
         .subscribe({
           next: (posts) => {
-            this.recommendedPostsPopularCommunities = posts;
+            if (!posts) {
+              this.noMorePostsCommunities = true;
+              this.loadingMorePostsCommunities = false;
+              return;
+            }
+            this.recommendedPostsPopularCommunities =
+              this.recommendedPostsPopularCommunities.concat(posts);
+            this.pagePostCommunities += 1;
+            this.loadingMorePostsCommunities = false;
+
+            if (posts.length < this.size) {
+              this.noMorePostsCommunities = true;
+            }
           },
           error: (r) => {
             console.error(
@@ -189,13 +367,17 @@ export class LandingComponent implements OnInit {
     if (this.loggedIn) {
       // does the user follow anyone
       if (this.user!.following > 0) {
-        this.algoUser('default');
+        this.algoUser('most-liked-users');
+        this.algoUser('most-recent-communities');
       } else {
         this.algoUser('no-following');
+        this.algoUser('most-liked-users');
+        this.algoUser('most-liked-communities');
       }
     } else {
       // if user is not logged in
-      this.algoGeneral('default');
+      this.algoGeneral('most-liked-users');
+      this.algoGeneral('most-recent-communities');
     }
   }
 
@@ -238,7 +420,7 @@ export class LandingComponent implements OnInit {
 
   // Get user profile picture
   profilePicture(username: string) {
-    return this.profileService.downloadProfilePicture(username);
+    return this.profileService.getPostImageURL(username);
   }
 
   login() {
@@ -266,5 +448,117 @@ export class LandingComponent implements OnInit {
         console.error('Logout failed: ' + JSON.stringify(r));
       },
     });
+  }
+
+  postImage(postID: number) {
+    return this.postService.getPostImage(postID);
+  }
+
+  postImageURL(postID: number) {
+    return this.postService.getPostImageURL(postID);
+  }
+
+  loadChart() {
+    // Chart data gathering
+
+    let usernames: string[] = [];
+    let likesCount: number[] = [];
+
+    this.profileService.getMostPopularUsersLikesCount(10).subscribe({
+      next: (users) => {
+        users.forEach((user) => {
+          usernames.push(user[0]);
+          likesCount.push(user[1]);
+        });
+
+        // Create the chart
+
+        new Chart('mostPopularUsersChart', {
+          type: 'bar',
+          data: {
+            labels: usernames,
+            datasets: [
+              {
+                label: 'Upvotes totales',
+                data: likesCount,
+                backgroundColor: '#F8DDA4',
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function (value, index, values) {
+                    return Math.round(value as number);
+                  },
+                  color: '#91818A', // Set the color of the y-axis labels
+                },
+                grid: {
+                  display: false,
+                },
+              },
+              x: {
+                ticks: {
+                  color: '#efefef', // Set the color of the x-axis labels
+                },
+                grid: {
+                  display: false,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  color: '#efefef', // Set the color of the legend text
+                },
+              },
+            },
+          },
+        });
+        this.loadingChart = false;
+      },
+      error: (r) => {
+        console.error(
+          'Error getting most popular users likes count: ' + JSON.stringify(r)
+        );
+      },
+    });
+  }
+
+  loadMorePostsGeneral(mode: number) {
+    if (mode === 0) {
+      this.loadingMorePostsUsers = true;
+      this.algoGeneral('most-liked-users');
+    }
+    if (mode === 1) {
+      this.loadingMorePostsCommunities = true;
+      this.algoGeneral('most-recent-communities');
+    }
+  }
+
+  loadMorePostsUser(mode: number) {
+    if (mode === 0) {
+      this.loadingMorePostsUsers = true;
+      this.algoUser('most-liked-users');
+    }
+    if (mode === 1) {
+      this.loadingMorePostsCommunities = true;
+      this.algoUser('most-recent-communities');
+    }
+  }
+
+  /*
+        mode: 0: load more posts for users
+              1: load more posts for communities
+  */
+  loadMorePosts(mode: number) {
+    if (!this.loggedIn) {
+      this.loadMorePostsGeneral(mode);
+    } else {
+      this.loadMorePostsUser(mode);
+    }
   }
 }

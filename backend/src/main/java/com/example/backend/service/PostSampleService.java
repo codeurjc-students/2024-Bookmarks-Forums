@@ -59,5 +59,30 @@ public class PostSampleService {
             Reply reply = new Reply(replyTitles.get(i), replyContents.get(i), users.get(i), posts.get(i));
             replyRepository.save(reply);
         }
+
+        // Everybody upvotes the second post
+        Post post = posts.get(1);
+        for (User user : users) {
+            post.upvote(user);
+        }
+
+        // The first post is upvoted by the first user and downvoted by the second user
+        post = posts.get(0);
+        post.upvote(users.get(0));
+        post.downvote(users.get(1));
+
+        // The third post is upvoted by 2 users and downvoted by 1 user
+        post = posts.get(2);
+        post.upvote(users.get(0));
+        post.upvote(users.get(1));
+        post.downvote(users.get(2));
+
+        // The fourth post is upvoted by 3 users
+        post = posts.get(3);
+        for (int i = 0; i < 3; i++) {
+            post.upvote(users.get(i));
+        }
+
+        postRepository.saveAll(posts);
     }
 }

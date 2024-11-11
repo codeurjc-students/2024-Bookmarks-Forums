@@ -1,6 +1,6 @@
 .underline-active {
   position: relative;
-  color: #F8DDA4;
+  color: #efefef;
 }
 
 .underline-active::after {
@@ -10,7 +10,7 @@
   bottom: 0;
   height: 5px; /* Adjust as needed */
   width: 100%;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="5"><circle cx="4" cy="2.5" r="2.5" fill="%23F8DDA4"/><circle cx="15" cy="2.5" r="2.5" fill="%23F8DDA4"/><circle cx="26" cy="2.5" r="2.5" fill="%23F8DDA4"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="5"><circle cx="4" cy="2.5" r="2.5" fill="%23efefef"/><circle cx="15" cy="2.5" r="2.5" fill="%23efefef"/><circle cx="26" cy="2.5" r="2.5" fill="%23efefef"/></svg>');
   background-repeat: no-repeat;
   background-position: center; /* Center the background image */
   background-size: contain;
@@ -21,4 +21,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.dropdown-menu {
+  background-color: rgba(42, 43, 46, 1) !important; 
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); 
+  border-radius: 12px !important; 
+}
+
+.dropdown-item {
+  color: #efefef !important;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: #495057 !important;
+}
+
+.bm-nav-item.dropdown .dropdown-toggle::after {
+  color: #e4e4e4 !important;
+  vertical-align: middle;
 }

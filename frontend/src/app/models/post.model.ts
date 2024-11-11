@@ -3,6 +3,7 @@ import { User } from './user.model';
 
 export interface Post {
   identifier: number;
+  hasImage?: boolean;
   author: User;
   title: string;
   content: string;

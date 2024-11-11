@@ -31,7 +31,7 @@ public class Community {
     // The community ID is the same as the community name but with spaces replaced
     // by underscores
     @Id
-    @JsonView(BasicInfo.class)
+    @JsonView(NameInfo.class)
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
     private Long identifier;
 
