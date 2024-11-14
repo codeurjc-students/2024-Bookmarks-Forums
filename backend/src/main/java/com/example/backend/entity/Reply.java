@@ -1,6 +1,8 @@
 package com.example.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonView;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -45,9 +47,11 @@ public class Reply {
     private Post post;
 
     @JsonView(BasicInfo.class)
+    @Column(length = 150)
     private String title;
 
     @JsonView(BasicInfo.class)
+    @Column(length = 500)  
     private String content;
 
     @JsonView(BasicInfo.class)

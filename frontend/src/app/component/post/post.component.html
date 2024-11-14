@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <title>Bookmarks Forums - Post</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/8f3c0a721b.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Chart.js script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.js"></script>
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- ----------------------------------------------------------------- -->
+  </head>
+  <body>
+    <div class="main-body-container">
+      <!-- Page hero ---------------------------------------------------- -->
+      <header
+        class="bg-branding-white py-1 page-hero"
+        [ngClass]="
+          hasBanner(post?.community?.identifier) ? 'header-image-adapted' : ''
+        "
+        [ngStyle]="{
+          'background-image':
+            'url(' + communityBannerURL(post?.community?.identifier) + ')'
+        }"
+      >
+        <div class="header-top-info">
+          <a
+            class="card-link"
+            [routerLink]="['/community', post?.community?.identifier]"
+          >
+            <div
+              class="card-community-name-container branding-hyperlink-container"
+            >
+              <p
+                class="lead fw-normal text-white-50 mb-0 branding-hyperlink-text"
+              >
+                {{ post?.community?.name }}<br />
+              </p>
+            </div>
+          </a>
+        </div>
+        <div class="container px-4 px-lg-5 my-5">
+          <div class="text-start text-dark">
+            <a
+              [routerLink]="['/profile', post?.author?.username]"
+              class="card-link"
+            >
+              <div class="post-author-container">
+                <div class="post-author-profile-picture">
+                  <img
+                    class="profile-picture bm-rounded-circle"
+                    [src]="profilePicture(post?.author?.username)"
+                    alt="Foto de perfil del usuario publicante"
+                  />
+                </div>
+                <h1
+                  class="display-4 fw-bolder header-main-text landing-hero hero-hyperlink hero-username"
+                >
+                  <p>
+                    {{ post?.author?.username }}
+                  </p>
+                </h1>
+              </div>
+            </a>
+          </div>
+        </div>
+      </header>
+      <!-- ----------------------------------------------------------------- -->
+
+      <!-- Page content-->
+      <div class="container">
+        <div class="row justify-content-between">
+          <!-- Post Column -->
+          <div class="col-lg-7">
+            <!-- Post card -->
+            <div class="post-container-card card mb-4 featured-post">
+              <div class="post-container-card-top">
+                <div
+                  class="post-top-info d-flex justify-content-between align-items-center"
+                >
+                  <div class="card-content small text-muted mb-1">
+                    {{
+                      post?.fullCreationDate | date : "dd-MM-yyyy 'a las' HH:mm"
+                    }}
+                  </div>
+                </div>
+
+                <h2 class="card-content card-title">{{ post?.title }}</h2>
+              </div>
+              <div class="post-container-card-body">
+                <p class="post-container-card-body-text">{{ post?.content }}</p>
+              </div>
+              <!-- Post image -->
+              <ng-container *ngIf="post?.hasImage">
+                <div class="post-container-divider-container">
+                  <hr class="post-container-divider" />
+                </div>
+              </ng-container>
+              <div class="post-container-card-body-image-container">
+                <img
+                  *ngIf="post?.hasImage"
+                  [src]="postImageURL(post?.identifier)"
+                  alt="Post"
+                  class="post-container-card-body-image"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Replies column -->
+          <div class="col-lg-4">
+            <!-- Replies widget -->
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <div class="comments-title-container">
+                  <h3 class="fw-semibold page-title">Comentarios</h3>
+                  <div class="comments-count-container">
+                    <h3 class="card-content fw-semibold text-muted">
+                      {{ replies.length }}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="replies-list">
+                  <div
+                    *ngFor="let reply of this.replies"
+                    class="reply-card card mb-3"
+                  >
+                    <div
+                      class="card-top-info d-flex justify-content-between align-items-center"
+                    >
+                      <a
+                        [routerLink]="['/profile', reply.author.username]"
+                        class="card-link"
+                      >
+                        <div class="d-flex align-items-center card-user-info">
+                          <img
+                            [src]="profilePicture(reply.author.username)"
+                            alt="Profile Picture"
+                            class="card-profile-picture me-2"
+                          />
+                          <p
+                            class="card-content card-text mb-0 card-user-username"
+                          >
+                            {{ reply.author.username }}
+                          </p>
+                        </div>
+                      </a>
+                      <div class="card-content small text-muted mb-1">
+                        {{
+                          reply?.fullCreationDate
+                            | date : "dd-MM-yyyy 'a las' HH:mm"
+                        }}
+                      </div>
+                      <!-- Reply delete button -->
+                      <button
+                        *ngIf="reply.author.username === loggedUsername"
+                        class="btn danger-btn delete-reply-btn"
+                        (click)="deleteReply(reply.identifier)"
+                        title="Eliminar comentario"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                    <h4 class="card-content card-title wrap-text">
+                      {{ reply?.title }}
+                    </h4>
+                    <p class="card-content card-text wrap-text">
+                      {{ reply?.content }}
+                    </p>
+                  </div>
+                </div>
+                <!-- Reply text input and submit button-->
+                <div class="post-container-divider-container no-margins">
+                  <hr class="post-container-divider" />
+                </div>
+                <ng-container *ngIf="loggedIn; else notLoggedInRepliesText">
+                  <div class="reply-input-container">
+                    <input
+                      type="text"
+                      class="form-control mb-2 input-field reply-title-input"
+                      placeholder="Título de tu respuesta"
+                      [(ngModel)]="replyTitle"
+                    />
+                    <textarea
+                      class="form-control mb-2 input-field reply-content-input"
+                      placeholder="Escribe tu respuesta aquí"
+                      [(ngModel)]="replyContent"
+                    ></textarea>
+                    <button
+                      class="btn primary-btn"
+                      (click)="submitReply(post?.identifier)"
+                    >
+                      Responder
+                    </button>
+                  </div>
+                </ng-container>
+                <ng-template #notLoggedInRepliesText>
+                  <div class="reply-input-container">
+                    <p class="card-content card-text wrap-text center-text">
+                      Inicia sesión para poder responder a este post.
+                    </p>
+                    <!-- Login button -->
+                    <div class="d-grid gap-2">
+                      <a class="btn primary-btn" [routerLink]="['/login']"
+                        >Iniciar sesión</a
+                      >
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

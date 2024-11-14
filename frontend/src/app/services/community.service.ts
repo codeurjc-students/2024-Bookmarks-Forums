@@ -56,6 +56,10 @@ export class CommunityService {
             .pipe(catchError((error) => throwError(() => error)));
     }
 
+    getCommunityImageURL(communityId: number): string {
+        return `${API_URL}/${communityId}/pictures`;
+    }
+
     updateCommunityImage(communityId: number, image: File, action?: string): Observable<Community> {
         const formData = new FormData();
         formData.append('image', image);

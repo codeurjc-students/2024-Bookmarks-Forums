@@ -479,7 +479,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Replies found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Replies not found"),
+            @ApiResponse(responseCode = "204", description = "Replies not found"),
     })
     @JsonView(ReplyInfo.class)
     @GetMapping("/posts/{postId}/replies")
@@ -489,7 +489,7 @@ public class APIPostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Reply> replies = replyService.getRepliesByPost(postId, pageable, order);
         if (replies.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(replies.getContent(), HttpStatus.OK);
     }
@@ -559,6 +559,9 @@ public class APIPostController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Reply.class)),
             }),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "413", description = "Payload too large"),
     })
     @JsonView(ReplyInfo.class)
     @PostMapping("/posts/{postId}/replies")
@@ -591,6 +594,16 @@ public class APIPostController {
         // is the user banned from the community?
         if (communityService.isUserBannedFromCommunity(author.getUsername(), post.getCommunity().getIdentifier())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Max title length: 150 characters
+        if (replyData.get("title").length() > 150) {
+            return new ResponseEntity<>(HttpStatus.PAYLOAD_TOO_LARGE);
+        }
+
+        // Max content length: 500 characters
+        if (replyData.get("content").length() > 500) {
+            return new ResponseEntity<>(HttpStatus.PAYLOAD_TOO_LARGE);
         }
 
         Reply reply = new Reply(replyData.get("title"), replyData.get("content"), author, post);

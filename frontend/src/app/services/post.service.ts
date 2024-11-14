@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Post } from '../models/post.model';
+import { Reply } from '../models/reply.model';
 
 const API_URL = '/api/v1/posts';
 const COMMUNITY_API_URL = '/api/v1/communities';
@@ -114,15 +115,13 @@ export class PostService {
     page: number,
     size: number,
     order: string
-  ): Observable<Map<string, Object>> {
+  ): Observable<Reply[]> {
     let params = new HttpParams()
       .set('page', page)
       .set('size', size)
       .set('order', order);
     return this.http
-      .get<Map<string, Object>>(`${API_URL}/${postId}/replies`, {
-        params: params,
-      })
+      .get<Reply[]>(`${API_URL}/${postId}/replies`, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -166,7 +165,7 @@ export class PostService {
 
   deleteReply(replyId: number): Observable<any> {
     return this.http
-      .delete(`/api/v1/replies/${replyId}`)
+      .delete(`/api/v1/replies/${replyId}`, { responseType: 'text' }) // Expect a text response
       .pipe(catchError((error) => throwError(() => error)));
   }
 

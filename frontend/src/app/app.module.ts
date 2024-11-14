@@ -15,6 +15,7 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { PostComponent } from './component/post/post.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SignupComponent,
     LoginComponent,
     LandingComponent,
+    PostComponent,
   ],
   imports: [
     BrowserModule,
