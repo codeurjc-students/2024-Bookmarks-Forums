@@ -21,13 +21,31 @@ Chart.register(...registerables);
   providers: [DatePipe],
 })
 export class PostComponent implements OnInit {
+  selectedOrderText: string = 'Fecha de creación'; // Default text
+
+  showAdvancedMenu: boolean = false;
+  
+  searchTerm: string = '';
+  searchCriteria: string = 'title'; // Default search criteria (can be title, content or author)
+  searchCriteriaText: string = 'Título'; // Default search criteria text
   post: Post | undefined;
+  community: Community | undefined;
+
+  upvotes: number = 0;
+  downvotes: number = 0;
+
+  upvoted: boolean = false;
+  downvoted: boolean = false;
 
   replies: Reply[] = [];
   replyTitle: string = '';
   replyContent: string = '';
   replyTitleError: string = '';
   replyContentError: string = '';
+  postReplies: number = 0;
+
+  // ReplyID and boolean to check if user liked the reply
+  likedReplyList: Map<number, boolean> = new Map<number, boolean>();
 
   title = 'Bookmarks';
   userLoaded = false;
@@ -67,6 +85,8 @@ export class PostComponent implements OnInit {
     this.user = user;
     this.loggedUsername = user.username;
     this.isAdmin = user.roles.includes('ADMIN');
+    this.loadUserPostVotes();
+    this.loadLikedReplies();
   }
 
   submitReply(postId: number | undefined): void {
@@ -134,6 +154,7 @@ export class PostComponent implements OnInit {
     this.postService.createReply(postId, replyData).subscribe({
       next: (reply) => {
         this.replies.push(reply);
+        this.postReplies += 1;
         this.replyTitle = ''; // Clear the title field
         this.replyContent = ''; // Clear the content field
 
@@ -148,6 +169,26 @@ export class PostComponent implements OnInit {
       error: (r) => {
         console.error('Error creating reply: ' + JSON.stringify(r));
       },
+    });
+  }
+
+  loadLikedReplies() {
+    if (!this.user) {
+      return;
+    }
+    this.replies.forEach((reply) => {
+      this.postService
+        .hasUserLikedReply(reply.identifier, this.loggedUsername)
+        .subscribe({
+          next: (liked) => {
+            this.likedReplyList.set(reply.identifier, liked);
+          },
+          error: (r) => {
+            console.error(
+              'Error checking if user liked reply: ' + JSON.stringify(r)
+            );
+          },
+        });
     });
   }
 
@@ -170,6 +211,7 @@ export class PostComponent implements OnInit {
             this.replies = this.replies.concat(replies);
             this.loadingMoreReplies = false;
             this.page += 1;
+            this.loadLikedReplies();
 
             if (replies.length < this.size) {
               this.noMoreReplies = true;
@@ -191,12 +233,67 @@ export class PostComponent implements OnInit {
     this.loadingMoreReplies = false;
   }
 
+  loadCommunity() {
+    if (this.post) {
+      this.communityService
+        .getCommunityById(this.post.community.identifier)
+        .subscribe({
+          next: (community) => {
+            this.community = community;
+          },
+          error: (r) => {
+            console.error('Error getting community: ' + JSON.stringify(r));
+          },
+        });
+    }
+  }
+
+  loadUserPostVotes() {
+    if (this.post) {
+      this.postService
+        .hasUserVoted(this.post.identifier, this.loggedUsername, 'upvote')
+        .subscribe({
+          next: (voted) => {
+            this.upvoted = voted;
+          },
+          error: (r) => {
+            console.error(
+              'Error checking if user upvoted post: ' + JSON.stringify(r)
+            );
+          },
+        });
+
+      this.postService
+        .hasUserVoted(this.post.identifier, this.loggedUsername, 'downvote')
+        .subscribe({
+          next: (voted) => {
+            this.downvoted = voted;
+          },
+          error: (r) => {
+            console.error(
+              'Error checking if user downvoted post: ' + JSON.stringify(r)
+            );
+          },
+        });
+    }
+  }
+
+  loadPostVotes() {
+    if (this.post) {
+      this.upvotes = this.post.upvotes;
+      this.downvotes = this.post.downvotes;
+    }
+  }
+
   loadPost() {
     let postID = Number(this.route.snapshot.paramMap.get('identifier'));
     this.postService.getPostById(Number(postID)).subscribe({
       next: (post) => {
         this.post = post;
+        this.postReplies = post.comments;
         this.loadReplies();
+        this.loadCommunity();
+        this.loadPostVotes();
       },
       error: (r) => {
         console.error('Error getting post: ' + JSON.stringify(r));
@@ -292,8 +389,9 @@ export class PostComponent implements OnInit {
   hasBanner(communityID: number | undefined): boolean {
     if (!communityID) {
       return false;
+    } else {
+      return this.community?.hasBanner ?? false;
     }
-    return this.communityService.getCommunityImageURL(communityID) !== '';
   }
 
   deleteReply(replyID: number) {
@@ -302,10 +400,166 @@ export class PostComponent implements OnInit {
         this.replies = this.replies.filter(
           (reply) => reply.identifier !== replyID
         );
+        this.likedReplyList.delete(replyID);
+        this.postReplies -= 1;
       },
       error: (r) => {
         console.error('Error deleting reply: ' + JSON.stringify(r));
       },
     });
+  }
+
+  deletePost(postId: number | undefined): void {
+    if (!postId) {
+      console.error('Post ID is undefined');
+      return;
+    }
+    this.postService.deletePost(postId).subscribe({
+      next: () => {
+        // TODO: confirm deletion and redirect to home page or community page
+      },
+      error: (r) => {
+        console.error('Error deleting post: ' + JSON.stringify(r));
+      },
+    });
+  }
+
+  editPost(postId: number | undefined): void {
+    if (!postId) {
+      console.error('Post ID is undefined');
+      return;
+    }
+    // TODO: redirect to edit post page
+  }
+
+  downvotePost(postId: number | undefined): void {
+    if (!postId) {
+      console.error('Post ID is undefined');
+      return;
+    }
+    this.postService.editPost(postId, new FormData(), 'downvote').subscribe({
+      next: () => {
+        if (this.upvoted) {
+          // If the post was upvoted, remove the upvote and add a downvote
+          this.upvotes -= 1;
+          this.upvoted = false;
+          this.downvotes += 1;
+          this.downvoted = true;
+        } else if (this.downvoted) {
+          // If the post was already downvoted, remove the downvote
+          this.downvotes -= 1;
+          this.downvoted = false;
+        } else {
+          // If the post was not voted, add a downvote
+          this.downvotes += 1;
+          this.downvoted = true;
+        }
+      },
+      error: (r) => {
+        console.error('Error downvoting post: ' + JSON.stringify(r));
+      },
+    });
+  }
+
+  upvotePost(postId: number | undefined): void {
+    if (!postId) {
+      console.error('Post ID is undefined');
+      return;
+    }
+    this.postService.editPost(postId, new FormData(), 'upvote').subscribe({
+      next: () => {
+        if (this.downvoted) {
+          // If the post was downvoted, remove the downvote and add an upvote
+          this.downvotes -= 1;
+          this.downvoted = false;
+          this.upvotes += 1;
+          this.upvoted = true;
+        } else if (this.upvoted) {
+          // If the post was already upvoted, remove the upvote
+          this.upvotes -= 1;
+          this.upvoted = false;
+        } else {
+          // If the post was not voted, add an upvote
+          this.upvotes += 1;
+          this.upvoted = true;
+        }
+      },
+      error: (r) => {
+        console.error('Error upvoting post: ' + JSON.stringify(r));
+      },
+    });
+  }
+
+  hasLikedReply(replyID: number) {
+    return this.likedReplyList.get(replyID);
+  }
+
+  upvoteReply(replyID: number) {
+    if (!this.user) {
+      return;
+    }
+    this.postService.likeReply(replyID, 'like').subscribe({
+      next: () => {
+        this.replies = this.replies.map((reply) => {
+          if (reply.identifier === replyID) {
+            if (this.likedReplyList.get(replyID)) {
+              reply.likes -= 1;
+              this.likedReplyList.set(replyID, false);
+            } else {
+              reply.likes += 1;
+              this.likedReplyList.set(replyID, true);
+            }
+          }
+          return reply;
+        });
+      },
+      error: (r) => {
+        console.error('Error upvoting reply: ' + JSON.stringify(r));
+      },
+    });
+  }
+
+  changeRepliesOrder(order: string, orderText: string) {
+    this.repliesOrder = order;
+    this.selectedOrderText = orderText;
+    this.page = 0;
+    this.replies = [];
+    this.loadReplies();
+  }
+
+  searchReplies(postId: number | undefined) {
+    if (!postId) {
+      console.error('Post ID is undefined');
+      return;
+    }
+    this.page = 0;
+    this.replies = [];
+    this.postService
+      .searchReplies(this.searchCriteria, this.searchTerm, this.page, this.size)
+      .subscribe({
+        next: (replies) => {
+          this.replies = this.replies.concat(replies);
+          this.loadLikedReplies();
+          this.page += 1;
+        },
+        error: (r) => {
+          console.error('Error searching replies: ' + JSON.stringify(r));
+        },
+      });
+  }
+
+  setSearchCriteria(criteria: string) {
+    this.searchCriteria = criteria;
+    if (criteria === 'title') {
+      this.searchCriteriaText = 'Título';
+    } else if (criteria === 'content') {
+      this.searchCriteriaText = 'Contenido';
+    } else if (criteria === 'author') {
+      this.searchCriteriaText = 'Autor';
+    }
+  }
+
+  toggleAdvancedMenu() {
+    this.showAdvancedMenu = !this.showAdvancedMenu;
   }
 }

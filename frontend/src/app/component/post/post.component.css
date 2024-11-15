@@ -12371,3 +12371,62 @@ header {
   flex-direction: row;
   justify-content: space-between;
 }
+
+.post-container-card-action-buttons-container {
+  padding: 0.25rem 1rem;
+  background-color: var(--branding-forums-dark-grey);
+  border-radius: 0 0 12px 12px;
+}
+
+.action-btn {
+  margin-left: 0.5rem;
+  color: var(--branding-light-grey);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.action-btn:hover {
+  color: var(--branding-peach);
+}
+
+.action-btn:focus {
+  outline: none;
+}
+
+.action-btn:disabled {
+  color: var(--branding-light-grey) !important;
+}
+
+.action-btn:active {
+  color: var(--branding-darkish-grey) !important;
+}
+
+.post-votes-count-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.post-votes-count-container p {
+  margin: 0;
+  margin-left: 0.5rem;
+  color: var(--branding-light-grey);
+}
+
+.reply-votes-count-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.reply-votes-count-container p {
+  margin: 0;
+  margin-left: 0.5rem;
+  color: var(--branding-light-grey);
+}
+
+.dropdown-item {
+  cursor: pointer;
+}

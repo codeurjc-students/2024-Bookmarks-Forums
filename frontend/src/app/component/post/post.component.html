@@ -14,6 +14,11 @@
       rel="stylesheet"
     />
 
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -96,7 +101,7 @@
           <!-- Post Column -->
           <div class="col-lg-7">
             <!-- Post card -->
-            <div class="post-container-card card mb-4 featured-post">
+            <div class="post-container-card card mb-6 featured-post">
               <div class="post-container-card-top">
                 <div
                   class="post-top-info d-flex justify-content-between align-items-center"
@@ -127,6 +132,61 @@
                   class="post-container-card-body-image"
                 />
               </div>
+              <!-- Post action buttons row-->
+              <div
+                class="post-container-card-action-buttons-container d-flex justify-content-end"
+              >
+                <!-- Alert container -->
+                <div class="post-container-alert" *ngIf="!loggedIn">
+                  <p>Inicia sesión para poder votar.</p>
+                </div>
+                <button
+                  *ngIf="post?.author?.username === loggedUsername || isAdmin"
+                  class="btn action-btn"
+                  title="Eliminar post"
+                  (click)="deletePost(post?.identifier)"
+                >
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+
+                <button
+                  *ngIf="post?.author?.username === loggedUsername || isAdmin"
+                  class="btn action-btn"
+                  title="Editar post"
+                  (click)="editPost(post?.identifier)"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  class="btn action-btn"
+                  [ngClass]="{ 'active-icon-btn': upvoted }"
+                  title="Me gusta"
+                  (click)="upvotePost(post?.identifier)"
+                  [disabled]="!loggedIn"
+                >
+                  <i class="far fa-thumbs-up" [ngClass]="{ fas: upvoted }"></i>
+                </button>
+                <div
+                  class="post-votes-count-container"
+                  title="Me gusta / No me gusta"
+                >
+                  <p class="card-content fw-semibold text-muted">
+                    {{ upvotes }} / {{ downvotes }}
+                  </p>
+                </div>
+                <button
+                  class="btn action-btn"
+                  [ngClass]="{ 'active-icon-btn': downvoted }"
+                  title="No me gusta"
+                  (click)="downvotePost(post?.identifier)"
+                  [disabled]="!loggedIn"
+                >
+                  <i
+                    class="far fa-thumbs-down flip-horizontal"
+                    [ngClass]="{ fas: downvoted }"
+                  ></i>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -135,12 +195,131 @@
             <!-- Replies widget -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
-                <div class="comments-title-container">
+                <div
+                  class="comments-title-container d-flex justify-content-between align-items-center"
+                >
                   <h3 class="fw-semibold page-title">Comentarios</h3>
                   <div class="comments-count-container">
                     <h3 class="card-content fw-semibold text-muted">
-                      {{ replies.length }}
+                      {{ postReplies }}
                     </h3>
+                  </div>
+                </div>
+                <div class="advanced-menu-toggle-container">
+                  <button
+                    class="btn hyperlink-btn"
+                    (click)="toggleAdvancedMenu()"
+                  >
+                    Menú avanzado
+                    <i
+                      class="fas"
+                      [ngClass]="{
+                        'fa-chevron-down': !showAdvancedMenu,
+                        'fa-chevron-up': showAdvancedMenu
+                      }"
+                    ></i>
+                  </button>
+                </div>
+                <!-- Search bar and search criteria dropdown -->
+                <div
+                  *ngIf="showAdvancedMenu"
+                  class="card-header-advanced-container"
+                >
+                  <hr class="post-container-divider" />
+                  <div class="card-header-actions-container">
+                    <div class="card-header-search-omnibox">
+                      <div class="input-group">
+                        <div class="search-bar-button-group">
+                          <input
+                            type="text"
+                            class="form-control search-input"
+                            placeholder="Buscar comentarios"
+                            [(ngModel)]="searchTerm"
+                          />
+                          <button
+                            title="Buscar comentarios"
+                            class="btn search-btn"
+                            (click)="searchReplies(post?.identifier)"
+                          >
+                            <i class="fas fa-search"></i>
+                          </button>
+                        </div>
+                        <div class="input-group-append">
+                          <button
+                            class="btn btn-secondary branding-dropdown-toggle fa-dropdown-toggle"
+                            type="button"
+                            id="searchCriteriaDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            Buscar por: {{ searchCriteriaText | titlecase }}
+                          </button>
+                          <ul
+                            class="dropdown-menu dropdown-menu-dark branding-dropdown-menu"
+                            aria-labelledby="searchCriteriaDropdown"
+                          >
+                            <li>
+                              <a
+                                class="dropdown-item"
+                                (click)="setSearchCriteria('title')"
+                                >Título</a
+                              >
+                            </li>
+                            <li>
+                              <a
+                                class="dropdown-item"
+                                (click)="setSearchCriteria('content')"
+                                >Contenido</a
+                              >
+                            </li>
+                            <li>
+                              <a
+                                class="dropdown-item"
+                                (click)="setSearchCriteria('author')"
+                                >Autor</a
+                              >
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="dropdown mt-2">
+                      <button
+                        class="btn btn-secondary branding-dropdown-toggle fa-dropdown-toggle"
+                        type="button"
+                        id="dropdownMenuButton"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        <span class="dropdown-text">
+                          Ordenar por: {{ selectedOrderText }}
+                        </span>
+                      </button>
+                      <ul
+                        class="dropdown-menu dropdown-menu-dark branding-dropdown-menu"
+                        aria-labelledby="dropdownMenuButton"
+                      >
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            (click)="
+                              changeRepliesOrder(
+                                'creationDate',
+                                'Fecha de creación'
+                              )
+                            "
+                            >Fecha de creación</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            (click)="changeRepliesOrder('rating', 'Valoración')"
+                            >Valoración</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -149,6 +328,11 @@
                   <div
                     *ngFor="let reply of this.replies"
                     class="reply-card card mb-3"
+                    [ngClass]="
+                      reply.author.username === loggedUsername
+                        ? 'own-reply'
+                        : ''
+                    "
                   >
                     <div
                       class="card-top-info d-flex justify-content-between align-items-center"
@@ -160,7 +344,7 @@
                         <div class="d-flex align-items-center card-user-info">
                           <img
                             [src]="profilePicture(reply.author.username)"
-                            alt="Profile Picture"
+                            alt="Profile"
                             class="card-profile-picture me-2"
                           />
                           <p
@@ -178,7 +362,9 @@
                       </div>
                       <!-- Reply delete button -->
                       <button
-                        *ngIf="reply.author.username === loggedUsername"
+                        *ngIf="
+                          reply.author.username === loggedUsername || isAdmin
+                        "
                         class="btn danger-btn delete-reply-btn"
                         (click)="deleteReply(reply.identifier)"
                         title="Eliminar comentario"
@@ -192,6 +378,47 @@
                     <p class="card-content card-text wrap-text">
                       {{ reply?.content }}
                     </p>
+                    <!-- Reply action buttons row (like count and like button) -->
+                    <div
+                      class="reply-action-buttons-container d-flex justify-content-end"
+                    >
+                      <div class="reply-votes-count-container">
+                        <p class="card-content fw-semibold text-muted">
+                          {{ reply.likes }}
+                        </p>
+                      </div>
+                      <button
+                        class="btn action-btn"
+                        [ngClass]="{
+                          'active-icon-btn': hasLikedReply(reply.identifier)
+                        }"
+                        title="Me gusta"
+                        (click)="upvoteReply(reply.identifier)"
+                        [disabled]="!loggedIn"
+                      >
+                        <i
+                          class="far fa-thumbs-up"
+                          [ngClass]="{ fas: hasLikedReply(reply.identifier) }"
+                        ></i>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- Load more replies button -->
+                  <div class="load-more-replies-container">
+                    <button
+                      class="btn primary-btn"
+                      (click)="loadMoreReplies()"
+                      *ngIf="!noMoreReplies; else noMoreRepliesText"
+                    >
+                      Cargar más
+                    </button>
+                    <ng-template #noMoreRepliesText>
+                      <p
+                        class="card-content card-text wrap-text center-text text-muted"
+                      >
+                        No hay más comentarios
+                      </p>
+                    </ng-template>
                   </div>
                 </div>
                 <!-- Reply text input and submit button-->
@@ -222,7 +449,8 @@
                 <ng-template #notLoggedInRepliesText>
                   <div class="reply-input-container">
                     <p class="card-content card-text wrap-text center-text">
-                      Inicia sesión para poder responder a este post.
+                      Inicia sesión para poder responder a este post, votar los
+                      comentarios y más...
                     </p>
                     <!-- Login button -->
                     <div class="d-grid gap-2">

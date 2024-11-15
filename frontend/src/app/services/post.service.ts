@@ -136,14 +136,14 @@ export class PostService {
     query: string,
     page: number,
     size: number
-  ): Observable<Map<string, Object>> {
+  ): Observable<Reply[]> {
     let params = new HttpParams()
       .set('criteria', criteria)
       .set('query', query)
       .set('page', page)
       .set('size', size);
     return this.http
-      .get<Map<string, Object>>(`/api/v1/replies`, { params: params })
+      .get<Reply[]>(`/api/v1/replies`, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -213,5 +213,19 @@ export class PostService {
           .get<Post[]>(`${USER_API_URL}/posts/most-liked`, { params: params })
           .pipe(catchError((error) => throwError(() => error)));
     }
+  }
+
+  hasUserVoted(postId: number, username: string, type: string) {
+    let params = new HttpParams().set('username', username).set('type', type);
+    return this.http
+      .get<boolean>(`${API_URL}/${postId}/votes`, { params: params })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  hasUserLikedReply(replyId: number, username: string) {
+    let params = new HttpParams().set('username', username);
+    return this.http
+      .get<boolean>(`/api/v1/replies/${replyId}/votes`, { params: params })
+      .pipe(catchError((error) => throwError(() => error)));
   }
 }

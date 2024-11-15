@@ -56,6 +56,8 @@ public class PostSampleService {
         List<String> replyContents = List.of("Welcome to Bookmarks Forums! I'm excited to discuss books with everyone.", "I'm looking forward to the new releases in Bookmarks News!", "I can't wait to read the reviews of the best books in Bookmarks Reviews.", "I'm interested in the upcoming events for book readers in Bookmarks Events.");
 
         for (int i = 0; i < replyTitles.size(); i++) {
+            // +1 comment to the post
+            posts.get(i).setComments(posts.get(i).getComments() + 1);
             Reply reply = new Reply(replyTitles.get(i), replyContents.get(i), users.get(i), posts.get(i));
             replyRepository.save(reply);
         }

@@ -234,6 +234,37 @@ public class APIPostController {
         return ResponseEntity.created(location).body(post);
     }
 
+    // Has user upvoted or downvoted a post?
+    @Operation(summary = "Returns whether the user has upvoted or downvoted a post")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User has upvoted or downvoted the post", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Post not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+    })
+    @GetMapping("/posts/{postId}/votes")
+    public ResponseEntity<Boolean> hasUserVotedPost(@PathVariable Long postId, @RequestParam String username, @RequestParam String type) {
+        Post post = postService.getPostById(postId);
+        if (post == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (username == null || username.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        switch (type) {
+            case "upvote":
+                return new ResponseEntity<>(postService.hasUserUpvotedPost(username, postId), HttpStatus.OK);
+            case "downvote":
+                return new ResponseEntity<>(postService.hasUserDownvotedPost(username, postId), HttpStatus.OK);
+            default:
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
     // Edit a post (or upvote/downvote)
     @Operation(summary = "Edit a post (or upvote/downvote)")
     @ApiResponses(value = {
@@ -608,6 +639,8 @@ public class APIPostController {
 
         Reply reply = new Reply(replyData.get("title"), replyData.get("content"), author, post);
         replyService.saveReply(reply);
+        post.setComments(post.getComments() + 1);
+        postService.updatePost(post);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(reply.getIdentifier()).toUri();
@@ -664,6 +697,29 @@ public class APIPostController {
         }
     }
 
+    // Has user liked a reply?
+    @Operation(summary = "Returns whether the user has liked a reply")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User has liked the reply", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Reply not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+    })
+    @GetMapping("/replies/{replyId}/votes")
+    public ResponseEntity<Boolean> hasUserLikedReply(@PathVariable Long replyId, @RequestParam String username) {
+        Reply reply = replyService.getReplyById(replyId);
+        if (reply == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (username == null || username.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(replyService.hasUserLikedReply(username, replyId), HttpStatus.OK);
+    }
+
     // Delete a reply
     @Operation(summary = "Delete a reply")
     @ApiResponses(value = {
@@ -703,8 +759,11 @@ public class APIPostController {
                 reply.getPost().getCommunity().getIdentifier())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-
+        // get the post
+        Post post = reply.getPost();
+        post.setComments(post.getComments() - 1);
         replyService.deleteReply(reply);
+        postService.updatePost(post);
 
         return new ResponseEntity<>("Reply deleted", HttpStatus.OK);
     }

@@ -5,6 +5,7 @@ export interface Community {
     name: string;
     description: string;
     admin: User;
+    hasBanner?: boolean;
     bannerString: string;
     creationDate: Date;
     creationTime: string;

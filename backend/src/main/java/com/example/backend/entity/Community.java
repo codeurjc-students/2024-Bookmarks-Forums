@@ -51,6 +51,9 @@ public class Community {
     @JoinTable(name = "moderator_community", joinColumns = @JoinColumn(name = "community_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> moderators = new ArrayList<>();
 
+    @JsonView(BasicInfo.class)
+    private boolean hasBanner = false;
+
     // Banner image
     @JsonIgnore
     @Lob
@@ -120,6 +123,11 @@ public class Community {
 
     public String toString() {
         return this.name;
+    }
+
+    public void setBanner(Blob banner) {
+        this.banner = banner;
+        this.hasBanner = true;
     }
 
     public void banUser(User user, LocalDateTime duration, String reason) {
