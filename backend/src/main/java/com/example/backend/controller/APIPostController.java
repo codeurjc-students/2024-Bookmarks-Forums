@@ -504,9 +504,12 @@ public class APIPostController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // is the user the author of the post?
+        // is the user the author of the post, a community admin, moderator or a site admin?
         User author = userService.getUserByUsername(principal.getName());
-        if (!post.getAuthor().equals(author)) {
+        if (!post.getAuthor().equals(author) && !communityService.isUserAdminOfCommunity(author.getUsername(),
+                post.getCommunity().getIdentifier())
+                && !communityService.isUserModeratorOfCommunity(author.getUsername(), post.getCommunity().getIdentifier())
+                && !userService.getUserByUsername(principal.getName()).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 

@@ -322,7 +322,7 @@
         </div>
       </div>
     </div>
-    <!-- Modal -->
+    <!-- Image Modal -->
     <div id="imageModal" class="custom-modal">
       <div class="custom-modal-content">
         <div class="custom-modal-header">
@@ -341,14 +341,35 @@
             class="modal-image"
           />
         </div>
-        <div class="custom-modal-footer">
-          <a
-            [href]="postImageURL(post?.identifier)"
-            download
-            class="btn primary-btn"
-          >
-            <i class="fas fa-download"></i> Descargar
-          </a>
+      </div>
+    </div>
+
+    <!-- Alert modal with confirmation and cancel buttons -->
+    <div id="alertModal" class="custom-modal" [ngClass]="{ 'show': showAlertModal }">
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header">
+          <span class="action-btn close" (click)="closeAlertModal()">
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <p class="alert-modal-text">{{ alertModalText }}</p>
+          <div class="alert-modal-buttons">
+            <button
+              class="btn primary-btn"
+              title="Confirmar"
+              (click)="confirmAction(); closeAlertModal()"
+            >
+              <i class="fas fa-check"></i> Confirmar
+            </button>
+            <button
+              class="btn primary-btn"
+              title="Cancelar"
+              (click)="closeAlertModal()"
+            >
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
         </div>
       </div>
     </div>

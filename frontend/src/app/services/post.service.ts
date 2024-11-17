@@ -94,9 +94,9 @@ export class PostService {
       .pipe(catchError((error) => throwError(() => error)));
   }
 
-  deletePost(postId: number): Observable<any> {
+  deletePost(postId: number): Observable<string> {
     return this.http
-      .delete(`${API_URL}/${postId}`)
+      .delete(`${API_URL}/${postId}`, { responseType: 'text' })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -230,9 +230,9 @@ export class PostService {
       .pipe(catchError((error) => throwError(() => error)));
   }
 
-  deletePostImage(postId: number): Observable<any> {
+  deletePostImage(postId: number): Observable<string> {
     return this.http
-      .delete(`${API_URL}/${postId}/pictures`)
+      .delete(`${API_URL}/${postId}/pictures`, { responseType: 'text' })
       .pipe(catchError((error) => throwError(() => error)));
   }
 }

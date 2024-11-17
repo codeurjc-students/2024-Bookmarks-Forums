@@ -2690,3 +2690,19 @@ html {
 .red-underline:focus {
   border-bottom: 4px solid var(--bs-red) !important;
 }
+
+.alert-modal-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.alert-modal-text {
+  color: var(--branding-light-grey) !important;
+  font-size: 1.2rem !important;
+}
+
+.no-scroll {
+  overflow: hidden !important;
+}

@@ -21,6 +21,9 @@ Chart.register(...registerables);
 })
 export class ModifyPostComponent implements OnInit {
   showModal: boolean = false;
+  showAlertModal: boolean = false;
+  alertModalText: string = '';
+  confirmAction: () => void = () => {};
 
   post: Post | undefined;
   community: Community | undefined;
@@ -204,22 +207,25 @@ export class ModifyPostComponent implements OnInit {
       console.error('Post ID is undefined');
       return;
     }
-    this.postService.deletePost(postId).subscribe({
-      next: () => {
-        // TODO: confirm deletion and redirect to home page or community page
-      },
-      error: (r) => {
-        console.error('Error deleting post: ' + JSON.stringify(r));
-      },
-    });
-  }
-
-  editPost(postId: number | undefined): void {
-    if (!postId) {
-      console.error('Post ID is undefined');
-      return;
-    }
-    // TODO: redirect to edit post page
+    this.openAlertModal(
+      '¿Seguro que quieres eliminar este post? Esta acción no se puede deshacer.',
+      () => {
+        this.postService.deletePost(postId).subscribe({
+          next: (response: string) => {
+            // go back to previous page
+            // if the previous page is the post page, goes to the home page
+            if (document.referrer.includes('post')) {
+              window.location.href = '/';
+            } else {
+              window.history.back();
+            }
+          },
+          error: (r) => {
+            console.error('Error deleting post: ' + JSON.stringify(r));
+          },
+        });
+      }
+    );
   }
 
   openModal() {
@@ -240,6 +246,16 @@ export class ModifyPostComponent implements OnInit {
         this.showModal = false;
       }, 300); // Match the duration of the CSS transition
     }
+  }
+
+  openAlertModal(text: string, action: () => void) {
+    this.alertModalText = text;
+    this.confirmAction = action;
+    this.showAlertModal = true;
+  }
+
+  closeAlertModal() {
+    this.showAlertModal = false;
   }
 
   confirmEditPost(postID: number | undefined): void {
@@ -296,9 +312,6 @@ export class ModifyPostComponent implements OnInit {
       }
     }
 
-    console.log('Post DTO title: ' + postDTO.get('title'));
-    console.log('Post DTO content: ' + postDTO.get('content'));
-
     this.postService.editPost(postID, postDTO, 'edit').subscribe({
       next: () => {
         // Redirect to the post page
@@ -336,25 +349,21 @@ export class ModifyPostComponent implements OnInit {
       console.error('Post ID is undefined');
       return;
     }
-    // show confirmation dialog
-    if (
-      confirm(
-        'Are you sure you want to delete the image? This action cannot be undone.'
-      )
-    ) {
-      this.postService.deletePostImage(postID).subscribe({
-        next: (response: string) => {
-          console.log(response); // Log the response string
-          if (this.post) {
-            this.post.hasImage = false; // Update the post object to reflect the image deletion
-          }
-          console.log('Image deleted successfully');
-        },
-        error: (r) => {
-          console.error('Error deleting image: ' + JSON.stringify(r));
-        },
-      });
-    }
+    this.openAlertModal(
+      '¿Seguro que quieres eliminar la imagen de este post? Esta acción no se puede deshacer.',
+      () => {
+        this.postService.deletePostImage(postID).subscribe({
+          next: (response: string) => {
+            if (this.post) {
+              this.post.hasImage = false; // Update the post object to reflect the image deletion
+            }
+          },
+          error: (r) => {
+            console.error('Error deleting image: ' + JSON.stringify(r));
+          },
+        });
+      }
+    );
   }
 
   uploadPostImage(postID: number | undefined, file: File): void {
@@ -365,7 +374,6 @@ export class ModifyPostComponent implements OnInit {
     this.postService.updatePostImage(postID, file).subscribe({
       next: (post) => {
         this.post = post;
-        console.log('Image uploaded successfully');
       },
       error: (r) => {
         console.error('Error uploading image: ' + JSON.stringify(r));

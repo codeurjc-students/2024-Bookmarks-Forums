@@ -68,6 +68,10 @@ export class PostComponent implements OnInit {
 
   noMoreReplies = false;
 
+  showAlertModal: boolean = false;
+  alertModalText: string = '';
+  confirmAction: () => void = () => {};
+
   constructor(
     private http: HttpClient,
     public loginService: LoginService,
@@ -411,19 +415,40 @@ export class PostComponent implements OnInit {
     });
   }
 
+  openAlertModal(text: string, action: () => void) {
+    this.alertModalText = text;
+    this.confirmAction = action;
+    this.showAlertModal = true;
+  }
+
+  closeAlertModal() {
+    this.showAlertModal = false;
+  }
+
   deletePost(postId: number | undefined): void {
     if (!postId) {
       console.error('Post ID is undefined');
       return;
     }
-    this.postService.deletePost(postId).subscribe({
-      next: () => {
-        // TODO: confirm deletion and redirect to home page or community page
-      },
-      error: (r) => {
-        console.error('Error deleting post: ' + JSON.stringify(r));
-      },
-    });
+    this.openAlertModal(
+      '¿Seguro que quieres eliminar este post? Esta acción no se puede deshacer.',
+      () => {
+        this.postService.deletePost(postId).subscribe({
+          next: (response: string) => {
+            // go back to previous page
+            // if the previous page is the post page, goes to the home page
+            if (document.referrer.includes('post')) {
+              window.location.href = '/';
+            } else {
+              window.history.back();
+            }
+          },
+          error: (r) => {
+            console.error('Error deleting post: ' + JSON.stringify(r));
+          },
+        });
+      }
+    );
   }
 
   editPost(postId: number | undefined): void {
@@ -585,7 +610,7 @@ export class PostComponent implements OnInit {
       }
     }, 0);
   }
-  
+
   closeModal() {
     const modalElement = document.querySelector('.custom-modal');
     if (modalElement) {
