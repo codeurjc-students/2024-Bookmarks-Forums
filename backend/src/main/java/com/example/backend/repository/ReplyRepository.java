@@ -37,6 +37,18 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
         @Query("SELECT r FROM Reply r WHERE r.post.identifier = :postId ORDER BY r.likes DESC")
         Page<Reply> findByPostOrderByRating(Long postId, Pageable pageable);
 
+        // Find replies of a post by title
+        @Query("SELECT r FROM Reply r WHERE r.post.identifier = :postId AND r.title LIKE %:title%")
+        Page<Reply> findByPostAndTitle(Long postId, String title, Pageable pageable);
+
+        // Find replies of a post by content
+        @Query("SELECT r FROM Reply r WHERE r.post.identifier = :postId AND r.content LIKE %:content%")
+        Page<Reply> findByPostAndContent(Long postId, String content, Pageable pageable);
+
+        // Find replies of a post by author
+        @Query("SELECT r FROM Reply r WHERE r.post.identifier = :postId AND r.author.username LIKE %:author%")
+        Page<Reply> findByPostAndAuthor(Long postId, String author, Pageable pageable);
+
         // Search replies in a post by title or content
         @Query("SELECT r FROM Reply r WHERE " +
                         "r.post.identifier = :postId AND " +

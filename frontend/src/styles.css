@@ -2126,6 +2126,7 @@ html {
   width: 100%;
   max-height: 200px;
   object-fit: cover;
+  cursor: pointer;
 }
 
 .post-container-divider-container {
@@ -2252,7 +2253,6 @@ html {
 .post-container-alert p {
   color: var(--branding-forums-lighter-grey) !important;
   margin: 0 !important;
-
 }
 
 .hidden {
@@ -2351,6 +2351,8 @@ html {
   justify-content: flex-end;
   align-items: center;
   gap: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .card-header-search-omnibox {
@@ -2370,6 +2372,7 @@ html {
   color: var(--branding-light-grey) !important;
   border: 1px solid var(--branding-forums-light-grey) !important;
   border-radius: 0.5rem 0 0 0.5rem !important;
+  height: 2.5rem !important;
 }
 
 .search-input::placeholder {
@@ -2401,6 +2404,7 @@ html {
   border: 1px solid var(--branding-forums-light-grey) !important;
   border-left: none !important;
   border-radius: 0 0.5rem 0.5rem 0 !important;
+  height: 2.5rem !important;
 }
 
 .search-btn:hover {
@@ -2410,8 +2414,12 @@ html {
 
 .search-bar-button-group {
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 0;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  background-color: transparent !important;
+  height: 2.5rem !important;
 }
 
 .advanced-menu-toggle-container {
@@ -2436,4 +2444,249 @@ html {
 .hyperlink-btn:active {
   border: none !important;
   background-color: var(--branding-forums-darker-grey) !important;
+}
+
+.custom-modal {
+  display: flex; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1050; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.custom-modal.show {
+  opacity: 1;
+  visibility: visible;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.custom-modal-content {
+  position: relative;
+  margin: auto;
+  padding: 0;
+  width: 80%;
+  max-width: 700px;
+  background-color: var(--branding-forums-darker-grey);
+  border-radius: 10px;
+  overflow: scroll;
+  overflow-x: hidden;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  scale: 0.95;
+  opacity: 0;
+  transition: all 0.3s ease;
+  border: 1px solid var(--branding-forums-light-grey);
+}
+
+.custom-modal.show .custom-modal-content {
+  scale: 1;
+  opacity: 1;
+}
+
+.custom-modal-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  background-color: var(--branding-forums-dark-grey);
+}
+
+.custom-modal-header .close {
+  margin-left: auto;
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--branding-light-grey);
+}
+
+.custom-modal-body {
+  padding: 20px;
+  text-align: center;
+  background-color: var(--branding-forums-darker-grey);
+}
+
+.custom-modal-body .modal-image {
+  width: 100%;
+  height: auto;
+}
+
+.custom-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  background-color: var(--branding-forums-dark-grey);
+}
+
+.card-helper-text {
+  color: var(--branding-light-grey) !important;
+  text-align: center !important;
+  font-weight: 500 !important;
+  font-size: 1.2rem !important;
+}
+
+.post-editor-action-buttons-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.post-editor-action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center !important;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.post-title-input {
+  background-color: var(--branding-forums-dark-grey) !important;
+  border: none !important;
+  border-bottom: 4px solid var(--branding-darkish-grey) !important;
+  color: var(--branding-light-grey) !important;
+  font-size: 2rem !important; /* Match the font size of the Post Title */
+  font-weight: 500 !important;
+  width: 100% !important;
+  transition: border-color 0.3s ease-in-out !important;
+}
+
+.post-title-input:focus {
+  outline: none !important;
+  border-bottom: 4px solid var(--branding-peach) !important;
+}
+
+.post-title-input::placeholder {
+  color: var(--branding-light-grey);
+  opacity: 0.6;
+}
+
+.post-content-textarea {
+  background-color: transparent !important;
+  border: 2px solid var(--branding-darkish-grey) !important;
+  color: var(--branding-light-grey) !important;
+  font-size: 1rem !important; /* Match the font size of the Post Content */
+  font-weight: 400 !important;
+  width: 100% !important;
+  min-height: 200px !important; /* Set a minimum height */
+  transition: border-color 0.3s ease-in-out !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem !important;
+  overflow: hidden; /* Hide overflow */
+}
+
+.post-content-textarea:focus {
+  outline: none !important;
+  border: 2px solid var(--branding-peach) !important;
+}
+
+.post-content-textarea::placeholder {
+  color: var(--branding-light-grey);
+  opacity: 0.6;
+}
+
+.sticky-item {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 100px;
+}
+
+.image-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.image-actions-helper-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  color: var(--branding-light-grey) !important;
+  font-size: 1.2rem !important;
+}
+
+.post-content {
+  white-space: pre-wrap !important; /* CSS property to preserve whitespace and line breaks */
+}
+
+.single-line-card-text {
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-height: 1.5em;
+}
+
+.parent-container {
+  max-width: max-content;
+}
+
+.rich-text-editor-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rich-text-editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background-color: var(--branding-forums-dark-grey);
+  border-radius: 0.5rem;
+  border: 1px solid var(--branding-forums-light-grey);
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.toolbar-btn {
+  background-color: transparent !important;
+  color: var(--branding-light-grey) !important;
+  border: 1px solid transparent !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.15s ease-in-out !important;
+  width: 5rem !important;
+}
+
+.toolbar-btn:hover {
+  color: var(--branding-peach) !important;
+}
+
+.toolbar-btn.active {
+  border: 1px solid var(--branding-forums-lighter-grey) !important;
+  background-color: var(--branding-darkish-grey) !important;
+}
+
+.toolbar-btn:active {
+  background-color: var(--branding-forums-darker-grey) !important;
+}
+
+.red-border {
+  border: 2px solid var(--bs-red) !important;
+}
+
+.red-border:focus {
+  border: 2px solid var(--bs-red) !important;
+}
+
+.red-underline {
+  border-bottom: 4px solid var(--bs-red) !important;
+}
+
+.red-underline:focus {
+  border-bottom: 4px solid var(--bs-red) !important;
 }

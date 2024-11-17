@@ -88,19 +88,6 @@ public class PostService {
         }
     }
 
-    /*
-     * In order to be able to edit a post, it has to have the status "not edited" or
-     * have been edited more than a week ago
-     */
-    public void editPost(Post post, String title, String content) {
-        if (!post.isEdited() || post.getFullLastEditDate().plusDays(7).isBefore(post.getFullCreationDate())) {
-            post.setTitle(title);
-            post.setContent(content);
-            post.setEdited(true);
-            postRepository.save(post);
-        }
-    }
-
     public Post getPostById(Long id) {
         return postRepository.findByIdentifier(id);
     }
@@ -114,6 +101,8 @@ public class PostService {
     }
 
     public void updatePost(Post post) {
+        post.setEdited(true);
+        post.updateEditDate();
         postRepository.save(post);
     }
 

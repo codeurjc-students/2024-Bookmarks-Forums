@@ -138,7 +138,12 @@
                     }}
                   </div>
                   <h2 class="card-content card-title">{{ post.title }}</h2>
-                  <p class="card-content card-text">{{ post.content }}</p>
+                  <div class="parent-container">
+                    <p
+                      class="card-content card-text single-line-card-text"
+                      [innerHTML]="post.content"
+                    ></p>
+                  </div>
                   <div
                     class="card-bottom-action-bar d-flex justify-content-end"
                   >
@@ -263,7 +268,12 @@
                     }}
                   </div>
                   <h2 class="card-content card-title">{{ post.title }}</h2>
-                  <p class="card-content card-text">{{ post.content }}</p>
+                  <div class="parent-container">
+                    <p
+                      class="card-content card-text single-line-card-text"
+                      [innerHTML]="post.content"
+                    ></p>
+                  </div>
                   <div
                     class="card-bottom-action-bar d-flex justify-content-end"
                   >

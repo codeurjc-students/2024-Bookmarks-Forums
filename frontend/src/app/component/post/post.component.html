@@ -113,10 +113,13 @@
                   </div>
                 </div>
 
-                <h2 class="card-content card-title">{{ post?.title }}</h2>
+                <h2 class="card-content card-title wrap-text">{{ post?.title }}</h2>
               </div>
               <div class="post-container-card-body">
-                <p class="post-container-card-body-text">{{ post?.content }}</p>
+                <p
+                  class="post-container-card-body-text post-content"
+                  [innerHTML]="post?.content"
+                ></p>
               </div>
               <!-- Post image -->
               <ng-container *ngIf="post?.hasImage">
@@ -130,6 +133,8 @@
                   [src]="postImageURL(post?.identifier)"
                   alt="Post"
                   class="post-container-card-body-image"
+                  (click)="openModal()"
+                  (keydown)="handleKeyDown($event)"
                 />
               </div>
               <!-- Post action buttons row-->
@@ -245,6 +250,7 @@
                           </button>
                         </div>
                         <div class="input-group-append">
+                          <p class="card-content text-muted mb-0 me-2">por</p>
                           <button
                             class="btn btn-secondary branding-dropdown-toggle fa-dropdown-toggle"
                             type="button"
@@ -252,12 +258,19 @@
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
                           >
-                            Buscar por: {{ searchCriteriaText | titlecase }}
+                            {{ searchCriteriaText | titlecase }}
                           </button>
                           <ul
                             class="dropdown-menu dropdown-menu-dark branding-dropdown-menu"
                             aria-labelledby="searchCriteriaDropdown"
                           >
+                            <li>
+                              <a
+                                class="dropdown-item"
+                                (click)="setSearchCriteria('default')"
+                                >Título + contenido</a
+                              >
+                            </li>
                             <li>
                               <a
                                 class="dropdown-item"
@@ -283,7 +296,11 @@
                         </div>
                       </div>
                     </div>
-                    <div class="dropdown mt-2">
+                    <hr class="post-container-divider" />
+                    <div class="input-group-append">
+                      <p class="card-content text-muted mb-0 me-2">
+                        Ordenar por:
+                      </p>
                       <button
                         class="btn btn-secondary branding-dropdown-toggle fa-dropdown-toggle"
                         type="button"
@@ -291,9 +308,7 @@
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                       >
-                        <span class="dropdown-text">
-                          Ordenar por: {{ selectedOrderText }}
-                        </span>
+                        {{ selectedOrderText }}
                       </button>
                       <ul
                         class="dropdown-menu dropdown-menu-dark branding-dropdown-menu"
@@ -431,11 +446,14 @@
                       type="text"
                       class="form-control mb-2 input-field reply-title-input"
                       placeholder="Título de tu respuesta"
+                      maxlength="100"
                       [(ngModel)]="replyTitle"
                     />
                     <textarea
                       class="form-control mb-2 input-field reply-content-input"
                       placeholder="Escribe tu respuesta aquí"
+                      maxlength="500"
+                      style="height: 100px; resize: none"
                       [(ngModel)]="replyContent"
                     ></textarea>
                     <button
@@ -463,6 +481,32 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div id="imageModal" class="custom-modal">
+      <div class="custom-modal-content">
+        <div class="custom-modal-header">
+          <span class="action-btn close" (click)="closeModal()">
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <img
+            [src]="postImageURL(post?.identifier)"
+            alt="Post Image"
+            class="modal-image"
+          />
+        </div>
+        <div class="custom-modal-footer">
+          <a
+            [href]="postImageURL(post?.identifier)"
+            download
+            class="btn primary-btn"
+          >
+            <i class="fas fa-download"></i> Descargar
+          </a>
         </div>
       </div>
     </div>

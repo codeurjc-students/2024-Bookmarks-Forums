@@ -21,13 +21,15 @@ Chart.register(...registerables);
   providers: [DatePipe],
 })
 export class PostComponent implements OnInit {
+  showModal: boolean = false;
+
   selectedOrderText: string = 'Fecha de creación'; // Default text
 
   showAdvancedMenu: boolean = false;
-  
+
   searchTerm: string = '';
-  searchCriteria: string = 'title'; // Default search criteria (can be title, content or author)
-  searchCriteriaText: string = 'Título'; // Default search criteria text
+  searchCriteria: string = 'default'; // Default search criteria (can be title, content or author)
+  searchCriteriaText: string = 'Título + Contenido'; // Default search criteria text
   post: Post | undefined;
   community: Community | undefined;
 
@@ -429,7 +431,8 @@ export class PostComponent implements OnInit {
       console.error('Post ID is undefined');
       return;
     }
-    // TODO: redirect to edit post page
+    // Redirects to post/:identifier/edit
+    window.location.href = `/post/${postId}/edit`;
   }
 
   downvotePost(postId: number | undefined): void {
@@ -532,20 +535,28 @@ export class PostComponent implements OnInit {
       console.error('Post ID is undefined');
       return;
     }
-    this.page = 0;
-    this.replies = [];
-    this.postService
-      .searchReplies(this.searchCriteria, this.searchTerm, this.page, this.size)
-      .subscribe({
-        next: (replies) => {
-          this.replies = this.replies.concat(replies);
-          this.loadLikedReplies();
-          this.page += 1;
-        },
-        error: (r) => {
-          console.error('Error searching replies: ' + JSON.stringify(r));
-        },
-      });
+    if (this.post) {
+      this.page = 0;
+      this.replies = [];
+      this.postService
+        .searchReplies(
+          this.post.identifier,
+          this.searchCriteria,
+          this.searchTerm,
+          this.page,
+          this.size
+        )
+        .subscribe({
+          next: (replies) => {
+            this.replies = this.replies.concat(replies);
+            this.loadLikedReplies();
+            this.page += 1;
+          },
+          error: (r) => {
+            console.error('Error searching replies: ' + JSON.stringify(r));
+          },
+        });
+    }
   }
 
   setSearchCriteria(criteria: string) {
@@ -556,10 +567,40 @@ export class PostComponent implements OnInit {
       this.searchCriteriaText = 'Contenido';
     } else if (criteria === 'author') {
       this.searchCriteriaText = 'Autor';
+    } else if (criteria === 'default') {
+      this.searchCriteriaText = 'Título + contenido';
     }
   }
 
   toggleAdvancedMenu() {
     this.showAdvancedMenu = !this.showAdvancedMenu;
+  }
+
+  openModal() {
+    this.showModal = true;
+    setTimeout(() => {
+      const modalElement = document.querySelector('.custom-modal');
+      if (modalElement) {
+        modalElement.classList.add('show');
+      }
+    }, 0);
+  }
+  
+  closeModal() {
+    const modalElement = document.querySelector('.custom-modal');
+    if (modalElement) {
+      modalElement.classList.remove('show');
+      setTimeout(() => {
+        this.showModal = false;
+      }, 300); // Match the duration of the CSS transition
+    }
+  }
+
+  handleKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      this.openModal();
+    } else if (event.key === 'Escape') {
+      this.closeModal();
+    }
   }
 }

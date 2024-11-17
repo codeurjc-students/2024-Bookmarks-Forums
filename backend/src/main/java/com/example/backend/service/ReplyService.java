@@ -60,8 +60,13 @@ public class ReplyService {
         return replyRepository.engineSearchReplies(query, pageable);
     }
 
-    public Page<Reply> searchRepliesByPost(Long postId, String query, Pageable pageable) {
-        return replyRepository.findByPostAndQuery(postId, query, pageable);
+    public Page<Reply> searchRepliesByPost(Long postId, String query, String mode, Pageable pageable) {
+        return switch (mode) {
+            case "title" -> replyRepository.findByPostAndTitle(postId, query, pageable);
+            case "content" -> replyRepository.findByPostAndContent(postId, query, pageable);
+            case "author" -> replyRepository.findByPostAndAuthor(postId, query, pageable);
+            default -> replyRepository.findByPostAndQuery(postId, query, pageable);
+        };
     }
 
     public void likeReply(Reply reply, String username) {

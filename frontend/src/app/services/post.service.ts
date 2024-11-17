@@ -121,7 +121,7 @@ export class PostService {
       .set('size', size)
       .set('order', order);
     return this.http
-      .get<Reply[]>(`${API_URL}/${postId}/replies`, { params: params })
+      .get<Reply[]>(`${API_URL}/${postId}/replies/all`, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -132,6 +132,7 @@ export class PostService {
   }
 
   searchReplies(
+    postId: number,
     criteria: string,
     query: string,
     page: number,
@@ -143,7 +144,7 @@ export class PostService {
       .set('page', page)
       .set('size', size);
     return this.http
-      .get<Reply[]>(`/api/v1/replies`, { params: params })
+      .get<Reply[]>(`/api/v1/posts/${postId}/replies`, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -226,6 +227,12 @@ export class PostService {
     let params = new HttpParams().set('username', username);
     return this.http
       .get<boolean>(`/api/v1/replies/${replyId}/votes`, { params: params })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  deletePostImage(postId: number): Observable<any> {
+    return this.http
+      .delete(`${API_URL}/${postId}/pictures`)
       .pipe(catchError((error) => throwError(() => error)));
   }
 }

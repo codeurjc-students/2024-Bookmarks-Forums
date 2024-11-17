@@ -43,9 +43,11 @@ public class Post {
     @ManyToOne
     private User author;
 
+    @Column(length = 100)
     @JsonView(BasicInfo.class)
     private String title;
 
+    @Column(length = 5000)
     @JsonView(BasicInfo.class)
     private String content;
 
@@ -132,6 +134,12 @@ public class Post {
     public void addImage(Blob image) {
         this.image = image;
         this.hasImage = true;
+    }
+
+    public void updateEditDate() {
+        this.lastEditDate = LocalDate.now();
+        this.lastEditTime = LocalTime.now();
+        this.fullLastEditDate = LocalDateTime.of(lastEditDate, lastEditTime);
     }
 
     public Post(String title, String content, User author, Community community) {

@@ -234,6 +234,49 @@ public class APIPostController {
         return ResponseEntity.created(location).body(post);
     }
 
+    // Delete post image
+    @Operation(summary = "Delete post image")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Post image deleted"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Post not found"),
+    })
+    @DeleteMapping("/posts/{postId}/pictures")
+    public ResponseEntity<String> deletePostImage(HttpServletRequest request, @PathVariable Long postId) {
+
+        // is user logged in?
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the post found?
+        Post post = postService.getPostById(postId);
+        if (post == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // is the user the author of the post, a community admin, moderator or a site admin?
+        User author = userService.getUserByUsername(principal.getName());
+        if (!post.getAuthor().equals(author) && !communityService.isUserAdminOfCommunity(author.getUsername(),
+                post.getCommunity().getIdentifier())
+                && !communityService.isUserModeratorOfCommunity(author.getUsername(), post.getCommunity().getIdentifier())
+                && !userService.getUserByUsername(principal.getName()).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        // is the user banned from the community?
+        if (communityService.isUserBannedFromCommunity(author.getUsername(), post.getCommunity().getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        post.setImage(null);
+        post.setHasImage(false);
+        postService.updatePost(post);
+
+        return new ResponseEntity<>("Post image deleted", HttpStatus.OK);
+    }
+
     // Has user upvoted or downvoted a post?
     @Operation(summary = "Returns whether the user has upvoted or downvoted a post")
     @ApiResponses(value = {
@@ -244,7 +287,8 @@ public class APIPostController {
             @ApiResponse(responseCode = "400", description = "Invalid input"),
     })
     @GetMapping("/posts/{postId}/votes")
-    public ResponseEntity<Boolean> hasUserVotedPost(@PathVariable Long postId, @RequestParam String username, @RequestParam String type) {
+    public ResponseEntity<Boolean> hasUserVotedPost(@PathVariable Long postId, @RequestParam String username,
+            @RequestParam String type) {
         Post post = postService.getPostById(postId);
         if (post == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -263,7 +307,6 @@ public class APIPostController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
 
     // Edit a post (or upvote/downvote)
     @Operation(summary = "Edit a post (or upvote/downvote)")
@@ -319,8 +362,13 @@ public class APIPostController {
                 }
                 return new ResponseEntity<>(post, HttpStatus.OK);
             case "edit":
-                // is the user the author of the post?
-                if (!post.getAuthor().equals(author)) {
+                // is the user the author of the post a community admin, moderator or a site
+                // admin?
+                if (!post.getAuthor().equals(author) && !communityService.isUserAdminOfCommunity(author.getUsername(),
+                        post.getCommunity().getIdentifier())
+                        && !communityService.isUserModeratorOfCommunity(author.getUsername(),
+                                post.getCommunity().getIdentifier())
+                        && !userService.getUserByUsername(principal.getName()).getRoles().contains("ADMIN")) {
                     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
                 }
 
@@ -513,7 +561,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "204", description = "Replies not found"),
     })
     @JsonView(ReplyInfo.class)
-    @GetMapping("/posts/{postId}/replies")
+    @GetMapping("/posts/{postId}/replies/all")
     public ResponseEntity<List<Reply>> getRepliesOfPost(@PathVariable Long postId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "creationDate") String order) {
@@ -575,7 +623,50 @@ public class APIPostController {
                 replies = replyService.getRepliesByAuthor(query, pageable);
                 break;
             default:
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                replies = replyService.searchReplies(query, pageable);
+                break;
+        }
+        if (replies.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(replies.getContent(), HttpStatus.OK);
+    }
+
+    // Search replies by post
+    /*
+     * Possible search criteria:
+     * - title
+     * - content
+     * - author
+     * - query (searches by title and content) (default)
+     */
+    @Operation(summary = "Search replies by post")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Replies found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Replies not found"),
+    })
+    @JsonView(ReplyInfo.class)
+    @GetMapping("/posts/{postId}/replies")
+    public ResponseEntity<List<Reply>> searchRepliesByPost(@PathVariable Long postId, @RequestParam String criteria,
+            @RequestParam String query, @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Reply> replies = null;
+        switch (criteria) {
+            case "title":
+                replies = replyService.searchRepliesByPost(postId, query, "title", pageable);
+                break;
+            case "content":
+                replies = replyService.searchRepliesByPost(postId, query, "content", pageable);
+                break;
+            case "author":
+                replies = replyService.searchRepliesByPost(postId, query, "author", pageable);
+                break;
+            default:
+                replies = replyService.searchRepliesByPost(postId, query, "query", pageable);
+                break;
         }
         if (replies.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -768,7 +859,8 @@ public class APIPostController {
         return new ResponseEntity<>("Reply deleted", HttpStatus.OK);
     }
 
-    // Get the most liked posts of the most followed users the user follows (sorting the posts by upvotes)
+    // Get the most liked posts of the most followed users the user follows (sorting
+    // the posts by upvotes)
     @Operation(summary = "Get the most liked posts of the most followed users the user follows")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -793,7 +885,8 @@ public class APIPostController {
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }
 
-    // Get the most liked posts of the user's communities (sorting the posts by upvotes)
+    // Get the most liked posts of the user's communities (sorting the posts by
+    // upvotes)
     @Operation(summary = "Get the most liked posts of the user's communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -818,7 +911,8 @@ public class APIPostController {
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }
 
-    // Get the most recent posts of the user's communities (sorting the posts by creation date)
+    // Get the most recent posts of the user's communities (sorting the posts by
+    // creation date)
     @Operation(summary = "Get the most recent posts of the user's communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -893,7 +987,8 @@ public class APIPostController {
     })
     @JsonView(PostInfo.class)
     @GetMapping("/communities/most-popular/posts/most-recent")
-    public ResponseEntity<List<Post>> getMostRecentPostsOfMostFollowedCommunities(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<List<Post>> getMostRecentPostsOfMostFollowedCommunities(
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> posts = postService.getMostRecentPostsOfMostFollowedCommunities(pageable);

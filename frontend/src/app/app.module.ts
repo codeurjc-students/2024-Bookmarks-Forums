@@ -16,6 +16,8 @@ import {
 } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PostComponent } from './component/post/post.component';
+import { ModifyPostComponent } from './component/modifyPost/modifyPost.component';
+import { ContenteditableValueAccessor } from './component/modifyPost/contenteditable-value-accessor';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,8 @@ import { PostComponent } from './component/post/post.component';
     LoginComponent,
     LandingComponent,
     PostComponent,
+    ContenteditableValueAccessor,
+    ModifyPostComponent,
   ],
   imports: [
     BrowserModule,

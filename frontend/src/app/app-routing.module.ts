@@ -4,12 +4,14 @@ import { LandingComponent } from './component/landing/landing.component';
 import { LoginComponent } from './component/login/login.component';
 import { SignupComponent } from './component/signUp/signup.component';
 import { PostComponent } from './component/post/post.component';
+import { ModifyPostComponent } from './component/modifyPost/modifyPost.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, data: { animation: 'LoginPage' } },
   { path: 'signup', component: SignupComponent, data: { animation: 'SignupPage' } },
   { path: '', component: LandingComponent },
   { path: 'post/:identifier', component: PostComponent },
+  { path: 'post/:identifier/edit', component: ModifyPostComponent },
 ];
 
 @NgModule({
