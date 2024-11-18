@@ -107,6 +107,7 @@ body {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  position: relative;
 }
 
 .nav {
@@ -1473,13 +1474,17 @@ html {
 }
 
 .page-hero {
+  display: flex;
+  align-items: center;
   border-radius: 1rem;
   position: relative;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
+  height: 250px;
 }
+
 
 .header-image-adapted {
   position: relative;
@@ -2567,7 +2572,7 @@ html {
 }
 
 .post-title-input::placeholder {
-  color: var(--branding-light-grey);
+  color: var (--branding-light-grey);
   opacity: 0.6;
 }
 
@@ -2591,7 +2596,7 @@ html {
 }
 
 .post-content-textarea::placeholder {
-  color: var(--branding-light-grey);
+  color: var (--branding-light-grey);
   opacity: 0.6;
 }
 
@@ -2645,7 +2650,9 @@ html {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  background-color: var(--branding-forums-dark-grey);
+  background-color: rgba(42, 43, 46, 0.8);
+  --webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border-radius: 0.5rem;
   border: 1px solid var(--branding-forums-light-grey);
   padding: 0.5rem;
@@ -2668,11 +2675,11 @@ html {
 
 .toolbar-btn.active {
   border: 1px solid var(--branding-forums-lighter-grey) !important;
-  background-color: var(--branding-darkish-grey) !important;
+  background-color: rgba(73, 74, 80, 0.8) !important;
 }
 
 .toolbar-btn:active {
-  background-color: var(--branding-forums-darker-grey) !important;
+  background-color: rgba(31, 32, 34, 0.8) !important;
 }
 
 .red-border {
@@ -2705,4 +2712,53 @@ html {
 
 .no-scroll {
   overflow: hidden !important;
+}
+
+.hero-community-name{
+  color: var(--branding-light-grey) !important;
+  font-weight: 700 !important;
+}
+
+.community-name-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.community-info-item{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 0.5rem;
+  height: 2.5rem;
+}
+
+.community-info-item i{
+  color: var(--branding-light-grey) !important;
+  font-size: 1.5rem; /* Increase the icon size */
+  width: 2rem; /* Set the width */
+}
+
+.community-info-icon-title{
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.community-info-text{
+  margin: auto !important;
+}
+
+.community-info-text-container{
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.community-info-text-counter{
+  color: var(--branding-light-grey) !important;
+  font-weight: 700 !important;
+  margin: auto !important;
+
 }

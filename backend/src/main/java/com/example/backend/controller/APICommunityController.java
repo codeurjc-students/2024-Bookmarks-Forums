@@ -599,7 +599,8 @@ public class APICommunityController {
     @JsonView(CommunityBasicInfo.class)
     @PutMapping("/communities/{id}/pictures")
     public ResponseEntity<Object> uploadCommunityBanner(HttpServletRequest request, @PathVariable Long id,
-            @RequestParam MultipartFile file) throws IOException {
+            @RequestParam(required = false) String action,
+            @RequestParam(required=false) MultipartFile file) throws IOException {
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -620,6 +621,13 @@ public class APICommunityController {
         if (!community.getAdmin().getUsername().equals(principal.getName()) && !userService
                 .getUserByUsername(principal.getName()).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // delete banner
+        if (action != null && action.equals("delete")) {
+            community.setBanner(null);
+            communityService.saveCommunity(community);
+            return new ResponseEntity<>(community, HttpStatus.OK);
         }
 
         if (file == null || file.isEmpty()) {

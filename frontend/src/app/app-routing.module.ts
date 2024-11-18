@@ -5,6 +5,7 @@ import { LoginComponent } from './component/login/login.component';
 import { SignupComponent } from './component/signUp/signup.component';
 import { PostComponent } from './component/post/post.component';
 import { ModifyPostComponent } from './component/modifyPost/modifyPost.component';
+import { CommunityComponent } from './component/community/community.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, data: { animation: 'LoginPage' } },
@@ -12,6 +13,7 @@ const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'post/:identifier', component: PostComponent },
   { path: 'post/:identifier/edit', component: ModifyPostComponent },
+  {path: 'community/:identifier', component: CommunityComponent},
 ];
 
 @NgModule({

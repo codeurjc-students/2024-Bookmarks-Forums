@@ -8,13 +8,13 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  height: 5px; /* Adjust as needed */
+  height: 5px; /* Adjustable */
   width: 100%;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="5"><circle cx="4" cy="2.5" r="2.5" fill="%23efefef"/><circle cx="15" cy="2.5" r="2.5" fill="%23efefef"/><circle cx="26" cy="2.5" r="2.5" fill="%23efefef"/></svg>');
   background-repeat: no-repeat;
-  background-position: center; /* Center the background image */
+  background-position: center;
   background-size: contain;
-  margin-top: 5px; /* Adjust as needed */
+  margin-top: 5px; /* Adjustable */
 }
 
 .bm-navbar-menu{
@@ -40,4 +40,21 @@
 .bm-nav-item.dropdown .dropdown-toggle::after {
   color: #e4e4e4 !important;
   vertical-align: middle;
+}
+
+.gradient-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px; /* Adjustable */
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 999; 
+}
+
+.bm-navbar {
+  z-index: 1000 !important;
 }

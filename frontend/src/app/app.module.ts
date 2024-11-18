@@ -17,6 +17,7 @@ import {
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PostComponent } from './component/post/post.component';
 import { ModifyPostComponent } from './component/modifyPost/modifyPost.component';
+import { CommunityComponent } from './component/community/community.component';
 import { ContenteditableValueAccessor } from './component/modifyPost/contenteditable-value-accessor';
 
 @NgModule({
@@ -30,6 +31,7 @@ import { ContenteditableValueAccessor } from './component/modifyPost/contentedit
     PostComponent,
     ContenteditableValueAccessor,
     ModifyPostComponent,
+    CommunityComponent,
   ],
   imports: [
     BrowserModule,

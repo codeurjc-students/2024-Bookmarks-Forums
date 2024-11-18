@@ -105,7 +105,25 @@ export class NavbarComponent implements OnInit {
         localStorage.setItem('userSearch', this.userSearch ? 'true' : 'false');
       };
     }
+
+    window.addEventListener('scroll', this.onScroll);
   }
+
+  ngOnDestroy() {
+    window.removeEventListener('scroll', this.onScroll);
+  }
+
+  onScroll = () => {
+    const gradientOverlay = document.querySelector('.gradient-overlay') as HTMLElement;
+    const navbar = document.querySelector('.bm-navbar') as HTMLElement;
+    const scrollTop = window.scrollY;
+
+    if (scrollTop > navbar.offsetHeight) {
+      gradientOverlay.style.opacity = '1';
+    } else {
+      gradientOverlay.style.opacity = '0';
+    }
+  };
 
   logout() {
     this.sessionService.logout().subscribe({
