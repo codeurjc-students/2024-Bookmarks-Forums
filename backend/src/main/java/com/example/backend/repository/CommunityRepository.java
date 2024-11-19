@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -92,6 +93,10 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         @Query("SELECT c.members FROM Community c WHERE c.identifier = :communityId")
         Page<User> getMembers(long communityId, Pageable pageable);
 
+        // Search members of a community by username
+        @Query("SELECT u FROM Community c JOIN c.members u WHERE c.identifier = :communityId AND u.username LIKE %:username%")
+        Page<User> searchMembers(@Param("communityId") long communityId, @Param("username") String username, Pageable pageable);
+
         @Query("SELECT c.members FROM Community c WHERE c.identifier = :communityId")
         List<User> getMembersList(long communityId);
 
@@ -111,11 +116,12 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         @Query("SELECT c FROM Community c WHERE c.name LIKE %:name%")
         List<Community> findAllByName(String name);
 
-        //Get banned users of a community
+        // Get banned users of a community
         @Query("SELECT c.bannedUsers FROM Community c WHERE c.identifier = :communityId")
         Page<Ban> getBannedUsers(long communityId, Pageable pageable);
 
-        // Get a specific ban of a community given the user username and community identifier
+        // Get a specific ban of a community given the user username and community
+        // identifier
         @Query("SELECT b FROM Ban b WHERE b.community.identifier = :communityId AND b.user.username = :username")
         Ban getBan(long communityId, String username);
 
@@ -123,11 +129,13 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         @Query("SELECT b FROM Ban b WHERE b.id = :banId")
         Ban getBanById(long banId);
 
-        // Get communities with the most number of members and return both the community name and the total number of members
+        // Get communities with the most number of members and return both the community
+        // name and the total number of members
         @Query("SELECT c.name, COUNT(m) as totalMembers FROM Community c LEFT JOIN c.members m GROUP BY c.name ORDER BY totalMembers DESC")
         List<Object[]> getMostPopularCommunitiesCount();
 
-        // Get communities with the most number of members and return the community identifier, name, and the total number of members
+        // Get communities with the most number of members and return the community
+        // identifier, name, and the total number of members
         @Query("SELECT c.identifier, c.name, COUNT(m) as totalMembers FROM Community c LEFT JOIN c.members m GROUP BY c.identifier ORDER BY totalMembers DESC")
         List<Object[]> getMostPopularCommunitiesCountWithId();
 

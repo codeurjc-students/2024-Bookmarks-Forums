@@ -12430,3 +12430,7 @@ header {
 .dropdown-item {
   cursor: pointer;
 }
+
+.member-more-actions-container {
+  display: absolute;
+}

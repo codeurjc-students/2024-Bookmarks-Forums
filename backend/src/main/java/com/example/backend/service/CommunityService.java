@@ -316,4 +316,9 @@ public class CommunityService {
         }
     }
 
+    // Search members of a community by username
+    public Page<User> searchMembers(Long communityId, String username, Pageable pageable) {
+        return communityRepository.searchMembers(communityId, username, pageable);
+    }
+
 }

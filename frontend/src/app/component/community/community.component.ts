@@ -26,12 +26,27 @@ export class CommunityComponent implements OnInit {
 
   showAdvancedMenu: boolean = false;
 
+  showBanModal: boolean = false;
+  banReasonValue: string = '';
+  banDurationText: string = 'day';
+  banDurationTextTranslated: string = '1 día';
+  usernameToBan: string = '';
+
   searchTerm: string = '';
   searchCriteria: string = 'default'; // Default search criteria (can be title, content or author)
   searchCriteriaText: string = 'Título + Contenido'; // Default search criteria text
 
   communityPostsCount: number = 0;
   posts: Post[] = [];
+
+  admin: User | undefined;
+
+  hasModerators: boolean = false;
+  moderators: User[] = [];
+  moderatorsPage = 0;
+  moderatorsSize = 5;
+  loadingMoreModerators = false;
+  noMoreModerators = false;
 
   community: Community | undefined;
   communityMembersCount: number = 0;
@@ -44,6 +59,9 @@ export class CommunityComponent implements OnInit {
   loggedUsername: string = '';
   loggedIn: boolean = false;
   isAdmin: boolean = false;
+  isMember: boolean = false;
+  isCommunityAdmin: boolean = false;
+  isModerator: boolean = false;
 
   public chart: any;
 
@@ -52,13 +70,20 @@ export class CommunityComponent implements OnInit {
   page = 0;
   postOrder = 'lastModifiedDate'; // order by last modified date by default. Can be changed to 'creationDate', 'likes' or 'replies'
 
-  loadingMorePosts = false;
+  // members pagination
+  membersSize = 10;
+  membersPage = 0;
 
+  loadingMoreMembers = false;
+  noMoreMembers = false;
+
+  loadingMorePosts = false;
   noMorePosts = false;
 
   showAlertModal: boolean = false;
   alertModalText: string = '';
   confirmAction: () => void = () => {};
+  showCancelButton: boolean = true;
 
   constructor(
     private http: HttpClient,
@@ -79,9 +104,59 @@ export class CommunityComponent implements OnInit {
     this.user = user;
     this.loggedUsername = user.username;
     this.isAdmin = user.roles.includes('ADMIN');
+    this.isUserMember();
   }
 
-  
+  getAdmin() {
+    if (this.community) {
+      this.communityService.getAdmin(this.community.identifier).subscribe({
+        next: (admin) => {
+          this.admin = admin;
+        },
+        error: (r) => {
+          console.error('Error getting community admin: ' + JSON.stringify(r));
+        },
+      });
+    }
+  }
+
+  loadModerators() {
+    if (this.community) {
+      this.communityService
+        .getModerators(
+          this.community.identifier,
+          this.moderatorsPage,
+          this.moderatorsSize
+        )
+        .subscribe({
+          next: (moderators) => {
+            if (!moderators || moderators.length == 0) {
+              this.noMoreModerators = true;
+              this.loadingMoreModerators = false;
+              return;
+            }
+            this.moderators = this.moderators.concat(moderators);
+            this.hasModerators = true;
+            this.loadingMoreModerators = false;
+            this.moderatorsPage += 1;
+            this.noMoreModerators = moderators.length < this.moderatorsSize;
+          },
+          error: (r) => {
+            console.error(
+              'Error getting community moderators: ' + JSON.stringify(r)
+            );
+          },
+        });
+    } else {
+      // TODO: redirect to error page
+    }
+  }
+
+  loadMoreModerators() {
+    this.loadingMoreModerators = true;
+    this.loadModerators();
+    this.loadingMoreModerators = false;
+  }
 
   loadCommunity() {
     let communityID = Number(this.route.snapshot.paramMap.get('identifier'));
@@ -90,6 +165,8 @@ export class CommunityComponent implements OnInit {
         this.community = community;
         this.getMembers();
         this.getMembersCount();
+        this.getAdmin();
+        this.loadModerators();
         this.getPostsCount();
         this.loadPosts();
       },
@@ -162,6 +239,48 @@ export class CommunityComponent implements OnInit {
     }
   }
 
+  checkModerator() {
+    if (this.community) {
+      this.communityService
+        .isModerator(this.community.identifier, this.loggedUsername)
+        .subscribe({
+          next: (isModerator) => {
+            this.isModerator = isModerator;
+          },
+          error: (r) => {
+            console.error(
+              'Error checking if user is moderator: ' + JSON.stringify(r)
+            );
+          },
+        });
+    }
+  }
+
+  isUserMember() {
+    if (this.community) {
+      this.communityService
+        .isUserMember(this.community.identifier, this.loggedUsername)
+        .subscribe({
+          next: (isMember) => {
+            this.isMember = isMember;
+            this.isCommunityAdmin =
+              this.community?.admin.username === this.loggedUsername;
+            this.checkModerator();
+          },
+          error: (r) => {
+            // if the error is unauthorized, the user is not a member
+            if (r.status == 401) {
+              this.isMember = false;
+            } else {
+              console.error(
+                'Error checking if user is member: ' + JSON.stringify(r)
+              );
+            }
+          },
+        });
+    }
+  }
+
   checkIfLoggedIn() {
     this.loginService.checkLogged().subscribe({
       next: (bool) => {
@@ -223,14 +342,18 @@ export class CommunityComponent implements OnInit {
   }
 
   // Get user profile picture
-  profilePicture(username: string) {
+  profilePicture(username: string | undefined): string {
+    if (!username) {
+      return '';
+    }
     return this.profileService.getPostImageURL(username);
   }
 
-  openAlertModal(text: string, action: () => void) {
+  openAlertModal(text: string, action: () => void, showCancel: boolean = true) {
     this.alertModalText = text;
     this.confirmAction = action;
     this.showAlertModal = true;
+    this.showCancelButton = showCancel;
   }
 
   closeAlertModal() {
@@ -294,27 +417,55 @@ export class CommunityComponent implements OnInit {
 
   getMembers() {
     if (this.community) {
-      this.communityService.getMembers(this.community.identifier, 0, 10).subscribe({
-        next: (members) => {
-          this.communityMembers = members;
-        },
-        error: (r) => {
-          console.error('Error getting community members: ' + JSON.stringify(r));
-        },
-      });
+      this.communityService
+        .getMembers(
+          this.community.identifier,
+          this.membersPage,
+          this.membersSize
+        )
+        .subscribe({
+          next: (members) => {
+            if (!members || members.length == 0) {
+              this.noMoreMembers = true;
+              this.loadingMoreMembers = false;
+              return;
+            }
+            this.communityMembers = members;
+            this.loadingMoreMembers = false;
+            this.membersPage += 1;
+            this.noMoreMembers = members.length < this.size;
+          },
+          error: (r) => {
+            console.error(
+              'Error getting community members: ' + JSON.stringify(r)
+            );
+          },
+        });
+    } else {
+      // TODO: redirect to error page
     }
+  }
+
+  loadMoreMembers() {
+    this.loadingMoreMembers = true;
+    this.getMembers();
+    this.loadingMoreMembers = false;
   }
 
   getMembersCount() {
     if (this.community) {
-      this.communityService.getMembersCount(this.community.identifier).subscribe({
-        next: (count) => {
-          this.communityMembersCount = count;
-        },
-        error: (r) => {
-          console.error('Error getting community members count: ' + JSON.stringify(r));
-        },
-      });
+      this.communityService
+        .getMembersCount(this.community.identifier)
+        .subscribe({
+          next: (count) => {
+            this.communityMembersCount = count;
+          },
+          error: (r) => {
+            console.error(
+              'Error getting community members count: ' + JSON.stringify(r)
+            );
+          },
+        });
     }
   }
 
@@ -325,9 +476,323 @@ export class CommunityComponent implements OnInit {
           this.communityPostsCount = count;
         },
         error: (r) => {
-          console.error('Error getting community posts count: ' + JSON.stringify(r));
+          console.error(
+            'Error getting community posts count: ' + JSON.stringify(r)
+          );
         },
       });
+    }
+  }
+
+  joinOrLeaveCommunity() {
+    if (this.community) {
+      if (this.isMember) {
+        this.communityService
+          .leaveCommunity(this.community.identifier, this.loggedUsername)
+          .subscribe({
+            next: () => {
+              this.isMember = false;
+              this.communityMembers = this.communityMembers.filter(
+                (m) => m.username !== this.loggedUsername
+              );
+              this.moderators = this.moderators.filter(
+                (m) => m.username !== this.loggedUsername
+              );
+              this.getMembersCount();
+            },
+            error: (r) => {
+              if (r.status == 401) {
+                this.openAlertModal(
+                  'Debes traspasar tus poderes de administrador a otro usuario para poder abandonar esta comunidad',
+                  () => {},
+                  false
+                );
+              } else {
+                console.error('Error leaving community: ' + JSON.stringify(r));
+              }
+            },
+          });
+      } else {
+        this.communityService
+          .joinCommunity(this.community.identifier, this.loggedUsername)
+          .subscribe({
+            next: () => {
+              this.isMember = true;
+              this.reloadAllMembersList();
+            },
+            error: (r) => {
+              console.error('Error joining community: ' + JSON.stringify(r));
+            },
+          });
+      }
+    }
+  }
+
+  removeMember(username: string) {
+    // admin can't remove themselves
+    if (username === this.community?.admin.username) {
+      if (this.isAdmin) {
+        this.openAlertModal(
+          'Para expulsar a este usuario, conviértete en Administrador de la comunidad',
+          () => {},
+          false
+        );
+      } else {
+        this.openAlertModal(
+          '¿Qué sería de un reino sin su rey? No puedes expulsar al administrador de la comunidad',
+          () => {},
+          false
+        );
+      }
+      return;
+    }
+    if (this.community) {
+      this.communityService
+        .leaveCommunity(this.community.identifier, username)
+        .subscribe({
+          next: () => {
+            this.communityMembers = this.communityMembers.filter(
+              (m) => m.username !== username
+            );
+            this.communityMembersCount -= 1;
+
+            this.moderators = this.moderators.filter(
+              (m) => m.username !== username
+            );
+          },
+          error: (r) => {
+            this.openAlertModal(
+              'Error al expulsar al usuario: no puedes expulsar a otros moderadores.',
+              () => {},
+              false
+            );
+          },
+        });
+    }
+  }
+
+  closeBanModal() {
+    this.showBanModal = false;
+  }
+
+  confirmBanModal() {
+    if(!this.community){
+      return;
+    }
+
+    this.communityService.banUser(this.community.identifier, this.usernameToBan, this.banReasonValue, this.banDurationText).subscribe({
+      next: () => {
+        this.showBanModal = false;
+        this.openAlertModal(
+          '¡' + this.usernameToBan + ' ha sido expulsado de la comunidad!',
+          () => {},
+          false
+        );
+        this.reloadAllMembersList();
+      },
+      error: (r) => {
+        console.error('Error banning user: ' + JSON.stringify(r));
+      },
+    });
+  }
+
+  banMember(username: string) {
+    // admin can't ban themselves
+    if (username === this.community?.admin.username) {
+      if (this.isAdmin) {
+        this.openAlertModal(
+          'Para banear a este usuario, conviértete en Administrador de la comunidad',
+          () => {},
+          false
+        );
+      } else {
+        this.openAlertModal(
+          '¿Qué sería de un reino sin su rey? No puedes expulsar al administrador de la comunidad',
+          () => {},
+          false
+        );
+      }
+      return;
+    }
+    this.usernameToBan = username;
+    this.showBanModal = true;
+  }
+
+  makeAdmin(username: string) {
+    if (this.community) {
+      this.communityService
+        .setAdmin(this.community.identifier, username)
+        .subscribe({
+          next: () => {
+            this.openAlertModal(
+              '¡Ahora ' + username + ' es administrador de esta comunidad!',
+              () => {},
+              false
+            );
+            this.getAdmin();
+            this.reloadAllMembersList();
+          },
+          error: (r) => {
+            console.error('Error setting admin: ' + JSON.stringify(r));
+          },
+        });
+    }
+  }
+
+  reloadAllMembersList() {
+    this.moderators = [];
+    this.moderatorsPage = 0;
+    this.noMoreModerators = false;
+    this.loadingMoreModerators = true;
+    this.loadModerators();
+    this.loadingMoreModerators = false;
+
+    this.communityMembers = [];
+    this.membersPage = 0;
+    this.noMoreMembers = false;
+    this.loadingMoreMembers = true;
+    this.getMembers();
+    this.loadingMoreMembers = false;
+
+    this.getMembersCount();
+  }
+
+  addModeratorAction(username: string) {
+    if (this.community) {
+      this.communityService
+        .addModerator(this.community.identifier, username)
+        .subscribe({
+          next: () => {
+            this.openAlertModal(
+              '¡' + username + ' es ahora moderador de esta comunidad!',
+              () => {},
+              false
+            );
+            this.reloadAllMembersList();
+          },
+          error: (r) => {
+            console.error('Error adding moderator: ' + JSON.stringify(r));
+          },
+        });
+    }
+  }
+
+  addModerator(username: string) {
+    if (this.community) {
+      // if already a moderator, modal
+      this.communityService
+        .isModerator(this.community.identifier, username)
+        .subscribe({
+          next: (isModerator) => {
+            if (isModerator) {
+              this.openAlertModal(
+                username + ' ya es moderador de esta comunidad',
+                () => {},
+                false
+              );
+            } else {
+              this.addModeratorAction(username);
+            }
+          },
+          error: (r) => {
+            console.error(
+              'Error checking if user is moderator: ' + JSON.stringify(r)
+            );
+          },
+        });
+    }
+  }
+
+  removeModerator(username: string) {
+    if (this.community) {
+      this.communityService
+        .removeModerator(this.community.identifier, username)
+        .subscribe({
+          next: () => {
+            this.openAlertModal(
+              '¡' + username + ' ya no es moderador de esta comunidad!',
+              () => {},
+              false
+            );
+            this.reloadAllMembersList();
+          },
+          error: (r) => {
+            console.error('Error removing moderator: ' + JSON.stringify(r));
+          },
+        });
+    }
+  }
+
+  showDropdown(username: string): boolean {
+    return (
+      (this.isAdmin ||
+        this.isModerator ||
+        this.community?.admin.username === this.loggedUsername) &&
+      (username !== this.community?.admin.username || this.isAdmin)
+    );
+  }
+
+  canAddModerator(username: string) {
+    return (
+      (this.community?.admin.username === this.loggedUsername ||
+        this.isAdmin) &&
+      username !== this.community?.admin.username
+    );
+  }
+
+  canRemoveModerator(username: string) {
+    return (
+      this.community?.admin.username === this.loggedUsername || this.isAdmin
+    );
+  }
+
+  canMakeAdmin(username: string) {
+    return (
+      (this.community?.admin.username === this.loggedUsername ||
+        this.isAdmin) &&
+      username !== this.community?.admin.username
+    );
+  }
+
+  canRemoveMember(username: string) {
+    return (
+      (this.community?.admin.username === this.loggedUsername ||
+      this.isAdmin ||
+      this.isModerator)
+    );
+  }
+
+  canBanMember(username: string) {
+    return (
+      this.community?.admin.username === this.loggedUsername ||
+      this.isAdmin ||
+      this.isModerator
+    );
+  }
+
+  setBanDuration(duration: string) {
+    this.banDurationText = duration;
+    switch (duration) {
+      case 'day':
+      this.banDurationTextTranslated = '1 día';
+      break;
+      case 'week':
+      this.banDurationTextTranslated = '1 semana';
+      break;
+      case '2weeks':
+      this.banDurationTextTranslated = '2 semanas';
+      break;
+      case 'month':
+      this.banDurationTextTranslated = '1 mes';
+      break;
+      case '6months':
+      this.banDurationTextTranslated = '6 meses';
+      break;
+      case 'forever':
+      this.banDurationTextTranslated = 'Permanente';
+      break;
+      default:
+      this.banDurationTextTranslated = '';
     }
   }
 }

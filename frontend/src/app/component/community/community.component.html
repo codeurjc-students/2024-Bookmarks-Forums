@@ -113,18 +113,6 @@
                         </p>
                       </div>
                     </a>
-                    <a
-                      class="card-link"
-                      [routerLink]="['/community', post.community.identifier]"
-                    >
-                      <div class="card-community-name-container">
-                        <p
-                          class="card-content card-text card-community-name-text mb-0"
-                        >
-                          {{ post.community.name }}
-                        </p>
-                      </div>
-                    </a>
                   </div>
 
                   <div class="card-content small text-muted mb-1">
@@ -232,18 +220,210 @@
               <div class="post-container-card-top">
                 <h5 class="card-title mb-0">Acciones de la comunidad</h5>
               </div>
-              <div class="card-body"></div>
+              <div class="card-body">
+                <!-- Join or leave community -->
+                <div
+                  class="community-actions-container"
+                  *ngIf="loggedIn; else loginToJoin"
+                >
+                  <!-- If the user is logged in and is a member of the community-->
+                  <ng-container *ngIf="isMember; else joinCommunityButton">
+                    <button
+                      class="btn primary-btn"
+                      (click)="joinOrLeaveCommunity()"
+                    >
+                      <i class="fas fa-plus me-1"></i>
+                      Nuevo Post
+                    </button>
+                    <button
+                      class="btn negative-btn"
+                      (click)="joinOrLeaveCommunity()"
+                    >
+                      <i class="fas fa-sign-out-alt me-1"></i>
+                      Salir
+                    </button>
+                  </ng-container>
+                  <!-- If the user is logged in and is not a member of the community-->
+                  <ng-template #joinCommunityButton>
+                    <div class="community-actions-container-text">
+                      <p class="card-content card-text wrap-text center-text">
+                        Únete a la comunidad para crear posts, comentar, y
+                        más...
+                      </p>
+                      <button
+                        class="btn primary-btn"
+                        (click)="joinOrLeaveCommunity()"
+                        *ngIf="!isMember"
+                      >
+                        <i class="fas fa-sign-in-alt me-1"></i>
+                        Unirse
+                      </button>
+                    </div>
+                  </ng-template>
+                </div>
+                <!-- If the user is not logged in -->
+                <ng-template #loginToJoin>
+                  <div class="community-actions-container-text">
+                    <p class="card-content card-text wrap-text center-text">
+                      Inicia sesión para unirte a la comunidad, crear posts, y
+                      más...
+                    </p>
+                    <!-- Login button -->
+                    <div class="d-grid gap-2">
+                      <a class="btn primary-btn" [routerLink]="['/login']">
+                        <i class="fas fa-sign-in-alt me-1"></i>
+                        Iniciar sesión</a
+                      >
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
             </div>
 
             <!-- Community Members widget -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
+                <h5 class="card-title mb-0">El staff de la comunidad</h5>
+              </div>
+              <div class="card-body">
+                <!-- Admin -->
+                <div class="community-members-container">
+                  <h6 class="card-title mb-0">Administrador:</h6>
+                  <div class="community-member-card">
+                    <a
+                      [routerLink]="['/profile', admin?.username]"
+                      class="card-link"
+                    >
+                      <div class="community-member-info">
+                        <img
+                          [src]="profilePicture(admin?.username)"
+                          alt="Profile"
+                          class="community-member-profile-picture"
+                        />
+                        <p class="community-member-username">
+                          {{ admin?.username }}
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+                <hr class="post-container-divider" *ngIf="hasModerators" />
+                <!-- Moderators -->
+                <div class="community-members-container" *ngIf="hasModerators">
+                  <h6 class="card-title mb-0">Moderadores:</h6>
+                  <div
+                    class="community-member-card"
+                    *ngFor="let moderator of moderators"
+                  >
+                    <a
+                      [routerLink]="['/profile', moderator.username]"
+                      class="card-link"
+                    >
+                      <div class="community-member-info">
+                        <img
+                          [src]="profilePicture(moderator.username)"
+                          alt="Profile"
+                          class="community-member-profile-picture"
+                        />
+                        <p class="community-member-username">
+                          {{ moderator.username }}
+                        </p>
+                      </div>
+                    </a>
+                    <!-- 3 dot button for actions (dropdown) -->
+                    <div
+                      class="member-more-actions-container"
+                      *ngIf="
+                        showDropdown(moderator.username) === true &&
+                        !this.isModerator
+                      "
+                    >
+                      <button
+                        title="Más acciones"
+                        class="btn btn-secondary branding-dropdown-toggle more-actions-toggle"
+                        type="button"
+                        id="memberActionsDropdown"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        <i class="fas fa-ellipsis-v"></i>
+                      </button>
+                      <ul
+                        class="dropdown-menu dropdown-menu-dark branding-dropdown-menu"
+                        aria-labelledby="memberActionsDropdown"
+                      >
+                        <li>
+                          <a
+                            *ngIf="canRemoveMember(moderator.username)"
+                            class="dropdown-item"
+                            (click)="removeMember(moderator.username)"
+                          >
+                            <i class="fas fa-user-times me-1"></i>
+                            Expulsar de la comunidad
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            *ngIf="canBanMember(moderator.username)"
+                            class="dropdown-item"
+                            (click)="banMember(moderator.username)"
+                          >
+                            <i class="fas fa-ban me-1"></i>
+                            Banear de la comunidad
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            *ngIf="canMakeAdmin(moderator.username)"
+                            class="dropdown-item"
+                            (click)="makeAdmin(moderator.username)"
+                          >
+                            <i class="fas fa-crown me-1"></i>
+                            Convertir en Administrador</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            *ngIf="canRemoveModerator(moderator.username)"
+                            class="dropdown-item"
+                            (click)="removeModerator(moderator.username)"
+                          >
+                            <i class="fas fa-user-slash me-1"></i>
+                            Eliminar Moderador</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <!-- Load more moderators button -->
+                  <div class="load-more-replies-container">
+                    <button
+                      class="btn primary-btn"
+                      (click)="loadMoreModerators()"
+                      *ngIf="!noMoreModerators; else noMoreModeratorsText"
+                    >
+                      Cargar más
+                    </button>
+                    <ng-template #noMoreModeratorsText>
+                      <p
+                        class="card-content card-text wrap-text center-text text-muted"
+                      >
+                        No hay más moderadores
+                      </p>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
                 <h5 class="card-title mb-0">Miembros de la comunidad</h5>
               </div>
               <div class="card-body">
+                <!-- Members -->
                 <div class="community-members-container">
                   <div
-                    class="community-member-item"
+                    class="community-member-card"
                     *ngFor="let member of communityMembers"
                   >
                     <a
@@ -261,6 +441,84 @@
                         </p>
                       </div>
                     </a>
+                    <!-- 3 dot button for actions (dropdown) -->
+                    <div
+                      class="member-more-actions-container"
+                      *ngIf="showDropdown(member.username) === true"
+                    >
+                      <button
+                        title="Más acciones"
+                        class="btn btn-secondary branding-dropdown-toggle more-actions-toggle"
+                        type="button"
+                        id="memberActionsDropdown"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        <i class="fas fa-ellipsis-v"></i>
+                      </button>
+                      <ul
+                        class="dropdown-menu dropdown-menu-dark branding-dropdown-menu"
+                        aria-labelledby="memberActionsDropdown"
+                      >
+                        <li>
+                          <a
+                            *ngIf="canRemoveMember(member.username)"
+                            class="dropdown-item"
+                            (click)="removeMember(member.username)"
+                          >
+                            <i class="fas fa-user-times me-1"></i>
+                            Expulsar de la comunidad
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            *ngIf="canBanMember(member.username)"
+                            class="dropdown-item"
+                            (click)="banMember(member.username)"
+                          >
+                            <i class="fas fa-ban me-1"></i>
+                            Banear de la comunidad
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            *ngIf="canMakeAdmin(member.username)"
+                            class="dropdown-item"
+                            (click)="makeAdmin(member.username)"
+                          >
+                            <i class="fas fa-crown me-1"></i>
+                            Convertir en Administrador</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            *ngIf="canAddModerator(member.username)"
+                            class="dropdown-item"
+                            (click)="addModerator(member.username)"
+                          >
+                            <i class="fas fa-user-shield me-1"></i>
+                            Convertir en Moderador</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <!-- Load more members button -->
+                  <div class="load-more-replies-container">
+                    <button
+                      class="btn primary-btn"
+                      (click)="loadMoreMembers()"
+                      *ngIf="!noMoreMembers; else noMoreMembersText"
+                    >
+                      Cargar más
+                    </button>
+                    <ng-template #noMoreMembersText>
+                      <p
+                        class="card-content card-text wrap-text center-text text-muted"
+                      >
+                        No hay más miembros
+                      </p>
+                    </ng-template>
                   </div>
                 </div>
               </div>
@@ -299,6 +557,108 @@
               class="btn primary-btn"
               title="Cancelar"
               (click)="closeAlertModal()"
+              *ngIf="showCancelButton"
+            >
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert modal with a text field, dropdown, confirm and cancel buttons-->
+    <div
+      id="alertModalWithInput"
+      class="custom-modal"
+      [ngClass]="{ show: showBanModal }"
+    >
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header">
+          <span
+            class="action-btn close"
+            (click)="closeBanModal()"
+            (keypress)="closeBanModal()"
+          >
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <!-- Ban reason field -->
+          <div class="alert-modal-container">
+            <p class="alert-modal-text-left">Razón del ban:</p>
+            <div class="alert-modal-input">
+              <input
+                type="text"
+                class="form-control"
+                maxlength="255"
+                placeholder="Explica la razón del ban"
+                [(ngModel)]="banReasonValue"
+              />
+            </div>
+          </div>
+          <!-- Ban duration dropdown -->
+          <div class="alert-modal-container">
+            <p class="alert-modal-text-left">Duración del ban:</p>
+            <div class="input-group-append above">
+              <button
+                class="btn btn-secondary branding-dropdown-toggle fa-dropdown-toggle"
+                type="button"
+                id="searchCriteriaDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {{ banDurationTextTranslated | titlecase }}
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-dark branding-dropdown-menu above"
+                aria-labelledby="searchCriteriaDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" (click)="setBanDuration('day')"
+                    >1 Día</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" (click)="setBanDuration('week')"
+                    >1 Semana</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" (click)="setBanDuration('2weeks')"
+                    >2 Semanas</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" (click)="setBanDuration('month')"
+                    >1 Mes</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" (click)="setBanDuration('6months')"
+                    >6 Meses</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" (click)="setBanDuration('forever')"
+                    >Permanente</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="alert-modal-buttons">
+            <button
+              class="btn primary-btn"
+              title="Confirmar"
+              (click)="confirmBanModal(); closeBanModal()"
+            >
+              <i class="fas fa-check"></i> Confirmar
+            </button>
+            <button
+              class="btn primary-btn"
+              title="Cancelar"
+              (click)="closeBanModal()"
+              *ngIf="showCancelButton"
             >
               <i class="fas fa-times"></i> Cancelar
             </button>

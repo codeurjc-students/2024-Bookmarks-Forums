@@ -145,18 +145,31 @@ public class APICommunityController {
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String query,
             @RequestParam(defaultValue = "false") boolean count) {
-
+        // does community exist?
+        if (communityService.getCommunityById(id) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         Pageable pageable = PageRequest.of(page, size);
         if (count) {
             int numberOfUsers = communityService.getNumberOfUsers(id);
             return new ResponseEntity<>(numberOfUsers, HttpStatus.OK);
         } else {
-            Page<User> members = communityService.getMembers(id, pageable);
-            if (members.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (query != null) {
+                Page<User> members = communityService.searchMembers(id, query, pageable);
+                if (members.isEmpty()) {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                } else {
+                    return new ResponseEntity<>(members.getContent(), HttpStatus.OK);
+                }
             } else {
-                return new ResponseEntity<>(members.getContent(), HttpStatus.OK);
+                Page<User> members = communityService.getMembers(id, pageable);
+                if (members.isEmpty()) {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                } else {
+                    return new ResponseEntity<>(members.getContent(), HttpStatus.OK);
+                }
             }
         }
     }
@@ -244,14 +257,20 @@ public class APICommunityController {
             community.setDescription(body.get("description"));
         }
         if (body.containsKey("admin")) {
-            // check that the user performing the request is the admin of the community
-            if (!community.getAdmin().getUsername().equals(username)) {
+            // check that the user performing the request is the admin of the community or a
+            // site admin
+            if (!community.getAdmin().getUsername().equals(username)
+                    && !userService.getUserByUsername(username).getRoles().contains("ADMIN")) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             User admin = userService.getUserByUsername(body.get("admin"));
             if (admin == null) {
                 return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+            // if the user was a moderator, remove them from the moderators list
+            if (communityService.isUserModeratorOfCommunity(admin.getUsername(), community.getIdentifier())) {
+                communityService.demoteUserFromModerator(admin.getUsername(), community.getIdentifier());
             }
             communityService.promoteUserToAdmin(admin.getUsername(), community.getIdentifier());
         }
@@ -379,6 +398,7 @@ public class APICommunityController {
             case "join":
                 return addUserToCommunity(request, community, username);
             case "leave":
+
                 return removeUserFromCommunity(request, community, username);
             default:
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -413,12 +433,35 @@ public class APICommunityController {
 
     private ResponseEntity<Community> removeUserFromCommunity(HttpServletRequest request, Community community,
             String username) {
-        // check that the user performing the request is the user being removed or a
-        // site admin
+        // check that the user performing the request is the user being removed, a
+        // community admin, moderator or a site admin
         String requesterUsername = request.getUserPrincipal().getName();
-        if (!requesterUsername.equals(username)
+        if (!requesterUsername.equals(username) && !community.getAdmin().getUsername().equals(requesterUsername)
+                && !communityService.isUserModeratorOfCommunity(requesterUsername, community.getIdentifier())
                 && !userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // check that the user being removed is a member of the community
+        if (!communityService.isUserMemberOfCommunity(username, community.getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // check that the user being removed is not the admin of the community
+        if (community.getAdmin().getUsername().equals(username)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // check that a moderator is not removing another moderator
+        if (communityService.isUserModeratorOfCommunity(username, community.getIdentifier())
+                && communityService.isUserModeratorOfCommunity(requesterUsername, community.getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // if the user being removed is a moderator, remove them from the moderators
+        // list
+        if (communityService.isUserModeratorOfCommunity(username, community.getIdentifier())) {
+            communityService.demoteUserFromModerator(username, community.getIdentifier());
         }
 
         User user = userService.getUserByUsername(username);
@@ -444,8 +487,12 @@ public class APICommunityController {
     })
     @PostMapping("/bans")
     @JsonView(Ban.BasicInfo.class)
-    public ResponseEntity<Ban> banUser(HttpServletRequest request, @RequestParam Long communityID,
-            @RequestParam String username, @RequestParam String duration, @RequestParam String reason) {
+    public ResponseEntity<Ban> banUser(HttpServletRequest request, @RequestBody Map<String, String> body) {
+        Long communityID = Long.parseLong(body.get("communityID"));
+        String username = body.get("username");
+        String duration = body.get("duration");
+        String reason = body.get("reason");
+
         Community community = communityService.getCommunityById(communityID);
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -473,6 +520,17 @@ public class APICommunityController {
         // check if user is already banned
         if (communityService.isUserBannedFromCommunity(user.getUsername(), community.getIdentifier())) {
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        // check that a moderator is not banning another moderator
+        if (communityService.isUserModeratorOfCommunity(user.getUsername(), community.getIdentifier())
+                && communityService.isUserModeratorOfCommunity(requesterUsername, community.getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // if the user being banned is a moderator, remove them from the moderators list
+        if (communityService.isUserModeratorOfCommunity(user.getUsername(), community.getIdentifier())) {
+            communityService.demoteUserFromModerator(user.getUsername(), community.getIdentifier());
         }
 
         switch (duration) {
@@ -505,6 +563,36 @@ public class APICommunityController {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(ban.getId()).toUri();
         return ResponseEntity.created(location).body(ban);
+    }
+
+    // Is user a moderator of a community
+    @Operation(summary = "Check if a user is a moderator of a community")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the moderator", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
+
+            }),
+            @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
+    })
+    @JsonView(CommunityUsersInfo.class)
+    @GetMapping("/communities/{id}/moderators/{username}")
+    public ResponseEntity<Boolean> isUserModeratorOfCommunity(HttpServletRequest request, @PathVariable Long id,
+            @PathVariable String username) {
+        Community community = communityService.getCommunityById(id);
+        if (community == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        return new ResponseEntity<>(
+                communityService.isUserModeratorOfCommunity(user.getUsername(), community.getIdentifier()),
+                HttpStatus.OK);
     }
 
     // Unban user from community
@@ -554,6 +642,12 @@ public class APICommunityController {
     public ResponseEntity<Community> manageModerators(HttpServletRequest request, @PathVariable Long id,
             @PathVariable String username, @RequestParam(required = true) String action) {
         Community community = communityService.getCommunityById(id);
+
+        // is user logged in
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -569,6 +663,16 @@ public class APICommunityController {
         User user = userService.getUserByUsername(username);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        // check that the user being promoted/demoted is a member of the community
+        if (!communityService.isUserMemberOfCommunity(user.getUsername(), community.getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // check that the user being promoted/demoted is not the admin of the community
+        if (community.getAdmin().getUsername().equals(user.getUsername())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         switch (action) {
@@ -600,7 +704,7 @@ public class APICommunityController {
     @PutMapping("/communities/{id}/pictures")
     public ResponseEntity<Object> uploadCommunityBanner(HttpServletRequest request, @PathVariable Long id,
             @RequestParam(required = false) String action,
-            @RequestParam(required=false) MultipartFile file) throws IOException {
+            @RequestParam(required = false) MultipartFile file) throws IOException {
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -825,5 +929,33 @@ public class APICommunityController {
     public ResponseEntity<List<Object[]>> getMostPopularCommunities(@RequestParam(defaultValue = "10") int size) {
         List<Object[]> communities = communityService.getMostPopularCommunitiesCount(size);
         return new ResponseEntity<>(communities, HttpStatus.OK);
+    }
+
+    // Is the given username a member of the community?
+    @Operation(summary = "Check if a user is a member of a community")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User is a member of the community", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
+
+            }),
+            @ApiResponse(responseCode = "404", description = "User is not a member of the community", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
+    })
+    @GetMapping("/communities/{id}/users/{username}")
+    public ResponseEntity<Boolean> isUserMember(HttpServletRequest request, @PathVariable Long id,
+            @PathVariable String username) {
+        // is user logged in
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // does community exist?
+        if (communityService.getCommunityById(id) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        boolean isMember = communityService.isUserMemberOfCommunity(username, id);
+        return new ResponseEntity<>(isMember, HttpStatus.OK);
     }
 }

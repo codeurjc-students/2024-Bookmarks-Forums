@@ -11,6 +11,7 @@ import { Ban } from '../models/ban.model';
 type CommunitiesMembersCount = [number, string, number];
 
 const API_URL = '/api/v1/communities';
+const API_BANS_URL = '/api/v1/bans';
 
 @Injectable({
   providedIn: 'root',
@@ -98,7 +99,7 @@ export class CommunityService {
     communityId: number,
     page: number,
     size: number,
-    sort: string, /* 'lastModifiedDate' (default), 'creationDate', 'likes', 'replies' */
+    sort: string /* 'lastModifiedDate' (default), 'creationDate', 'likes', 'replies' */,
     query?: string
   ): Observable<Post[]> {
     let params = new HttpParams()
@@ -153,6 +154,28 @@ export class CommunityService {
       .pipe(catchError((error) => throwError(() => error)));
   }
 
+  searchMembers(
+    communityID: number,
+    query: string,
+    page: number,
+    size: number
+  ): Observable<User[]> {
+    let params = new HttpParams()
+      .set('count', 'false')
+      .set('query', query)
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http
+      .get<User[]>(`${API_URL}/${communityID}/users`, { params: params })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  isUserMember(communityID: number, username: string): Observable<boolean> {
+    return this.http
+      .get<boolean>(`${API_URL}/${communityID}/users/${username}`)
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
   joinCommunity(
     communityID: number,
     username: string
@@ -187,33 +210,34 @@ export class CommunityService {
     banReason: string,
     banUntil: string
   ): Observable<Ban> {
-    let params = new HttpParams()
-      .set('communityID', communityID)
-      .set('username', username)
-      .set('duration', banUntil)
-      .set('reason', banReason);
+    const body = {
+      communityID: communityID.toString(),
+      username: username,
+      duration: banUntil,
+      reason: banReason
+    };
     return this.http
-      .post<Ban>(`${API_URL}/${communityID}/bans`, null, { params: params })
+      .post<Ban>(`${API_BANS_URL}`, body)
       .pipe(catchError((error) => throwError(() => error)));
   }
 
   unbanUser(banID: number): Observable<string> {
     return this.http
-      .delete(`${API_URL}/bans/${banID}`, { responseType: 'text' })
+      .delete(`${API_BANS_URL}/bans/${banID}`, { responseType: 'text' })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
   getBan(banID: number): Observable<Ban> {
     let params = new HttpParams().set('banInfo', 'raw');
     return this.http
-      .get<Ban>(`${API_URL}/bans/${banID}`, { params: params })
+      .get<Ban>(`${API_BANS_URL}/bans/${banID}`, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
   getBanStatus(banID: number): Observable<boolean> {
     let params = new HttpParams().set('banStatus', 'status');
     return this.http
-      .get<boolean>(`${API_URL}/bans/${banID}`, { params: params })
+      .get<boolean>(`${API_BANS_URL}/bans/${banID}`, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -230,7 +254,7 @@ export class CommunityService {
 */
   setAdmin(communityID: number, username: string): Observable<Community> {
     return this.http
-      .put<Community>(`${API_URL}/${communityID}/admins`, { admin: username })
+      .put<Community>(`${API_URL}/${communityID}`, { admin: username })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -273,6 +297,12 @@ export class CommunityService {
       .pipe(catchError((error) => throwError(() => error)));
   }
 
+  isModerator(communityID: number, username: string): Observable<boolean> {
+    return this.http
+      .get<boolean>(`${API_URL}/${communityID}/moderators/${username}`)
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
   updateCommunityName(commID: number, newName: string): Observable<Community> {
     return this.http
       .put<Community>(`${API_URL}/${commID}`, { name: newName })
@@ -300,11 +330,19 @@ export class CommunityService {
       params = params.set('action', action);
     }
     return this.http
-      .put<Community>(`${API_URL}/${communityId}/pictures`, formData, { params: params })
+      .put<Community>(`${API_URL}/${communityId}/pictures`, formData, {
+        params: params,
+      })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
-  getCommunities(query: string, page: number, size: number, sort: string, by: string): Observable<Community[]> {
+  getCommunities(
+    query: string,
+    page: number,
+    size: number,
+    sort: string,
+    by: string
+  ): Observable<Community[]> {
     let params = new HttpParams()
       .set('query', query)
       .set('page', page.toString())

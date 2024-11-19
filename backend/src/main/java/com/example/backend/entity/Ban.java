@@ -17,7 +17,7 @@ public class Ban {
     @JsonView(BasicInfo.class)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JsonView(User.UsernameInfo.class)
     @JoinColumn(name = "username")
     private User user;
