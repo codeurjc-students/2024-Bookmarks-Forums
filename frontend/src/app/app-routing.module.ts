@@ -6,14 +6,24 @@ import { SignupComponent } from './component/signUp/signup.component';
 import { PostComponent } from './component/post/post.component';
 import { ModifyPostComponent } from './component/modifyPost/modifyPost.component';
 import { CommunityComponent } from './component/community/community.component';
+import { ModifyCommunityComponent } from './component/modifyCommunity/modifyCommunity.component';
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent, data: { animation: 'LoginPage' } },
-  { path: 'signup', component: SignupComponent, data: { animation: 'SignupPage' } },
+  {
+    path: 'login',
+    component: LoginComponent,
+    data: { animation: 'LoginPage' },
+  },
+  {
+    path: 'signup',
+    component: SignupComponent,
+    data: { animation: 'SignupPage' },
+  },
   { path: '', component: LandingComponent },
   { path: 'post/:identifier', component: PostComponent },
   { path: 'post/:identifier/edit', component: ModifyPostComponent },
-  {path: 'community/:identifier', component: CommunityComponent},
+  { path: 'community/:identifier', component: CommunityComponent },
+  { path: 'community/:identifier/edit', component: ModifyCommunityComponent },
 ];
 
 @NgModule({

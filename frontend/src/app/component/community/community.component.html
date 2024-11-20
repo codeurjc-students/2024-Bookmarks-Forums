@@ -65,41 +65,44 @@
             </div>
           </div>
           <!-- Community description toggle -->
-          <div class="community-description-toggle-container">
-            <button
-              title="Mostrar descripción de la comunidad"
-              class="btn hyperlink-btn hyperlink-btn-in-header"
-              (click)="toggleCommunityDescription()"
-            >
-              <p *ngIf="showDescription">
-                Ocultar Descripción
-                <i
-                  class="fas"
-                  [ngClass]="{
-                    'fa-chevron-down': !showDescription,
-                    'fa-chevron-up': showDescription
-                  }"
-                ></i>
-              </p>
-              <p *ngIf="!showDescription">
-                Mostrar Descripción
-                <i
-                  class="fas"
-                  [ngClass]="{
-                    'fa-chevron-down': !showDescription,
-                    'fa-chevron-up': showDescription
-                  }"
-                ></i>
-              </p>
-            </button>
-            <hr
-              class="post-container-divider divider-in-header"
-              *ngIf="showDescription"
-            />
-          </div>
-          <!-- Community description -->
-          <div *ngIf="showDescription" class="community-description">
-            <p>{{ community?.description }}</p>
+          <div id="community-description-block"
+          *ngIf="community?.description">
+            <div class="community-description-toggle-container">
+              <button
+                title="Mostrar descripción de la comunidad"
+                class="btn hyperlink-btn hyperlink-btn-in-header"
+                (click)="toggleCommunityDescription()"
+              >
+                <p *ngIf="showDescription">
+                  Ocultar Descripción
+                  <i
+                    class="fas"
+                    [ngClass]="{
+                      'fa-chevron-down': !showDescription,
+                      'fa-chevron-up': showDescription
+                    }"
+                  ></i>
+                </p>
+                <p *ngIf="!showDescription">
+                  Mostrar Descripción
+                  <i
+                    class="fas"
+                    [ngClass]="{
+                      'fa-chevron-down': !showDescription,
+                      'fa-chevron-up': showDescription
+                    }"
+                  ></i>
+                </p>
+              </button>
+              <hr
+                class="post-container-divider divider-in-header"
+                *ngIf="showDescription"
+              />
+            </div>
+            <!-- Community description -->
+            <div *ngIf="showDescription" class="community-description">
+              <p>{{ community?.description }}</p>
+            </div>
           </div>
         </div>
       </header>
@@ -113,7 +116,7 @@
             <!-- Post search bar and sorting -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
-                <h5 class="card-title mb-0">Buscar posts</h5>
+                <h5 class="card-title mb-0">Buscar y ordenar posts</h5>
               </div>
               <div class="card-body">
                 <div class="post-search-container">
@@ -376,13 +379,17 @@
                     </button>
                     <!-- If the user is an admin of the community -->
                     <ng-container *ngIf="isCommunityAdmin">
-                      <button
+                      <a
                         class="btn primary-dimmed-btn"
-                        (click)="editCommunity()"
+                        [routerLink]="[
+                          '/community',
+                          community?.identifier,
+                          'edit'
+                        ]"
                       >
                         <i class="fas fa-edit me-1"></i>
                         Editar comunidad
-                      </button>
+                      </a>
                       <button
                         class="btn negative-btn"
                         (click)="deleteCommunity()"

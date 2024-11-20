@@ -22,7 +22,7 @@ public class Community {
     public interface NameInfo {
     }
 
-    public interface BasicInfo  extends NameInfo {
+    public interface BasicInfo extends NameInfo {
     }
 
     public interface UsersInfo {
@@ -127,7 +127,11 @@ public class Community {
 
     public void setBanner(Blob banner) {
         this.banner = banner;
-        this.hasBanner = true;
+        if (banner != null) {
+            this.hasBanner = true;
+        } else {
+            this.hasBanner = false;
+        }
     }
 
     public void banUser(User user, LocalDateTime duration, String reason) {

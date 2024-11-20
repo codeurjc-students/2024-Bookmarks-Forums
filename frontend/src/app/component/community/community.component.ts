@@ -574,15 +574,23 @@ export class CommunityComponent implements OnInit {
   removeMember(username: string) {
     // admin can't remove themselves
     if (username === this.community?.admin.username) {
+      if(this.loggedUsername === this.community?.admin.username) {
+        this.openAlertModal(
+          'Debes traspasar tus poderes de administrador a otro usuario para poder abandonar esta comunidad',
+          () => {},
+          false
+        );
+        return;
+      }
       if (this.isAdmin) {
         this.openAlertModal(
-          'Para expulsar a este usuario, conviértete en Administrador de la comunidad',
+          'Para expulsar a este usuario, conviértete en Administrador de la comunidad.',
           () => {},
           false
         );
       } else {
         this.openAlertModal(
-          '¿Qué sería de un reino sin su rey? No puedes expulsar al administrador de la comunidad',
+          '¿Qué sería de un reino sin su rey? No puedes expulsar al administrador de la comunidad.',
           () => {},
           false
         );
@@ -649,6 +657,14 @@ export class CommunityComponent implements OnInit {
   banMember(username: string) {
     // admin can't ban themselves
     if (username === this.community?.admin.username) {
+      if(this.loggedUsername === this.community?.admin.username) {
+        this.openAlertModal(
+          'No tiene sentido lo que estás haciendo...',
+          () => {},
+          false
+        );
+        return;
+      }
       if (this.isAdmin) {
         this.openAlertModal(
           'Para banear a este usuario, conviértete en Administrador de la comunidad',
@@ -848,14 +864,6 @@ export class CommunityComponent implements OnInit {
 
   toggleCommunityDescription() {
     this.showDescription = !this.showDescription;
-  }
-
-  editCommunity() {
-    if (this.community) {
-      // goes to community/<id>/edit
-      window.location.href =
-        '/community/' + this.community.identifier + '/edit';
-    }
   }
 
   deleteCommunity() {

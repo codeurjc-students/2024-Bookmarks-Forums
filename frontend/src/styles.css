@@ -3021,3 +3021,82 @@ html {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.community-name-input{
+  background-color: transparent !important;
+  color: var(--branding-light-grey) !important;
+  border: none !important;
+  border-bottom: 4px solid rgba(255, 255, 255, 0.342) !important;
+  transition: all 0.2s ease-in-out !important;
+  text-align: center !important;
+  width: 100% !important;
+  outline: none !important;
+}
+
+.community-name-input::placeholder{
+  color: var(--branding-light-grey) !important;
+  opacity: 0.5 !important;
+}
+
+.community-name-input:hover{
+  border-bottom: 4px solid var(--branding-light-grey) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.community-name-input:focus{
+  border-bottom: 4px solid var(--branding-peach) !important;
+  background-color: transparent !important;
+}
+
+.hero-community-name p{
+  margin-bottom: 4px !important;
+}
+
+.community-description-input{
+  background-color: transparent !important;
+  color: var(--branding-light-grey) !important;
+  border: 1px solid var(--branding-forums-light-grey) !important;
+  border-radius: 0.5rem !important;
+  outline: none !important;
+  transition: all 0.2s ease-in-out !important;
+  width: 100% !important;
+  resize: none !important;
+  overflow: hidden !important;
+}
+
+.community-description-input::placeholder{
+  color: var(--branding-light-grey) !important;
+  opacity: 0.5 !important;
+}
+
+.community-description-input:focus{
+  border: 1px solid var(--branding-peach) !important;
+  background-color: rgba(255, 255, 255, 0) !important;
+}
+
+.community-description-input:hover{
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.editor-mode-text-container{
+  padding: 0.3rem !important;
+}
+
+.editor-mode-text-container p{
+  color: var(--branding-light-grey) !important;
+  font-size: 0.95rem !important;
+}
+
+.skeleton {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: transparent !important;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease-in-out !important;
+  -webkit-user-select: none !important;
+  user-select: none !important; 
+  box-shadow: none !important;
+}
+
+.skeleton-cover {
+  filter: blur(5px);
+}

@@ -49,7 +49,7 @@ export class CommunityService {
 
   editCommunity(
     communityId: number,
-    communityData: FormData,
+    communityData: { name: string; description: string },
     action: string
   ): Observable<Community> {
     let params = new HttpParams().set('action', action);
@@ -320,11 +320,13 @@ export class CommunityService {
 
   updateCommunityBanner(
     communityId: number,
-    image: File,
+    image?: File,
     action?: string
   ): Observable<Community> {
     const formData = new FormData();
-    formData.append('file', image);
+    if (image) {
+      formData.append('file', image);
+    }
     let params = new HttpParams();
     if (action) {
       params = params.set('action', action);

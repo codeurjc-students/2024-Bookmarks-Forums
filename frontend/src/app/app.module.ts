@@ -19,6 +19,7 @@ import { PostComponent } from './component/post/post.component';
 import { ModifyPostComponent } from './component/modifyPost/modifyPost.component';
 import { CommunityComponent } from './component/community/community.component';
 import { ContenteditableValueAccessor } from './component/modifyPost/contenteditable-value-accessor';
+import { ModifyCommunityComponent } from './component/modifyCommunity/modifyCommunity.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { ContenteditableValueAccessor } from './component/modifyPost/contentedit
     ContenteditableValueAccessor,
     ModifyPostComponent,
     CommunityComponent,
+    ModifyCommunityComponent
   ],
   imports: [
     BrowserModule,

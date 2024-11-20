@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <title>Bookmarks Forums - Post</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/8f3c0a721b.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Chart.js script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.js"></script>
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- ----------------------------------------------------------------- -->
+  </head>
+  <body>
+    <div class="main-body-container">
+      <!-- Page hero ---------------------------------------------------- -->
+      <header
+        class="bg-branding-white py-1 page-hero"
+        [ngClass]="{
+          'header-image-adapted': (hasBanner(community?.identifier) || this.selectedImageURL) && !this.wantsToDeleteBanner,
+          'page-hero-expanded': showDescription,
+        }"
+        [ngStyle]="{
+          'background-image':
+            'url(' + communityBannerURL(community?.identifier) + ')'
+        }"
+      >
+        <div class="container px-4 px-lg-5 my-5">
+          <div class="header-top-info">
+            <div
+              class="card-community-name-container editor-mode-text-container"
+            >
+              <p class="fw-normal text-white-50 mb-0">Modo edición</p>
+            </div>
+          </div>
+          <div class="text-start text-dark">
+            <div class="community-name-container">
+              <input
+                id="communityName"
+                type="text"
+                class="display-4 fw-bolder header-main-text landing-hero hero-community-name community-name-input"
+                name="communityName"
+                placeholder="Nombre de la comunidad"
+                [(ngModel)]="communityName"
+                [value]="community?.name"
+                (input)="checkContentLength()"
+                (keydown)="preventExceedingContent($event)"
+              />
+            </div>
+          </div>
+          <!-- Community description toggle -->
+          <div class="community-description-toggle-container">
+            <button
+              title="Mostrar descripción de la comunidad"
+              class="btn hyperlink-btn hyperlink-btn-in-header"
+              (click)="toggleCommunityDescription()"
+            >
+              <p *ngIf="showDescription">
+                Ocultar Descripción
+                <i
+                  class="fas"
+                  [ngClass]="{
+                    'fa-chevron-down': !showDescription,
+                    'fa-chevron-up': showDescription
+                  }"
+                ></i>
+              </p>
+              <p *ngIf="!showDescription">
+                Mostrar Descripción
+                <i
+                  class="fas"
+                  [ngClass]="{
+                    'fa-chevron-down': !showDescription,
+                    'fa-chevron-up': showDescription
+                  }"
+                ></i>
+              </p>
+            </button>
+            <hr
+              class="post-container-divider divider-in-header"
+              *ngIf="showDescription"
+            />
+          </div>
+          <!-- Community description -->
+          <div *ngIf="showDescription" class="community-description">
+            <textarea
+              id="communityDescription"
+              class="form-control community-description-input"
+              placeholder="Escribe aquí una descripción para tu comunidad"
+              [(ngModel)]="communityDescription"
+              (input)="checkContentLength(); adjustTextareaHeight($event)"
+              (keydown)="preventExceedingContent($event)"
+            ></textarea>
+          </div>
+        </div>
+      </header>
+      <!-- ----------------------------------------------------------------- -->
+
+      <!-- Page content-->
+      <div class="container">
+        <div class="row justify-content-between">
+          <!-- Posts Column -->
+          <div class="col-lg-7 position-relative">
+            <div class="skeleton-cover">
+              <!-- Post search bar and sorting -->
+              <div class="card dark-card mb-4">
+                <div class="post-container-card-top">
+                  <h5 class="card-title mb-0 skeleton">&nbsp;</h5>
+                </div>
+                <div class="card-body">
+                  <div class="post-search-container">
+                    <div
+                      class="search-bar-button-group wide-search-bar-button-group skeleton"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <hr class="post-container-divider" />
+              <div class="mt-4">
+                <div class="card mb-4 featured-post">
+                  <div class="card-body">
+                    <div>
+                      <div
+                        class="card-top-info d-flex justify-content-between align-items-center"
+                      >
+                        <div class="d-flex align-items-center card-user-info">
+                          <div
+                            class="card-profile-picture me-2 skeleton"
+                            style="border-radius: 50%"
+                          ></div>
+                          <p
+                            class="card-content card-text mb-0 card-user-username skeleton"
+                          >
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="card-content small text-muted mb-1 skeleton">
+                        &nbsp;
+                      </div>
+                      <h2 class="card-content card-title skeleton">&nbsp;</h2>
+                      <div class="parent-container skeleton"></div>
+                      <div
+                        class="card-bottom-action-bar d-flex justify-content-end"
+                      >
+                        <i class="fas fa-arrow-right skeleton"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- LOAD MORE BUTTON -->
+              <div
+                class="pagination justify-content-center my-4 load-more-container"
+              >
+                <p class="text-muted no-more-books-message skeleton">
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions column -->
+          <div class="col-lg-4">
+            <!-- Community Banner Actions Widget -->
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Banner</h5>
+              </div>
+              <div class="card-body">
+                <!-- Set community banner / Remove banner -->
+                <div class="image-actions">
+                  <button
+                    *ngIf="
+                      (community?.hasBanner || this.selectedImageURL) &&
+                      !this.wantsToDeleteBanner
+                    "
+                    class="btn primary-btn"
+                    title="Eliminar imagen"
+                    (click)="deleteBanner()"
+                  >
+                    <i class="fas fa-trash-alt"></i> Eliminar imagen
+                  </button>
+                  <label class="btn primary-btn" title="Subir imagen">
+                    <i class="fas fa-upload"></i> Subir imagen
+                    <input
+                      type="file"
+                      accept="image/jpeg, image/png"
+                      (change)="onFileSelected($event)"
+                      hidden
+                    />
+                  </label>
+                </div>
+                <div class="image-actions-helper-text">
+                  <p class="text-muted">
+                    Máximo 5MB. Formatos: .jpg, .jpeg, .png
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- Community Actions widget -->
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Acciones sobre la comunidad</h5>
+              </div>
+              <div class="card-body">
+                <!-- Save, cancel, delete community -->
+                <div
+                  class="community-actions-container"
+                  *ngIf="loggedIn; else loginToJoin"
+                >
+                  <!-- If the user is logged in and is a member of the community-->
+                  <ng-container *ngIf="isMember">
+                    <!-- If the user is an admin of the community -->
+                    <ng-container *ngIf="isCommunityAdmin">
+                      <button
+                        class="btn primary-btn"
+                        (click)="confirmChanges()"
+                      >
+                        <i class="fas fa-save me-1"></i>
+                        Guardar
+                      </button>
+                      <a
+                        class="btn primary-dimmed-btn"
+                        [routerLink]="['/community', community?.identifier]"
+                      >
+                        <i class="fas fa-times me-1"></i>
+                        Cancelar
+                      </a>
+                      <button
+                        class="btn negative-btn"
+                        (click)="deleteCommunity()"
+                      >
+                        <i class="fas fa-trash me-1"></i>
+                        Eliminar comunidad
+                      </button>
+                    </ng-container>
+                  </ng-container>
+                </div>
+                <!-- If the user is not logged in -->
+                <ng-template #loginToJoin>
+                  <div class="community-actions-container-text">
+                    <p class="card-content card-text wrap-text center-text">
+                      Inicia sesión
+                    </p>
+                    <!-- Login button -->
+                    <div class="d-grid gap-2">
+                      <a class="btn primary-btn" [routerLink]="['/login']">
+                        <i class="fas fa-sign-in-alt me-1"></i>
+                        Iniciar sesión</a
+                      >
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Alert modal with confirmation and cancel buttons -->
+    <div
+      id="alertModal"
+      class="custom-modal"
+      [ngClass]="{ show: showAlertModal }"
+    >
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header">
+          <span
+            class="action-btn close"
+            (click)="closeAlertModal()"
+            (keypress)="closeAlertModal()"
+          >
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <p class="alert-modal-text">{{ alertModalText }}</p>
+          <div class="alert-modal-buttons">
+            <button
+              class="btn primary-btn"
+              title="Confirmar"
+              (click)="confirmAction(); closeAlertModal()"
+            >
+              <i class="fas fa-check"></i> Confirmar
+            </button>
+            <button
+              class="btn primary-btn"
+              title="Cancelar"
+              (click)="closeAlertModal()"
+              *ngIf="showCancelButton"
+            >
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
