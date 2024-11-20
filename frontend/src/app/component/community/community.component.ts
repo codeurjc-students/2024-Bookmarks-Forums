@@ -33,8 +33,8 @@ export class CommunityComponent implements OnInit {
   usernameToBan: string = '';
 
   searchTerm: string = '';
-  searchCriteria: string = 'default'; // Default search criteria (can be title, content or author)
-  searchCriteriaText: string = 'Título + Contenido'; // Default search criteria text
+  sortCriteria: string = 'default'; // Default search criteria
+  sortCriteriaText: string = 'Más antiguos'; // Default search criteria text
 
   communityPostsCount: number = 0;
   posts: Post[] = [];
@@ -68,7 +68,8 @@ export class CommunityComponent implements OnInit {
   // posts pagination
   size = 10;
   page = 0;
-  postOrder = 'lastModifiedDate'; // order by last modified date by default. Can be changed to 'creationDate', 'likes' or 'replies'
+
+  membersSearchTerm: string = '';
 
   // members pagination
   membersSize = 10;
@@ -84,6 +85,8 @@ export class CommunityComponent implements OnInit {
   alertModalText: string = '';
   confirmAction: () => void = () => {};
   showCancelButton: boolean = true;
+
+  showDescription: boolean = false;
 
   constructor(
     private http: HttpClient,
@@ -183,7 +186,7 @@ export class CommunityComponent implements OnInit {
           this.community.identifier,
           this.page,
           this.size,
-          this.postOrder
+          this.sortCriteria,
         )
         .subscribe({
           next: (posts) => {
@@ -360,27 +363,67 @@ export class CommunityComponent implements OnInit {
     this.showAlertModal = false;
   }
 
-  changeRepliesOrder(order: string, orderText: string) {
-    this.postOrder = order;
-    this.selectedOrderText = orderText;
-    this.page = 0;
+  searchPosts() {
+    if (!this.community) {
+      return;
+    }
     this.posts = [];
-    this.loadPosts();
+    this.page = 0;
+    this.noMorePosts = false;
+    this.loadingMorePosts = true;
+    this.communityService.getPosts(
+      this.community.identifier,
+      this.page,
+      this.size,
+      this.sortCriteria,
+      this.searchTerm
+    ).subscribe({
+      next: (posts) => {
+        if (!posts || posts.length == 0) {
+          this.noMorePosts = true;
+          this.loadingMorePosts = false;
+          return;
+        }
+        this.posts = this.posts.concat(posts);
+        this.loadingMorePosts = false;
+        this.page += 1;
+        this.noMorePosts = posts.length < this.size;
+      },
+      error: (r) => {
+        console.error('Error searching posts: ' + JSON.stringify(r));
+      }
+    });
   }
 
-  searchPosts() {}
+  clearSearch() {
+    this.searchTerm = '';
+    this.posts = [];
+    this.page = 0;
+    this.noMorePosts = false;
+    this.loadingMorePosts = true;
+    this.loadPosts();
+    this.loadingMorePosts = false;
+  }
 
-  setSearchCriteria(criteria: string) {
-    this.searchCriteria = criteria;
-    if (criteria === 'title') {
-      this.searchCriteriaText = 'Título';
-    } else if (criteria === 'content') {
-      this.searchCriteriaText = 'Contenido';
-    } else if (criteria === 'author') {
-      this.searchCriteriaText = 'Autor';
-    } else if (criteria === 'default') {
-      this.searchCriteriaText = 'Título + contenido';
+  setSortCriteria(criteria: string) {
+    this.sortCriteria = criteria;
+    if (criteria === 'lastModifiedDate') {
+      this.sortCriteriaText = 'Última modificación';
+    } else if (criteria === 'creationDate') {
+      this.sortCriteriaText = 'Más recientes';
+    } else if (criteria === 'likes') {
+      this.sortCriteriaText = 'Mejor votados';
+    } else if (criteria === 'replies') {
+      this.sortCriteriaText = 'Más comentados';
+    } else {
+      this.sortCriteriaText = 'Más antiguos';
     }
+    this.posts = [];
+    this.page = 0;
+    this.noMorePosts = false;
+    this.loadingMorePosts = true;
+    this.loadPosts();
+    this.loadingMorePosts = false;
   }
 
   toggleAdvancedMenu() {
@@ -576,24 +619,31 @@ export class CommunityComponent implements OnInit {
   }
 
   confirmBanModal() {
-    if(!this.community){
+    if (!this.community) {
       return;
     }
 
-    this.communityService.banUser(this.community.identifier, this.usernameToBan, this.banReasonValue, this.banDurationText).subscribe({
-      next: () => {
-        this.showBanModal = false;
-        this.openAlertModal(
-          '¡' + this.usernameToBan + ' ha sido expulsado de la comunidad!',
-          () => {},
-          false
-        );
-        this.reloadAllMembersList();
-      },
-      error: (r) => {
-        console.error('Error banning user: ' + JSON.stringify(r));
-      },
-    });
+    this.communityService
+      .banUser(
+        this.community.identifier,
+        this.usernameToBan,
+        this.banReasonValue,
+        this.banDurationText
+      )
+      .subscribe({
+        next: () => {
+          this.showBanModal = false;
+          this.openAlertModal(
+            '¡' + this.usernameToBan + ' ha sido expulsado de la comunidad!',
+            () => {},
+            false
+          );
+          this.reloadAllMembersList();
+        },
+        error: (r) => {
+          console.error('Error banning user: ' + JSON.stringify(r));
+        },
+      });
   }
 
   banMember(username: string) {
@@ -756,9 +806,9 @@ export class CommunityComponent implements OnInit {
 
   canRemoveMember(username: string) {
     return (
-      (this.community?.admin.username === this.loggedUsername ||
+      this.community?.admin.username === this.loggedUsername ||
       this.isAdmin ||
-      this.isModerator)
+      this.isModerator
     );
   }
 
@@ -774,25 +824,102 @@ export class CommunityComponent implements OnInit {
     this.banDurationText = duration;
     switch (duration) {
       case 'day':
-      this.banDurationTextTranslated = '1 día';
-      break;
+        this.banDurationTextTranslated = '1 día';
+        break;
       case 'week':
-      this.banDurationTextTranslated = '1 semana';
-      break;
+        this.banDurationTextTranslated = '1 semana';
+        break;
       case '2weeks':
-      this.banDurationTextTranslated = '2 semanas';
-      break;
+        this.banDurationTextTranslated = '2 semanas';
+        break;
       case 'month':
-      this.banDurationTextTranslated = '1 mes';
-      break;
+        this.banDurationTextTranslated = '1 mes';
+        break;
       case '6months':
-      this.banDurationTextTranslated = '6 meses';
-      break;
+        this.banDurationTextTranslated = '6 meses';
+        break;
       case 'forever':
-      this.banDurationTextTranslated = 'Permanente';
-      break;
+        this.banDurationTextTranslated = 'Permanente';
+        break;
       default:
-      this.banDurationTextTranslated = '';
+        this.banDurationTextTranslated = '';
     }
+  }
+
+  toggleCommunityDescription() {
+    this.showDescription = !this.showDescription;
+  }
+
+  editCommunity() {
+    if (this.community) {
+      // goes to community/<id>/edit
+      window.location.href =
+        '/community/' + this.community.identifier + '/edit';
+    }
+  }
+
+  deleteCommunity() {
+    // open confirmation modal
+    this.openAlertModal(
+      '¿Estás seguro de que quieres eliminar esta comunidad? Esta acción no se puede deshacer.',
+      () => {
+        if (this.community) {
+          this.communityService
+            .deleteCommunity(this.community.identifier)
+            .subscribe({
+              next: () => {
+                this.openAlertModal(
+                  '¡La comunidad ha sido eliminada!',
+                  () => {
+                    window.location.href = '/';
+                  },
+                  false
+                );
+              },
+            });
+        }
+      }
+    );
+  }
+
+  clearMembersSearch() {
+    this.membersSearchTerm = '';
+    this.communityMembers = [];
+    this.membersPage = 0;
+    this.noMoreMembers = false;
+    this.loadingMoreMembers = true;
+    this.getMembers();
+    this.loadingMoreMembers = false;
+  }
+
+  searchMembers() {
+    if (!this.community) {
+      return;
+    }
+    this.communityMembers = [];
+    this.membersPage = 0;
+    this.noMoreMembers = false;
+    this.loadingMoreMembers = true;
+    this.communityService.searchMembers(
+      this.community.identifier,
+      this.membersSearchTerm,
+      this.membersPage,
+      this.membersSize,
+    ).subscribe({
+      next: (members) => {
+        if (!members || members.length == 0) {
+          this.noMoreMembers = true;
+          this.loadingMoreMembers = false;
+          return;
+        }
+        this.communityMembers = this.communityMembers.concat(members);
+        this.loadingMoreMembers = false;
+        this.membersPage += 1;
+        this.noMoreMembers = members.length < this.membersSize;
+      },
+      error: (r) => {
+        console.error('Error searching members: ' + JSON.stringify(r));
+      }
+    });
   }
 }

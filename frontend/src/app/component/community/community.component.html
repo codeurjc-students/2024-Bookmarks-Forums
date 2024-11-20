@@ -43,9 +43,10 @@
       <!-- Page hero ---------------------------------------------------- -->
       <header
         class="bg-branding-white py-1 page-hero"
-        [ngClass]="
-          hasBanner(community?.identifier) ? 'header-image-adapted' : ''
-        "
+        [ngClass]="{
+          'header-image-adapted': hasBanner(community?.identifier),
+          'page-hero-expanded': showDescription,
+        }"
         [ngStyle]="{
           'background-image':
             'url(' + communityBannerURL(community?.identifier) + ')'
@@ -63,6 +64,43 @@
               </h1>
             </div>
           </div>
+          <!-- Community description toggle -->
+          <div class="community-description-toggle-container">
+            <button
+              title="Mostrar descripción de la comunidad"
+              class="btn hyperlink-btn hyperlink-btn-in-header"
+              (click)="toggleCommunityDescription()"
+            >
+              <p *ngIf="showDescription">
+                Ocultar Descripción
+                <i
+                  class="fas"
+                  [ngClass]="{
+                    'fa-chevron-down': !showDescription,
+                    'fa-chevron-up': showDescription
+                  }"
+                ></i>
+              </p>
+              <p *ngIf="!showDescription">
+                Mostrar Descripción
+                <i
+                  class="fas"
+                  [ngClass]="{
+                    'fa-chevron-down': !showDescription,
+                    'fa-chevron-up': showDescription
+                  }"
+                ></i>
+              </p>
+            </button>
+            <hr
+              class="post-container-divider divider-in-header"
+              *ngIf="showDescription"
+            />
+          </div>
+          <!-- Community description -->
+          <div *ngIf="showDescription" class="community-description">
+            <p>{{ community?.description }}</p>
+          </div>
         </div>
       </header>
       <!-- ----------------------------------------------------------------- -->
@@ -72,70 +110,164 @@
         <div class="row justify-content-between">
           <!-- Posts Column -->
           <div class="col-lg-7">
-            <div
-              class="post-card card mb-4 featured-post"
-              *ngFor="let post of posts"
-            >
-              <a
-                [routerLink]="['/post', post.identifier]"
-                class="card-link"
-                [ngClass]="{
-                  'card-body-with-image': post.hasImage,
-                  'card-body': !post.hasImage
-                }"
-                [ngStyle]="
-                  post.hasImage
-                    ? {
-                        'background-image':
-                          'url(' + postImageURL(post.identifier) + ')'
-                      }
-                    : {}
-                "
-              >
-                <div [ngClass]="post.hasImage ? 'card-body-image-adapted' : ''">
+            <!-- Post search bar and sorting -->
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Buscar posts</h5>
+              </div>
+              <div class="card-body">
+                <div class="post-search-container">
                   <div
-                    class="card-top-info d-flex justify-content-between align-items-center"
+                    class="search-bar-button-group wide-search-bar-button-group"
                   >
-                    <a
-                      [routerLink]="['/profile', post.author.username]"
-                      class="card-link"
+                    <input
+                      type="text"
+                      class="form-control search-input"
+                      placeholder="Buscar posts..."
+                      [(ngModel)]="searchTerm"
+                      (keydown.enter)="searchPosts()"
+                    />
+                    <button
+                      class="btn clear-search-btn"
+                      (click)="clearSearch()"
+                      title="Limpiar búsqueda"
                     >
-                      <div class="d-flex align-items-center card-user-info">
-                        <img
-                          [src]="profilePicture(post.author.username)"
-                          alt="Profile"
-                          class="card-profile-picture me-2"
-                        />
-                        <p
-                          class="card-content card-text mb-0 card-user-username"
-                        >
-                          {{ post.author.username }}
-                        </p>
-                      </div>
-                    </a>
+                      <i class="fas fa-times"></i>
+                    </button>
+                    <button
+                      title="Buscar comentarios"
+                      class="btn search-btn"
+                      (click)="searchPosts()"
+                    >
+                      <i class="fas fa-search"></i>
+                    </button>
                   </div>
-
-                  <div class="card-content small text-muted mb-1">
-                    {{
-                      post.fullCreationDate | date : "dd-MM-yyyy 'a las' HH:mm"
-                    }}
-                  </div>
-                  <h2 class="card-content card-title">{{ post.title }}</h2>
-                  <div class="parent-container">
-                    <p
-                      class="card-content card-text single-line-card-text"
-                      [innerHTML]="post.content"
-                    ></p>
-                  </div>
-                  <div
-                    class="card-bottom-action-bar d-flex justify-content-end"
-                  >
-                    <i class="fas fa-arrow-right"></i>
+                  <div class="post-sort-container">
+                    <div class="input-group-append">
+                      <p class="card-content text-muted mb-0 me-2">Orden:</p>
+                      <button
+                        class="btn btn-secondary branding-dropdown-toggle fa-dropdown-toggle single-line"
+                        type="button"
+                        id="searchCriteriaDropdown"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        {{ sortCriteriaText }}
+                      </button>
+                      <ul
+                        class="dropdown-menu dropdown-menu-dark branding-dropdown-menu"
+                        aria-labelledby="searchCriteriaDropdown"
+                      >
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            (click)="setSortCriteria('default')"
+                            >Más antiguos</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            (click)="setSortCriteria('creationDate')"
+                            >Más recientes</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            (click)="setSortCriteria('lastModifiedDate')"
+                            >Última modificación</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            (click)="setSortCriteria('likes')"
+                            >Mejor votados</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            (click)="setSortCriteria('replies')"
+                            >Más comentarios</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </a>
+              </div>
             </div>
+            <hr class="post-container-divider" />
+            <div class="mt-4">
+              <div
+                class="post-card card mb-4 featured-post"
+                *ngFor="let post of posts"
+              >
+                <a
+                  [routerLink]="['/post', post.identifier]"
+                  class="card-link"
+                  [ngClass]="{
+                    'card-body-with-image': post.hasImage,
+                    'card-body': !post.hasImage
+                  }"
+                  [ngStyle]="
+                    post.hasImage
+                      ? {
+                          'background-image':
+                            'url(' + postImageURL(post.identifier) + ')'
+                        }
+                      : {}
+                  "
+                >
+                  <div
+                    [ngClass]="post.hasImage ? 'card-body-image-adapted' : ''"
+                  >
+                    <div
+                      class="card-top-info d-flex justify-content-between align-items-center"
+                    >
+                      <a
+                        [routerLink]="['/profile', post.author.username]"
+                        class="card-link"
+                      >
+                        <div class="d-flex align-items-center card-user-info">
+                          <img
+                            [src]="profilePicture(post.author.username)"
+                            alt="Profile"
+                            class="card-profile-picture me-2"
+                          />
+                          <p
+                            class="card-content card-text mb-0 card-user-username"
+                          >
+                            {{ post.author.username }}
+                          </p>
+                        </div>
+                      </a>
+                    </div>
 
+                    <div class="card-content small text-muted mb-1">
+                      {{
+                        post.fullCreationDate
+                          | date : "dd-MM-yyyy 'a las' HH:mm"
+                      }}
+                    </div>
+                    <h2 class="card-content card-title">{{ post.title }}</h2>
+                    <div class="parent-container">
+                      <p
+                        class="card-content card-text single-line-card-text"
+                        [innerHTML]="post.content"
+                      ></p>
+                    </div>
+                    <div
+                      class="card-bottom-action-bar d-flex justify-content-end"
+                    >
+                      <i class="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
             <!-- LOAD MORE BUTTON -->
             <nav aria-label="Pagination">
               <ul
@@ -242,6 +374,23 @@
                       <i class="fas fa-sign-out-alt me-1"></i>
                       Salir
                     </button>
+                    <!-- If the user is an admin of the community -->
+                    <ng-container *ngIf="isCommunityAdmin">
+                      <button
+                        class="btn primary-dimmed-btn"
+                        (click)="editCommunity()"
+                      >
+                        <i class="fas fa-edit me-1"></i>
+                        Editar comunidad
+                      </button>
+                      <button
+                        class="btn negative-btn"
+                        (click)="deleteCommunity()"
+                      >
+                        <i class="fas fa-trash me-1"></i>
+                        Eliminar comunidad
+                      </button>
+                    </ng-container>
                   </ng-container>
                   <!-- If the user is logged in and is not a member of the community-->
                   <ng-template #joinCommunityButton>
@@ -418,6 +567,37 @@
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
                 <h5 class="card-title mb-0">Miembros de la comunidad</h5>
+                <!-- Search bar and search criteria dropdown -->
+
+                <div class="card-header-actions-container pb-0">
+                  <div class="input-group">
+                    <div
+                      class="search-bar-button-group wide-search-bar-button-group"
+                    >
+                      <input
+                        type="text"
+                        class="form-control search-input"
+                        placeholder="Buscar miembros"
+                        [(ngModel)]="membersSearchTerm"
+                        (keydown.enter)="searchMembers()"
+                      />
+                      <button
+                        class="btn clear-search-btn"
+                        (click)="clearMembersSearch()"
+                        title="Limpiar búsqueda"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                      <button
+                        title="Buscar miembros"
+                        class="btn search-btn"
+                        (click)="searchMembers()"
+                      >
+                        <i class="fas fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="card-body">
                 <!-- Members -->

@@ -94,7 +94,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found"),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/posts")
@@ -104,7 +104,7 @@ public class APIPostController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> posts = postService.searchPosts(query, pageable, order);
         if (posts.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(posts.getContent());
     }
@@ -124,7 +124,8 @@ public class APIPostController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = PostInfo.class))
 
             }),
-            @ApiResponse(responseCode = "404", description = "Community not found", content = @Content)
+            @ApiResponse(responseCode = "204", description = "No posts found"),
+            @ApiResponse(responseCode = "404", description = "Community not found"),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/communities/{communityID}/posts")
@@ -154,7 +155,7 @@ public class APIPostController {
             }
 
             if (posts.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } else {
                 return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
             }

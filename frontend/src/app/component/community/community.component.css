@@ -12434,3 +12434,7 @@ header {
 .member-more-actions-container {
   display: absolute;
 }
+
+.post-container-card-top.dimmed{
+  background-color: transparent !important;
+}

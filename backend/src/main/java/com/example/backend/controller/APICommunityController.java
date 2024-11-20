@@ -137,7 +137,8 @@ public class APICommunityController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
             }),
             @ApiResponse(responseCode = "404", description = "Community not found", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Missing parameter", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Missing parameter", content = @Content),
+            @ApiResponse(responseCode = "204", description = "No content", content = @Content)
     })
     @JsonView(CommunityUsersInfo.class)
     @GetMapping("/communities/{id}/users")
@@ -159,14 +160,14 @@ public class APICommunityController {
             if (query != null) {
                 Page<User> members = communityService.searchMembers(id, query, pageable);
                 if (members.isEmpty()) {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 } else {
                     return new ResponseEntity<>(members.getContent(), HttpStatus.OK);
                 }
             } else {
                 Page<User> members = communityService.getMembers(id, pageable);
                 if (members.isEmpty()) {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 } else {
                     return new ResponseEntity<>(members.getContent(), HttpStatus.OK);
                 }

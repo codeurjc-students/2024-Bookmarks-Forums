@@ -1483,8 +1483,8 @@ html {
   background-repeat: no-repeat;
   overflow: hidden;
   height: 250px;
+  transition: all ease-out 0.3s;
 }
-
 
 .header-image-adapted {
   position: relative;
@@ -1959,8 +1959,8 @@ html {
 
 .card-img,
 .card-img-bottom {
-  border-bottom-right-radius: var(--bs-card-inner-border-radius);
-  border-bottom-left-radius: var(--bs-card-inner-border-radius);
+  border-bottom-right-radius: var (--bs-card-inner-border-radius);
+  border-bottom-left-radius: var (--bs-card-inner-border-radius);
 }
 
 .card-group > .card {
@@ -2402,6 +2402,26 @@ html {
   align-items: center;
 }
 
+.clear-search-btn {
+  background-color: var(--branding-forums-dark-grey) !important;
+  color: var(--branding-light-grey) !important;
+  border: 1px solid var(--branding-forums-light-grey) !important;
+  border-left: none !important;
+  border-radius: 0 0 0 0 !important;
+  height: 2.5rem !important;
+  width: 2.5rem !important;
+}
+
+.clear-search-btn:hover {
+  background-color: var(--branding-forums-light-grey) !important;
+  color: var(--branding-peach) !important;
+}
+
+.clear-search-btn:active {
+  background-color: var(--branding-forums-darker-grey) !important;
+}
+
+
 .search-btn {
   margin-left: 0 !important;
   background-color: var(--branding-forums-dark-grey) !important;
@@ -2410,11 +2430,16 @@ html {
   border-left: none !important;
   border-radius: 0 0.5rem 0.5rem 0 !important;
   height: 2.5rem !important;
+  width: 2.5rem !important;
 }
 
 .search-btn:hover {
   background-color: var(--branding-forums-light-grey) !important;
   color: var(--branding-peach) !important;
+}
+
+.search-btn:active {
+  background-color: var(--branding-forums-darker-grey) !important;
 }
 
 .search-bar-button-group {
@@ -2658,7 +2683,6 @@ html {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-
 }
 
 .toolbar-btn {
@@ -2715,19 +2739,19 @@ html {
   overflow: hidden !important;
 }
 
-.hero-community-name{
+.hero-community-name {
   color: var(--branding-light-grey) !important;
   font-weight: 700 !important;
 }
 
-.community-name-container{
+.community-name-container {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
 }
 
-.community-info-item{
+.community-info-item {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -2735,42 +2759,41 @@ html {
   height: 2.5rem;
 }
 
-.community-info-item i{
+.community-info-item i {
   color: var(--branding-light-grey) !important;
   font-size: 1.5rem; /* Increase the icon size */
   width: 2rem; /* Set the width */
 }
 
-.community-info-icon-title{
+.community-info-icon-title {
   display: flex;
   gap: 0.5rem;
   align-items: center;
 }
 
-.community-info-text{
+.community-info-text {
   margin: auto !important;
 }
 
-.community-info-text-container{
+.community-info-text-container {
   display: flex;
   gap: 0.5rem;
   align-items: center;
 }
 
-.community-info-text-counter{
+.community-info-text-counter {
   color: var(--branding-light-grey) !important;
   font-weight: 700 !important;
   margin: auto !important;
-
 }
 
-.community-members-container{
+.community-members-container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.community-member-card{
+.community-member-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2782,27 +2805,26 @@ html {
   border: 1px solid var(--branding-forums-light-grey);
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease-in-out;
-  
 }
 
-.community-member-card:hover{
+.community-member-card:hover {
   border: 1px solid var(--branding-peach);
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
 }
 
-.community-member-card:hover .community-member-username:hover{
+.community-member-card:hover .community-member-username:hover {
   color: var(--branding-peach) !important;
   text-decoration: underline !important;
 }
 
-.community-member-info{
+.community-member-info {
   display: flex;
   flex-direction: row;
   gap: 0.5rem;
   align-items: center;
 }
 
-.community-member-username{
+.community-member-username {
   color: var(--branding-light-grey) !important;
   margin: 0 !important;
   white-space: nowrap;
@@ -2810,37 +2832,38 @@ html {
   text-overflow: ellipsis;
 }
 
-.community-member-profile-picture{
+.community-member-profile-picture {
   width: 40px !important;
   height: 40px !important;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.more-actions-toggle{
+.more-actions-toggle {
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-.more-actions-toggle:hover{
+.more-actions-toggle:hover {
   color: var(--branding-peach) !important;
   box-shadow: none !important;
 }
 
-.dropdown-item i{
+.dropdown-item i {
   color: var(--branding-light-grey) !important;
   width: 1.25rem;
 }
 
-.community-actions-container{
+.community-actions-container {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.negative-btn{
+.negative-btn {
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
   border: 1px solid var(--branding-forums-light-grey) !important;
@@ -2850,33 +2873,33 @@ html {
   transition: all 0.2s ease-in-out !important;
 }
 
-.negative-btn:hover{
+.negative-btn:hover {
   border: 1px solid var(--bs-red) !important;
   background-color: var(--branding-forums-light-grey) !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
 }
 
-.negative-btn:active{
+.negative-btn:active {
   background-color: var(--branding-forums-dark-grey) !important;
   border: 1px solid var(--branding-forums-light-grey) !important;
   scale: 0.95 !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
-.community-actions-container-text{
+.community-actions-container-text {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.alert-modal-text-left{
+.alert-modal-text-left {
   color: var(--branding-light-grey) !important;
   font-size: 1.2rem !important;
   text-align: left !important;
 }
 
-.alert-modal-input input{
+.alert-modal-input input {
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
   border: 1px solid var(--branding-forums-light-grey) !important;
@@ -2886,12 +2909,115 @@ html {
   transition: all 0.2s ease-in-out !important;
 }
 
-.alert-modal-input input:focus{
+.alert-modal-input input:focus {
   border: 1px solid var(--branding-peach) !important;
 }
 
-.alert-modal-container{
+.alert-modal-container {
   display: flex;
   flex-direction: column;
   margin-bottom: 1.5rem;
+}
+
+.community-description-toggle-container {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.community-description {
+  display: flex;
+  padding: 1rem;
+  left: 0;
+  width: 100%;
+}
+
+.community-description p {
+  color: var(--branding-light-grey) !important;
+  margin-bottom: 0 !important;
+}
+
+.page-hero-expanded {
+  height: auto;
+}
+
+.divider-in-header {
+  position: relative;
+  width: 100%;
+}
+
+.divider-in-header.show {
+  display: block;
+}
+
+.hyperlink-btn-in-header {
+  position: relative;
+  z-index: 1;
+  background-color: transparent !important;
+}
+
+.primary-dimmed-btn {
+  background-color: var(--branding-forums-dark-grey) !important;
+  color: var(--branding-light-grey) !important;
+  border: 1px solid var(--branding-forums-light-grey) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.primary-dimmed-btn:hover {
+  border: 1px solid var(--branding-peach) !important;
+  background-color: var(--branding-forums-light-grey) !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
+}
+
+.primary-dimmed-btn:active {
+  background-color: var(--branding-forums-dark-grey) !important;
+  border: 1px solid var(--branding-forums-light-grey) !important;
+  scale: 0.95 !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.hyperlink-btn-in-header p{
+  margin: 0 !important;
+}
+
+.post-search-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.wide-search-bar-button-group {
+  width: 100%;
+}
+
+.clear-search-btn{
+  height: 2.5rem !important;
+}
+
+.post-sort-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 600px) {
+  .post-search-container {
+    flex-wrap: nowrap;
+  }
+}
+
+.single-line{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

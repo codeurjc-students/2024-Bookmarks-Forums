@@ -242,6 +242,7 @@
                             class="form-control search-input"
                             placeholder="Buscar comentarios"
                             [(ngModel)]="searchTerm"
+                            (keyup.enter)="searchReplies(post?.identifier)"
                           />
                           <button
                             title="Buscar comentarios"
