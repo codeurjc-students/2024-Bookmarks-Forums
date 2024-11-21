@@ -1,11 +1,9 @@
 package com.example.backend.service;
 
 import com.example.backend.entity.Community;
-import com.example.backend.entity.Message;
 import com.example.backend.entity.Reply;
 import com.example.backend.entity.User;
 import com.example.backend.repository.CommunityRepository;
-import com.example.backend.repository.MessageRepository;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.ReplyRepository;
 import com.example.backend.repository.UserRepository;
@@ -22,16 +20,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CommunityRepository communityRepository;
-    private final MessageRepository messageRepository;
     private final ReplyRepository replyRepository;
     private final PostRepository postRepository;
 
     public UserService(UserRepository userRepository, CommunityRepository communityRepository,
-            MessageRepository messageRepository, ReplyRepository replyRepository, PostRepository postRepository) {
+            ReplyRepository replyRepository, PostRepository postRepository) {
 
         this.userRepository = userRepository;
         this.communityRepository = communityRepository;
-        this.messageRepository = messageRepository;
         this.replyRepository = replyRepository;
         this.postRepository = postRepository;
     }
@@ -175,19 +171,6 @@ public class UserService {
             communityRepository.save(community);
         }
         user.getCommunities().clear();
-
-        // Remove user from sent messages
-        for (Message message : user.getSentMessages()) {
-            message.setSender(null);
-            messageRepository.save(message);
-        }
-
-        user.setChats1(null);
-        user.setChats2(null);
-
-        // Clear the list to avoid further issues
-        user.getSentMessages().clear();
-
         // Save the user
         userRepository.save(user);
     }
@@ -208,5 +191,5 @@ public class UserService {
             return Collections.emptyList();
         }
     }
-    
+
 }

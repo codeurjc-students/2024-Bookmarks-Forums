@@ -107,18 +107,6 @@ public class User {
     @ManyToMany(mappedBy = "members")
     private List<Community> communities = new ArrayList<>();
 
-    // A user can have 0 or multiple chats
-    @OneToMany(mappedBy = "user1", cascade = CascadeType.ALL)
-    private List<Chat> chats1 = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user2", cascade = CascadeType.ALL)
-    private List<Chat> chats2 = new ArrayList<>();
-
-    // A user may have sent 0 or multiple messages
-    @JsonIgnore
-    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
-    private List<Message> sentMessages = new ArrayList<>();
-
     @JsonView(BasicInfo.class)
     private LocalDate creationDate = LocalDate.now();
 
@@ -218,14 +206,5 @@ public class User {
     public String toString() {
         return this.username;
     }
-
-    public void setChats1(List<Chat> chats1) {
-        this.chats1 = chats1;
-    }
-
-    public void setChats2(List<Chat> chats2) {
-        this.chats2 = chats2;
-    }
-
 
 }
