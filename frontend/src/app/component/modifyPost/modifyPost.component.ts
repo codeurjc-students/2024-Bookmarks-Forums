@@ -377,7 +377,6 @@ export class ModifyPostComponent implements OnInit {
       return;
     }
     if (this.selectedImageURL) {
-      console.log('Selected image URL: ' + this.selectedImageURL);
       const input = document.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
@@ -385,7 +384,7 @@ export class ModifyPostComponent implements OnInit {
         const file = input.files[0];
         this.postService.updatePostImage(this.post.identifier, file).subscribe({
           next: () => {
-            if(!this.post) {
+            if (!this.post) {
               return;
             }
             this.selectedImageURL = null; // Clear the selected image URL
@@ -432,15 +431,8 @@ export class ModifyPostComponent implements OnInit {
       return;
     }
     if (this.post.hasImage) {
-      this.openAlertModal(
-        '¿Seguro que quieres eliminar la imagen de este post? Esta acción no se puede deshacer.',
-        () => {
-          this.hasToDeleteImage = true;
-          this.selectedImageURL = null;
-          this.closeAlertModal();
-        },
-        true
-      );
+      this.hasToDeleteImage = true;
+      this.selectedImageURL = null;
     } else if (this.selectedImageURL) {
       this.selectedImageURL = null;
     }
@@ -468,7 +460,7 @@ export class ModifyPostComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = () => {
         this.selectedImageURL = reader.result; // Set the selected image URL
-        this.hasToDeleteImage = false; 
+        this.hasToDeleteImage = false;
       };
       reader.readAsDataURL(file);
     }

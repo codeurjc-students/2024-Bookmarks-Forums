@@ -48,14 +48,14 @@
             class="card-community-name-container"
           >
             <p
-              *ngIf="this.following || !this.followed"
+              *ngIf="this.following && !this.followed"
               class="lead fw-normal text-white-50 mb-0"
             >
               Sigues a este usuario
               <br />
             </p>
             <p
-              *ngIf="!this.following || this.followed"
+              *ngIf="!this.following && this.followed"
               class="lead fw-normal text-white-50 mb-0"
             >
               Este usuario te sigue
