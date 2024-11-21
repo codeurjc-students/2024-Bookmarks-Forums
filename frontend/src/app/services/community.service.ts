@@ -223,14 +223,14 @@ export class CommunityService {
 
   unbanUser(banID: number): Observable<string> {
     return this.http
-      .delete(`${API_BANS_URL}/bans/${banID}`, { responseType: 'text' })
+      .delete(`${API_BANS_URL}/${banID}`, { responseType: 'text' })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
   getBan(banID: number): Observable<Ban> {
     let params = new HttpParams().set('banInfo', 'raw');
     return this.http
-      .get<Ban>(`${API_BANS_URL}/bans/${banID}`, { params: params })
+      .get<Ban>(`${API_BANS_URL}/${banID}`, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -238,6 +238,12 @@ export class CommunityService {
     let params = new HttpParams().set('banStatus', 'status');
     return this.http
       .get<boolean>(`${API_BANS_URL}/bans/${banID}`, { params: params })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  isUserBanned(communityID: number, username: string): Observable<number> { //returns banID
+    return this.http
+      .get<number>(`${API_BANS_URL}/users/${username}/communities/${communityID}`)
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -353,6 +359,15 @@ export class CommunityService {
       .set('by', by); // name, description, admin, general (queryless, gets all communities), default
     return this.http
       .get<Community[]>(API_URL, { params: params })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  getBannedUsers(communityID: number, page: number, size: number): Observable<Ban[]> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+    return this.http
+      .get<Ban[]>(`${API_BANS_URL}/communities/${communityID}`, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 }

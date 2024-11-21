@@ -139,7 +139,25 @@ public class Community {
         this.bannedUsers.add(ban);
     }
 
-    public void unbanUser(User user) {
-        this.bannedUsers.removeIf(ban -> ban.getUser().equals(user));
+    public void unbanUser(Long banID) {
+        if (this.bannedUsers.size() > 0) {
+            for (Ban ban : this.bannedUsers) {
+                if (ban.getId().equals(banID)) {
+                    this.bannedUsers.remove(ban);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void unbanUserByUser(User user) {
+        if (this.bannedUsers.size() > 0) {
+            for (Ban ban : this.bannedUsers) {
+                if (ban.getUser().equals(user)) {
+                    this.bannedUsers.remove(ban);
+                    break;
+                }
+            }
+        }
     }
 }

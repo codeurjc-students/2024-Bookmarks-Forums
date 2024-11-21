@@ -138,5 +138,4 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         // identifier, name, and the total number of members
         @Query("SELECT c.identifier, c.name, COUNT(m) as totalMembers FROM Community c LEFT JOIN c.members m GROUP BY c.identifier ORDER BY totalMembers DESC")
         List<Object[]> getMostPopularCommunitiesCountWithId();
-
 }

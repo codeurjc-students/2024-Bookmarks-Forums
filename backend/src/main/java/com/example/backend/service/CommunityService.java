@@ -3,6 +3,7 @@ package com.example.backend.service;
 import com.example.backend.entity.Ban;
 import com.example.backend.entity.Community;
 import com.example.backend.entity.User;
+import com.example.backend.repository.BanRepository;
 import com.example.backend.repository.CommunityRepository;
 import com.example.backend.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -18,10 +19,12 @@ public class CommunityService {
 
     private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
+    private final BanRepository banRepository;
 
-    public CommunityService(CommunityRepository communityRepository, UserRepository userRepository) {
+    public CommunityService(CommunityRepository communityRepository, UserRepository userRepository, BanRepository banRepository) {
         this.communityRepository = communityRepository;
         this.userRepository = userRepository;
+        this.banRepository = banRepository;
     }
 
     public Community getCommunityById(Long id) {
@@ -245,27 +248,14 @@ public class CommunityService {
         return communityRepository.getBannedUsers(communityId, pageable);
     }
 
-    // Given username and communityId, user is no longer banned from the community
-    public void unbanUserFromCommunity(String username, Long communityId) {
-        User user = userRepository.findByUsername(username);
-        Community community = communityRepository.findByIdentifier(communityId);
-        if (user != null && community != null) {
-            Ban ban = communityRepository.getBan(communityId, user.getUsername());
-            if (ban != null) {
-                community.unbanUser(user);
-                communityRepository.save(community);
-            }
-        }
-    }
-
     // Given the ban id, unban the user
     public void unbanUserFromCommunityById(Long banId) {
         Ban ban = communityRepository.getBanById(banId);
         if (ban != null) {
             Community community = ban.getCommunity();
-            User user = ban.getUser();
-            community.unbanUser(user);
+            community.unbanUser(banId);
             communityRepository.save(community);
+            banRepository.delete(ban);
         }
     }
 
@@ -280,7 +270,7 @@ public class CommunityService {
                 // is ban over?
                 if (ban.getBanUntil().isBefore(LocalDateTime.now())) {
                     // unban user
-                    community.unbanUser(user);
+                    community.unbanUserByUser(user);
                     communityRepository.save(community);
                     return false;
                 } else {

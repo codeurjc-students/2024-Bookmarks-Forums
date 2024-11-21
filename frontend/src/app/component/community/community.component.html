@@ -52,6 +52,17 @@
             'url(' + communityBannerURL(community?.identifier) + ')'
         }"
       >
+        <div class="header-top-info" *ngIf="this.isUserBanned">
+          <a class="card-link" (click)="showBanInfoModal()">
+            <div
+              class="card-community-name-container branding-hyperlink-container banned-user-info-container"
+            >
+              <p class="lead fw-normal mb-0 banned-user-info-text">
+                Estás baneado<br />
+              </p>
+            </div>
+          </a>
+        </div>
         <div class="container px-4 px-lg-5 my-5">
           <div class="text-start text-dark">
             <div class="community-name-container">
@@ -65,8 +76,7 @@
             </div>
           </div>
           <!-- Community description toggle -->
-          <div id="community-description-block"
-          *ngIf="community?.description">
+          <div id="community-description-block" *ngIf="community?.description">
             <div class="community-description-toggle-container">
               <button
                 title="Mostrar descripción de la comunidad"
@@ -356,81 +366,90 @@
                 <h5 class="card-title mb-0">Acciones de la comunidad</h5>
               </div>
               <div class="card-body">
-                <!-- Join or leave community -->
-                <div
-                  class="community-actions-container"
-                  *ngIf="loggedIn; else loginToJoin"
-                >
-                  <!-- If the user is logged in and is a member of the community-->
-                  <ng-container *ngIf="isMember; else joinCommunityButton">
-                    <button
-                      class="btn primary-btn"
-                      (click)="joinOrLeaveCommunity()"
-                    >
-                      <i class="fas fa-plus me-1"></i>
-                      Nuevo Post
-                    </button>
-                    <button
-                      class="btn negative-btn"
-                      (click)="joinOrLeaveCommunity()"
-                    >
-                      <i class="fas fa-sign-out-alt me-1"></i>
-                      Salir
-                    </button>
-                    <!-- If the user is an admin of the community -->
-                    <ng-container *ngIf="isCommunityAdmin">
-                      <a
-                        class="btn primary-dimmed-btn"
-                        [routerLink]="[
-                          '/community',
-                          community?.identifier,
-                          'edit'
-                        ]"
-                      >
-                        <i class="fas fa-edit me-1"></i>
-                        Editar comunidad
-                      </a>
-                      <button
-                        class="btn negative-btn"
-                        (click)="deleteCommunity()"
-                      >
-                        <i class="fas fa-trash me-1"></i>
-                        Eliminar comunidad
-                      </button>
-                    </ng-container>
-                  </ng-container>
-                  <!-- If the user is logged in and is not a member of the community-->
-                  <ng-template #joinCommunityButton>
-                    <div class="community-actions-container-text">
-                      <p class="card-content card-text wrap-text center-text">
-                        Únete a la comunidad para crear posts, comentar, y
-                        más...
-                      </p>
+                <ng-container *ngIf="!this.isUserBanned; else userBanned">
+                  <!-- Join or leave community -->
+                  <div
+                    class="community-actions-container"
+                    *ngIf="loggedIn; else loginToJoin"
+                  >
+                    <!-- If the user is logged in and is a member of the community-->
+                    <ng-container *ngIf="isMember; else joinCommunityButton">
                       <button
                         class="btn primary-btn"
                         (click)="joinOrLeaveCommunity()"
-                        *ngIf="!isMember"
                       >
-                        <i class="fas fa-sign-in-alt me-1"></i>
-                        Unirse
+                        <i class="fas fa-plus me-1"></i>
+                        Nuevo Post
                       </button>
+                      <button
+                        class="btn negative-btn"
+                        (click)="joinOrLeaveCommunity()"
+                      >
+                        <i class="fas fa-sign-out-alt me-1"></i>
+                        Salir
+                      </button>
+                      <!-- If the user is an admin of the community -->
+                      <ng-container *ngIf="isCommunityAdmin">
+                        <a
+                          class="btn primary-dimmed-btn"
+                          [routerLink]="[
+                            '/community',
+                            community?.identifier,
+                            'edit'
+                          ]"
+                        >
+                          <i class="fas fa-edit me-1"></i>
+                          Editar comunidad
+                        </a>
+                        <button
+                          class="btn negative-btn"
+                          (click)="deleteCommunity()"
+                        >
+                          <i class="fas fa-trash me-1"></i>
+                          Eliminar comunidad
+                        </button>
+                      </ng-container>
+                    </ng-container>
+                    <!-- If the user is logged in and is not a member of the community-->
+                    <ng-template #joinCommunityButton>
+                      <div class="community-actions-container-text">
+                        <p class="card-content card-text wrap-text center-text">
+                          Únete a la comunidad para crear posts, comentar, y
+                          más...
+                        </p>
+                        <button
+                          class="btn primary-btn"
+                          (click)="joinOrLeaveCommunity()"
+                          *ngIf="!isMember"
+                        >
+                          <i class="fas fa-sign-in-alt me-1"></i>
+                          Unirse
+                        </button>
+                      </div>
+                    </ng-template>
+                  </div>
+                  <!-- If the user is not logged in -->
+                  <ng-template #loginToJoin>
+                    <div class="community-actions-container-text">
+                      <p class="card-content card-text wrap-text center-text">
+                        Inicia sesión para unirte a la comunidad, crear posts, y
+                        más...
+                      </p>
+                      <!-- Login button -->
+                      <div class="d-grid gap-2">
+                        <a class="btn primary-btn" [routerLink]="['/login']">
+                          <i class="fas fa-sign-in-alt me-1"></i>
+                          Iniciar sesión</a
+                        >
+                      </div>
                     </div>
                   </ng-template>
-                </div>
-                <!-- If the user is not logged in -->
-                <ng-template #loginToJoin>
+                </ng-container>
+                <ng-template #userBanned>
                   <div class="community-actions-container-text">
-                    <p class="card-content card-text wrap-text center-text">
-                      Inicia sesión para unirte a la comunidad, crear posts, y
-                      más...
+                    <p class="card-content card-text wrap-text center-text red-text">
+                      Has sido baneado de esta comunidad
                     </p>
-                    <!-- Login button -->
-                    <div class="d-grid gap-2">
-                      <a class="btn primary-btn" [routerLink]="['/login']">
-                        <i class="fas fa-sign-in-alt me-1"></i>
-                        Iniciar sesión</a
-                      >
-                    </div>
                   </div>
                 </ng-template>
               </div>
@@ -605,6 +624,17 @@
                     </div>
                   </div>
                 </div>
+                <!-- Button to open the ban manager modal -->
+                <div class="card-header-actions-container" *ngIf="isCommunityAdmin">
+                  <button
+                    class="btn negative-btn"
+                    (click)="openBanManagerModal()"
+                    *ngIf="isCommunityAdmin"
+                  >
+                    <i class="fas fa-ban me-1"></i>
+                    Gestor de baneos
+                  </button>
+                </div>
               </div>
               <div class="card-body">
                 <!-- Members -->
@@ -719,6 +749,7 @@
       id="alertModal"
       class="custom-modal"
       [ngClass]="{ show: showAlertModal }"
+      style="z-index: 1060"
     >
       <div class="custom-modal-content no-scroll">
         <div class="custom-modal-header">
@@ -749,6 +780,31 @@
               <i class="fas fa-times"></i> Cancelar
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ban info modal -->
+    <div
+      id="banInfoModal"
+      class="custom-modal"
+      [ngClass]="{ show: showUserBanInfo }"
+    >
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header">
+          <span
+            class="action-btn close"
+            (click)="closeBanInfoModal()"
+            (keypress)="closeBanInfoModal()"
+          >
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <p class="alert-modal-text">Razón: {{ this.userBan?.banReason }}</p>
+          <p class="alert-modal-text">
+            Hasta: {{ this.userBan?.banUntil | date : "dd-MM-yyyy" }}
+          </p>
         </div>
       </div>
     </div>
@@ -849,6 +905,80 @@
             >
               <i class="fas fa-times"></i> Cancelar
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Ban manager modal -->
+    <div
+      id="banManagerModal"
+      class="custom-modal"
+      [ngClass]="{ show: showBanManagerModal }"
+    >
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header with-title">
+          <h5 class="modal-title">Usuarios baneados</h5>
+          <span
+            class="action-btn close"
+            (click)="closeBanManagerModal()"
+            (keypress)="closeBanManagerModal()"
+          >
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <div class="card dark-card banned-users-list">
+            <div class="banned-member-card" *ngFor="let ban of bannedUsers">
+              <div class="ban-info-container">
+                <div class="banned-user-info">
+                  <div class="community-ban-info">
+                    <p class="ban-info-text">Usuario:</p>
+                    <img
+                      [src]="profilePicture(ban.user.username)"
+                      alt="Profile"
+                      class="community-member-profile-picture"
+                    />
+                    <p class="community-member-username">
+                      {{ ban.user.username }}
+                    </p>
+                  </div>
+                  <div class="community-ban-info">
+                    <p class="ban-info-text">Razón:</p>
+                    <p class="ban-info-data">{{ ban.banReason }}</p>
+                  </div>
+                  <div class="community-ban-info">
+                    <p class="ban-info-text">Hasta:</p>
+                    <p class="ban-info-data">
+                      Hasta: {{ ban.banUntil | date : "dd-MM-yyyy" }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <button
+                class="btn primary-dimmed-btn"
+                (click)="openUnbanConfirmationModal(ban)"
+              >
+                <i class="fas fa-ban me-1"></i>
+                Desbanear
+              </button>
+            </div>
+            <!-- Load more banned users button -->
+            <div class="load-more-replies-container">
+              <button
+                class="btn primary-btn"
+                (click)="loadMoreBannedUsers()"
+                *ngIf="!noMoreBannedUsers; else noMoreBannedUsersText"
+              >
+                Cargar más
+              </button>
+              <ng-template #noMoreBannedUsersText>
+                <p
+                  class="card-content card-text wrap-text center-text text-muted"
+                >
+                  No hay más usuarios baneados
+                </p>
+              </ng-template>
+            </div>
           </div>
         </div>
       </div>

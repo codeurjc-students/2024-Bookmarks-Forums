@@ -10,6 +10,7 @@ import { Post } from '../../models/post.model';
 import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
+import { Ban } from '../../models/ban.model';
 
 Chart.register(...registerables);
 
@@ -88,6 +89,18 @@ export class CommunityComponent implements OnInit {
 
   showDescription: boolean = false;
 
+  showBanManagerModal: boolean = false;
+  bannedUsers: Ban[] = [];
+  bannedUsersPage: number = 0;
+  bannedUsersSize: number = 1;
+  loadingMoreBannedUsers: boolean = false;
+  noMoreBannedUsers: boolean = false;
+  banToUnban: Ban | undefined = undefined;
+
+  isUserBanned: boolean = false;
+  userBan: Ban | undefined;
+  showUserBanInfo: boolean = false;
+
   constructor(
     private http: HttpClient,
     public loginService: LoginService,
@@ -98,7 +111,6 @@ export class CommunityComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Check if user is logged in
     this.checkIfLoggedIn();
     this.loadCommunity();
   }
@@ -161,6 +173,41 @@ export class CommunityComponent implements OnInit {
     this.loadingMoreModerators = false;
   }
 
+  loadBan(banID: number) {
+    if (this.community) {
+      this.communityService.getBan(banID).subscribe({
+        next: (ban) => {
+          this.userBan = ban;
+        },
+        error: (r) => {
+          console.error('Error getting user ban: ' + JSON.stringify(r));
+        },
+      });
+    }
+  }
+
+  loadUserBan() {
+    if (this.community) {
+      this.communityService
+        .isUserBanned(this.community.identifier, this.loggedUsername)
+        .subscribe({
+          next: (banID) => {
+            if (banID !== -1) {
+              this.isUserBanned = true;
+              this.loadBan(banID);
+            } else {
+              this.isUserBanned = false;
+            }
+          },
+          error: (r) => {
+            console.error(
+              'Error checking if user is banned: ' + JSON.stringify(r)
+            );
+          },
+        });
+    }
+  }
+
   loadCommunity() {
     let communityID = Number(this.route.snapshot.paramMap.get('identifier'));
     this.communityService.getCommunityById(communityID).subscribe({
@@ -186,7 +233,7 @@ export class CommunityComponent implements OnInit {
           this.community.identifier,
           this.page,
           this.size,
-          this.sortCriteria,
+          this.sortCriteria
         )
         .subscribe({
           next: (posts) => {
@@ -268,6 +315,7 @@ export class CommunityComponent implements OnInit {
             this.isMember = isMember;
             this.isCommunityAdmin =
               this.community?.admin.username === this.loggedUsername;
+            this.loadUserBan();
             this.checkModerator();
           },
           error: (r) => {
@@ -279,6 +327,7 @@ export class CommunityComponent implements OnInit {
                 'Error checking if user is member: ' + JSON.stringify(r)
               );
             }
+            this.loadUserBan();
           },
         });
     }
@@ -305,6 +354,9 @@ export class CommunityComponent implements OnInit {
           this.loggedUsername = ''; // set the logged username to empty
           this.user = undefined;
           this.isAdmin = false;
+          this.isMember = false;
+          this.isCommunityAdmin = false;
+          this.isModerator = false;
         }
       },
       error: (r) => {
@@ -371,28 +423,30 @@ export class CommunityComponent implements OnInit {
     this.page = 0;
     this.noMorePosts = false;
     this.loadingMorePosts = true;
-    this.communityService.getPosts(
-      this.community.identifier,
-      this.page,
-      this.size,
-      this.sortCriteria,
-      this.searchTerm
-    ).subscribe({
-      next: (posts) => {
-        if (!posts || posts.length == 0) {
-          this.noMorePosts = true;
+    this.communityService
+      .getPosts(
+        this.community.identifier,
+        this.page,
+        this.size,
+        this.sortCriteria,
+        this.searchTerm
+      )
+      .subscribe({
+        next: (posts) => {
+          if (!posts || posts.length == 0) {
+            this.noMorePosts = true;
+            this.loadingMorePosts = false;
+            return;
+          }
+          this.posts = this.posts.concat(posts);
           this.loadingMorePosts = false;
-          return;
-        }
-        this.posts = this.posts.concat(posts);
-        this.loadingMorePosts = false;
-        this.page += 1;
-        this.noMorePosts = posts.length < this.size;
-      },
-      error: (r) => {
-        console.error('Error searching posts: ' + JSON.stringify(r));
-      }
-    });
+          this.page += 1;
+          this.noMorePosts = posts.length < this.size;
+        },
+        error: (r) => {
+          console.error('Error searching posts: ' + JSON.stringify(r));
+        },
+      });
   }
 
   clearSearch() {
@@ -574,7 +628,7 @@ export class CommunityComponent implements OnInit {
   removeMember(username: string) {
     // admin can't remove themselves
     if (username === this.community?.admin.username) {
-      if(this.loggedUsername === this.community?.admin.username) {
+      if (this.loggedUsername === this.community?.admin.username) {
         this.openAlertModal(
           'Debes traspasar tus poderes de administrador a otro usuario para poder abandonar esta comunidad',
           () => {},
@@ -657,7 +711,7 @@ export class CommunityComponent implements OnInit {
   banMember(username: string) {
     // admin can't ban themselves
     if (username === this.community?.admin.username) {
-      if(this.loggedUsername === this.community?.admin.username) {
+      if (this.loggedUsername === this.community?.admin.username) {
         this.openAlertModal(
           'No tiene sentido lo que estás haciendo...',
           () => {},
@@ -908,26 +962,108 @@ export class CommunityComponent implements OnInit {
     this.membersPage = 0;
     this.noMoreMembers = false;
     this.loadingMoreMembers = true;
-    this.communityService.searchMembers(
-      this.community.identifier,
-      this.membersSearchTerm,
-      this.membersPage,
-      this.membersSize,
-    ).subscribe({
-      next: (members) => {
-        if (!members || members.length == 0) {
-          this.noMoreMembers = true;
+    this.communityService
+      .searchMembers(
+        this.community.identifier,
+        this.membersSearchTerm,
+        this.membersPage,
+        this.membersSize
+      )
+      .subscribe({
+        next: (members) => {
+          if (!members || members.length == 0) {
+            this.noMoreMembers = true;
+            this.loadingMoreMembers = false;
+            return;
+          }
+          this.communityMembers = this.communityMembers.concat(members);
           this.loadingMoreMembers = false;
-          return;
-        }
-        this.communityMembers = this.communityMembers.concat(members);
-        this.loadingMoreMembers = false;
-        this.membersPage += 1;
-        this.noMoreMembers = members.length < this.membersSize;
-      },
-      error: (r) => {
-        console.error('Error searching members: ' + JSON.stringify(r));
-      }
-    });
+          this.membersPage += 1;
+          this.noMoreMembers = members.length < this.membersSize;
+        },
+        error: (r) => {
+          console.error('Error searching members: ' + JSON.stringify(r));
+        },
+      });
+  }
+
+  loadMorebansList() {
+    this.loadingMoreBannedUsers = true;
+    this.loadBannedUsers();
+    this.loadingMoreBannedUsers = false;
+  }
+
+  openBanManagerModal() {
+    this.showBanManagerModal = true;
+    this.loadBannedUsers();
+  }
+
+  closeBanManagerModal() {
+    this.showBanManagerModal = false;
+  }
+
+  loadBannedUsers() {
+    if (this.community) {
+      this.communityService
+        .getBannedUsers(
+          this.community.identifier,
+          this.bannedUsersPage,
+          this.bannedUsersSize
+        )
+        .subscribe({
+          next: (bannedUsers) => {
+            if (!bannedUsers || bannedUsers.length == 0) {
+              this.noMoreBannedUsers = true;
+              this.loadingMoreBannedUsers = false;
+              return;
+            }
+            this.bannedUsers = this.bannedUsers.concat(bannedUsers);
+            this.bannedUsersPage += 1;
+            this.noMoreBannedUsers = bannedUsers.length < this.bannedUsersSize;
+            this.loadingMoreBannedUsers = false;
+          },
+          error: (r) => {
+            console.error('Error getting banned users: ' + JSON.stringify(r));
+          },
+        });
+    }
+  }
+
+  loadMoreBannedUsers() {
+    this.loadingMoreBannedUsers = true;
+    this.loadBannedUsers();
+    this.loadingMoreBannedUsers = false;
+  }
+
+  openUnbanConfirmationModal(ban: Ban) {
+    this.banToUnban = ban;
+    this.showAlertModal = true;
+    this.alertModalText = `¿Estás seguro de que quieres desbanear a ${ban.user.username}?`;
+    this.confirmAction = () => this.unbanUser();
+  }
+
+  unbanUser() {
+    if (this.banToUnban) {
+      this.communityService.unbanUser(this.banToUnban.id).subscribe({
+        next: () => {
+          this.bannedUsers = this.bannedUsers.filter(
+            (b) => b.id !== this.banToUnban!.id
+          );
+          this.banToUnban = undefined;
+          this.showAlertModal = false;
+        },
+        error: (r) => {
+          console.error('Error unbanning user: ' + JSON.stringify(r));
+        },
+      });
+    }
+  }
+
+  showBanInfoModal() {
+    this.showUserBanInfo = true;
+  }
+
+  closeBanInfoModal() {
+    this.showUserBanInfo = false;
   }
 }
