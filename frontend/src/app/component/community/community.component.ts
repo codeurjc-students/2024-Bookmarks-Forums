@@ -112,14 +112,13 @@ export class CommunityComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkIfLoggedIn();
-    this.loadCommunity();
   }
 
   loadUserData(user: User) {
     this.user = user;
     this.loggedUsername = user.username;
     this.isAdmin = user.roles.includes('ADMIN');
-    this.isUserMember();
+    this.loadCommunity();
   }
 
   getAdmin() {
@@ -187,7 +186,7 @@ export class CommunityComponent implements OnInit {
   }
 
   loadUserBan() {
-    if (this.community) {
+    if (this.community && this.loggedUsername) {
       this.communityService
         .isUserBanned(this.community.identifier, this.loggedUsername)
         .subscribe({
@@ -213,6 +212,7 @@ export class CommunityComponent implements OnInit {
     this.communityService.getCommunityById(communityID).subscribe({
       next: (community) => {
         this.community = community;
+        this.isUserMember();
         this.getMembers();
         this.getMembersCount();
         this.getAdmin();
@@ -307,7 +307,7 @@ export class CommunityComponent implements OnInit {
   }
 
   isUserMember() {
-    if (this.community) {
+    if (this.community && this.loggedUsername) {
       this.communityService
         .isUserMember(this.community.identifier, this.loggedUsername)
         .subscribe({
@@ -347,6 +347,7 @@ export class CommunityComponent implements OnInit {
             },
             error: (r) => {
               console.error('Error getting logged user: ' + JSON.stringify(r));
+              this.loadCommunity();
             },
           });
         } else {
@@ -357,6 +358,7 @@ export class CommunityComponent implements OnInit {
           this.isMember = false;
           this.isCommunityAdmin = false;
           this.isModerator = false;
+          this.loadCommunity();
         }
       },
       error: (r) => {
@@ -366,6 +368,7 @@ export class CommunityComponent implements OnInit {
             'Error checking if user is logged in: ' + JSON.stringify(r)
           );
         }
+        this.loadCommunity();
       },
     });
   }

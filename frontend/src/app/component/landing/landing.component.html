@@ -427,6 +427,35 @@
                 </div>
               </div>
             </div>
+
+            <!-- Side widget (create community button) -->
+            <div class="card mb-4" *ngIf="loggedIn else notLoggedInCreateCommunity">
+              <div class="card-header">Crea tu propia comunidad</div>
+              <div class="card-body">
+                <p>
+                  ¿No encuentras una comunidad que te guste? ¡Crea la tuya
+                  propia!
+                </p>
+                <div class="input-group">
+                  <a [routerLink]="['/new/community']">
+                    <button class="btn primary-btn" type="button">
+                      <i class="fas fa-plus me-1"></i>
+                      Crear comunidad
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <ng-template #notLoggedInCreateCommunity>
+              <div class="card mb-4">
+                <div class="card-header">Crea tu propia comunidad</div>
+                <div class="card-body">
+                  <p class="mb-0">
+                    ¿No encuentras una comunidad que te guste? ¡Inicia sesión más arriba y crea la tuya!
+                  </p>
+                </div>
+              </div>
+            </ng-template>
           </div>
         </div>
       </div>

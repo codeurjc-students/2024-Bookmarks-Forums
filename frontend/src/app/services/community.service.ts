@@ -41,7 +41,9 @@ export class CommunityService {
       .pipe(catchError((error) => throwError(() => error)));
   }
 
-  createCommunity(communityData: FormData): Observable<Community> {
+  createCommunity(
+    communityData: { name: string; description: string }
+  ): Observable<Community> {
     return this.http
       .post<Community>(API_URL, communityData)
       .pipe(catchError((error) => throwError(() => error)));

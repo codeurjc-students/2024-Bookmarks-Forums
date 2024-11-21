@@ -39,6 +39,7 @@ public class Community {
     private String name;
 
     @JsonView(BasicInfo.class)
+    @Column(length = 500)
     private String description;
 
     @JsonView(BasicInfo.class)
@@ -99,8 +100,8 @@ public class Community {
 
     public Community(String name, String description, String banner, User admin) {
         this.name = name;
-        this.admin = admin;
         this.members.add(admin);
+        this.admin = admin;
         this.description = description;
         this.bannerString = Objects.requireNonNullElse(banner, "default_community_banner.jpg");
     }

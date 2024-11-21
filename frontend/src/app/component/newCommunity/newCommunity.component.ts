@@ -14,29 +14,17 @@ import { DatePipe } from '@angular/common';
 Chart.register(...registerables);
 
 @Component({
-  selector: 'app-modify-community',
-  templateUrl: './modifyCommunity.component.html',
-  styleUrls: ['./modifyCommunity.component.css', '../../../animations.css'],
+  selector: 'app-new-community',
+  templateUrl: './newCommunity.component.html',
+  styleUrls: ['./newCommunity.component.css', '../../../animations.css'],
   providers: [DatePipe],
 })
-export class ModifyCommunityComponent implements OnInit {
+export class NewCommunityComponent implements OnInit {
   showModal: boolean = false;
-
-  communityPostsCount: number = 0;
-  posts: Post[] = [];
 
   admin: User | undefined;
 
-  hasModerators: boolean = false;
-  moderators: User[] = [];
-  moderatorsPage = 0;
-  moderatorsSize = 5;
-  loadingMoreModerators = false;
-  noMoreModerators = false;
-
   community: Community | undefined;
-  communityMembersCount: number = 0;
-  communityMembers: User[] = [];
 
   title = 'Bookmarks';
   userLoaded = false;
@@ -45,9 +33,6 @@ export class ModifyCommunityComponent implements OnInit {
   loggedUsername: string = '';
   loggedIn: boolean = false;
   isAdmin: boolean = false;
-  isMember: boolean = false;
-  isCommunityAdmin: boolean = false;
-  isModerator: boolean = false;
 
   public chart: any;
 
@@ -85,80 +70,6 @@ export class ModifyCommunityComponent implements OnInit {
     this.user = user;
     this.loggedUsername = user.username;
     this.isAdmin = user.roles.includes('ADMIN');
-    this.loadCommunity();
-  }
-
-  getAdmin() {
-    if (this.community) {
-      this.communityService.getAdmin(this.community.identifier).subscribe({
-        next: (admin) => {
-          this.admin = admin;
-        },
-        error: (r) => {
-          console.error('Error getting community admin: ' + JSON.stringify(r));
-        },
-      });
-    }
-  }
-
-  loadCommunity() {
-    let communityID = Number(this.route.snapshot.paramMap.get('identifier'));
-    this.communityService.getCommunityById(communityID).subscribe({
-      next: (community) => {
-        this.community = community;
-        this.communityName = community.name;
-        this.communityDescription = community.description;
-        this.isUserMember();
-        this.getMembersCount();
-        this.getAdmin();
-        this.getPostsCount();
-      },
-      error: (r) => {
-        console.error('Error getting community: ' + JSON.stringify(r));
-      },
-    });
-  }
-
-  checkModerator() {
-    if (this.community) {
-      this.communityService
-        .isModerator(this.community.identifier, this.loggedUsername)
-        .subscribe({
-          next: (isModerator) => {
-            this.isModerator = isModerator;
-          },
-          error: (r) => {
-            console.error(
-              'Error checking if user is moderator: ' + JSON.stringify(r)
-            );
-          },
-        });
-    }
-  }
-
-  isUserMember() {
-    if (this.community) {
-      this.communityService
-        .isUserMember(this.community.identifier, this.loggedUsername)
-        .subscribe({
-          next: (isMember) => {
-            this.isMember = isMember;
-            this.isCommunityAdmin =
-              this.community?.admin.username === this.loggedUsername;
-            this.checkModerator();
-          },
-          error: (r) => {
-            // if the error is unauthorized, the user is not a member
-            if (r.status == 401) {
-              this.isMember = false;
-            } else {
-              console.error(
-                'Error checking if user is member: ' + JSON.stringify(r)
-              );
-            }
-          },
-        });
-    }
   }
 
   checkIfLoggedIn() {
@@ -175,7 +86,6 @@ export class ModifyCommunityComponent implements OnInit {
             },
             error: (r) => {
               console.error('Error getting logged user: ' + JSON.stringify(r));
-              this.loadCommunity();
             },
           });
         } else {
@@ -183,7 +93,6 @@ export class ModifyCommunityComponent implements OnInit {
           this.loggedUsername = ''; // set the logged username to empty
           this.user = undefined;
           this.isAdmin = false;
-          this.loadCommunity();
         }
       },
       error: (r) => {
@@ -193,7 +102,6 @@ export class ModifyCommunityComponent implements OnInit {
             'Error checking if user is logged in: ' + JSON.stringify(r)
           );
         }
-        this.loadCommunity();
       },
     });
   }
@@ -209,14 +117,6 @@ export class ModifyCommunityComponent implements OnInit {
       return '';
     }
     return this.communityService.getCommunityImageURL(communityID);
-  }
-
-  hasBanner(communityID: number | undefined): boolean {
-    if (!communityID) {
-      return false;
-    } else {
-      return this.community?.hasBanner ?? false;
-    }
   }
 
   // Get user profile picture
@@ -266,71 +166,8 @@ export class ModifyCommunityComponent implements OnInit {
     }
   }
 
-  getMembersCount() {
-    if (this.community) {
-      this.communityService
-        .getMembersCount(this.community.identifier)
-        .subscribe({
-          next: (count) => {
-            this.communityMembersCount = count;
-          },
-          error: (r) => {
-            console.error(
-              'Error getting community members count: ' + JSON.stringify(r)
-            );
-          },
-        });
-    }
-  }
-
-  getPostsCount() {
-    if (this.community) {
-      this.communityService.getPostsCount(this.community.identifier).subscribe({
-        next: (count) => {
-          this.communityPostsCount = count;
-        },
-        error: (r) => {
-          console.error(
-            'Error getting community posts count: ' + JSON.stringify(r)
-          );
-        },
-      });
-    }
-  }
-
-  showDropdown(username: string): boolean {
-    return (
-      (this.isAdmin ||
-        this.isModerator ||
-        this.community?.admin.username === this.loggedUsername) &&
-      (username !== this.community?.admin.username || this.isAdmin)
-    );
-  }
-
-  adjustTextareaHeightInit() {
-    const textarea = document.getElementById('communityDescription') as HTMLTextAreaElement;
-    textarea.style.height = 'auto';
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }
-
   toggleCommunityDescription() {
     this.showDescription = !this.showDescription;
-    if (this.showDescription) {
-      setTimeout(() => {
-        const textarea = document.getElementById('communityDescription') as HTMLTextAreaElement;
-        if (textarea) {
-          this.adjustTextareaHeightInit();
-        }
-      }, 100);
-    }
-  }
-
-  editCommunity() {
-    if (this.community) {
-      // goes to community/<id>/edit
-      window.location.href =
-        '/community/' + this.community.identifier + '/edit';
-    }
   }
 
   onFileSelected(event: Event): void {
@@ -344,47 +181,6 @@ export class ModifyCommunityComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     }
-  }
-
-  deleteBanner() {
-    if (this.community) {
-      if (!this.community.hasBanner && this.selectedImageURL) {
-        this.selectedImageURL = null;
-      } else {
-        this.openAlertModal(
-          '¿Estás seguro de que quieres eliminar la imagen de la comunidad?',
-          () => {
-            this.wantsToDeleteBanner = true;
-            this.selectedImageURL = null;
-          },
-          true
-        );
-      }
-    }
-  }
-
-  deleteCommunity() {
-    // open confirmation modal
-    this.openAlertModal(
-      '¿Estás seguro de que quieres eliminar esta comunidad? Esta acción no se puede deshacer.',
-      () => {
-        if (this.community) {
-          this.communityService
-            .deleteCommunity(this.community.identifier)
-            .subscribe({
-              next: () => {
-                this.openAlertModal(
-                  '¡La comunidad ha sido eliminada!',
-                  () => {
-                    window.location.href = '/';
-                  },
-                  false
-                );
-              },
-            });
-        }
-      }
-    );
   }
 
   // COMMUNITY EDITOR
@@ -450,6 +246,14 @@ export class ModifyCommunityComponent implements OnInit {
     window.scrollTo(0, scrollTop);
   }
 
+  deleteBanner() {
+    if (this.selectedImageURL) {
+      this.selectedImageURL = null;
+    } else {
+      this.wantsToDeleteBanner = !this.wantsToDeleteBanner;
+    }
+  }
+
   setBanner() {
     if (!this.community) {
       return;
@@ -461,38 +265,35 @@ export class ModifyCommunityComponent implements OnInit {
       ) as HTMLInputElement;
       if (input.files && input.files.length > 0) {
         const file = input.files[0];
-        this.communityService.updateCommunityBanner(
-          this.community.identifier,
-          file,
-          undefined
-        ).subscribe({
-          next: () => {
-            this.showDoneModal();
-          },
-          error: (r) => {
-            console.error(
-              'Error updating community banner: ' + JSON.stringify(r)
-            );
-          },
-        });
+        this.communityService
+          .updateCommunityBanner(this.community.identifier, file, undefined)
+          .subscribe({
+            next: () => {
+              this.showDoneModal();
+            },
+            error: (r) => {
+              console.error(
+                'Error updating community banner: ' + JSON.stringify(r)
+              );
+            },
+          });
       }
     } else {
       this.showDoneModal();
     }
   }
 
-  showDoneModal(){
+  showDoneModal() {
     this.openAlertModal(
       '¡Los cambios han sido guardados!',
       () => {
-        window.location.href =
-          '/community/' + this.community?.identifier;
+        window.location.href = '/community/' + this.community?.identifier;
       },
       false
     );
   }
 
-  manageBanner(){
+  manageBanner() {
     if (this.wantsToDeleteBanner) {
       if (!this.community) {
         return;
@@ -515,33 +316,38 @@ export class ModifyCommunityComponent implements OnInit {
   }
 
   confirmChanges() {
-    if (this.community) {
-      // Check if the community name is empty
-      if (this.communityName.trim() === '') {
-        this.openAlertModal(
-          'El nombre de la comunidad no puede estar vacío.',
-          () => {},
-          false
-        );
-        return;
-      }
-
-      const communityData = {
-        name: this.communityName,
-        description: this.communityDescription,
-      };
-
-      this.communityService
-        .editCommunity(this.community.identifier, communityData, 'edit')
-        .subscribe({
-          next: () => {
-            this.manageBanner();
-            
-          },
-          error: (r) => {
-            console.error('Error editing community: ' + JSON.stringify(r));
-          },
-        });
+    // Check if the community name is empty
+    if (this.communityName.trim() === '') {
+      this.openAlertModal(
+        'El nombre de la comunidad no puede estar vacío.',
+        () => {},
+        false
+      );
+      return;
     }
+
+    const communityData = {
+      name: this.communityName,
+      description: this.communityDescription,
+    };
+
+    this.communityService.createCommunity(communityData).subscribe({
+      next: (community) => {
+        this.community = community;
+        this.manageBanner();
+      },
+      error: (r) => {
+        // if error code is 409, the community name is already taken
+        if (r.status === 409) {
+          this.openAlertModal(
+            'El nombre de la comunidad ya está en uso.',
+            () => {},
+            false
+          );
+        } else {
+          console.error('Error creating community: ' + JSON.stringify(r));
+        }
+      },
+    });
   }
 }

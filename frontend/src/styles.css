@@ -2946,11 +2946,13 @@ html {
   padding: 1rem;
   left: 0;
   width: 100%;
+  height: fit-content;
 }
 
 .community-description p {
   color: var(--branding-light-grey) !important;
   margin-bottom: 0 !important;
+  word-break: break-word;
 }
 
 .page-hero-expanded {
