@@ -83,15 +83,15 @@ public class User {
     private List<User> followingList = new ArrayList<>();
 
     // A user may have upvoted 0 or multiple posts
-    @ManyToMany(mappedBy = "upvotedBy")
+    @ManyToMany(mappedBy = "upvotedBy", cascade = CascadeType.ALL)
     private List<Post> upvotedPosts = new ArrayList<>();
 
     // A user may have downvoted 0 or multiple posts
-    @ManyToMany(mappedBy = "downvotedBy")
+    @ManyToMany(mappedBy = "downvotedBy", cascade = CascadeType.ALL)
     private List<Post> downvotedPosts = new ArrayList<>();
 
     // A user may have liked 0 or multiple replies
-    @ManyToMany(mappedBy = "likedBy")
+    @ManyToMany(mappedBy = "likedBy", cascade = CascadeType.ALL)
     private List<Reply> likedReplies = new ArrayList<>();
 
     // A user can have 0 or multiple posts
@@ -218,4 +218,14 @@ public class User {
     public String toString() {
         return this.username;
     }
+
+    public void setChats1(List<Chat> chats1) {
+        this.chats1 = chats1;
+    }
+
+    public void setChats2(List<Chat> chats2) {
+        this.chats2 = chats2;
+    }
+
+
 }

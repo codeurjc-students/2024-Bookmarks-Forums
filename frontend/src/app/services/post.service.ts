@@ -180,15 +180,21 @@ export class PostService {
     switch (option) {
       case 'most-liked-communities':
         return this.http
-          .get<Post[]>(`${ME_API_URL}/communities/posts/most-liked`, { params: params })
+          .get<Post[]>(`${ME_API_URL}/communities/posts/most-liked`, {
+            params: params,
+          })
           .pipe(catchError((error) => throwError(() => error)));
       case 'most-recent-communities':
         return this.http
-          .get<Post[]>(`${ME_API_URL}/communities/posts/most-recent`, { params: params })
+          .get<Post[]>(`${ME_API_URL}/communities/posts/most-recent`, {
+            params: params,
+          })
           .pipe(catchError((error) => throwError(() => error)));
       default:
         return this.http
-          .get<Post[]>(`${ME_API_URL}/following/posts/most-liked`, { params: params })
+          .get<Post[]>(`${ME_API_URL}/following/posts/most-liked`, {
+            params: params,
+          })
           .pipe(catchError((error) => throwError(() => error)));
     }
   }
@@ -203,11 +209,15 @@ export class PostService {
     switch (option) {
       case 'most-liked-communities':
         return this.http
-          .get<Post[]>(`${COMMUNITY_API_URL}/most-popular/posts/most-liked`, { params: params })
+          .get<Post[]>(`${COMMUNITY_API_URL}/most-popular/posts/most-liked`, {
+            params: params,
+          })
           .pipe(catchError((error) => throwError(() => error)));
       case 'most-recent-communities':
         return this.http
-          .get<Post[]>(`${COMMUNITY_API_URL}/most-popular/posts/most-recent`, { params: params })
+          .get<Post[]>(`${COMMUNITY_API_URL}/most-popular/posts/most-recent`, {
+            params: params,
+          })
           .pipe(catchError((error) => throwError(() => error)));
       default:
         return this.http
@@ -233,6 +243,31 @@ export class PostService {
   deletePostImage(postId: number): Observable<string> {
     return this.http
       .delete(`${API_URL}/${postId}/pictures`, { responseType: 'text' })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  getPostsOfUser(
+    username: string,
+    page: number,
+    size: number,
+    order: string,
+    query?: string
+  ): Observable<Post[]> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('order', order);
+    if (query && query.length > 0) {
+      params = params.set('query', query);
+    }
+    return this.http
+      .get<Post[]>(`${USER_API_URL}/${username}/posts`, { params: params })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  getPostCountOfUser(username: string): Observable<number> {
+    return this.http
+      .get<number>(`${USER_API_URL}/${username}/posts/count`)
       .pipe(catchError((error) => throwError(() => error)));
   }
 }

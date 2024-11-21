@@ -179,4 +179,24 @@ public class PostService {
         return postRepository.getMostRecentPostsOfMostFollowedCommunities(pageable);
     }
 
+    public Page<Post> getPostsOfUser(String username, Pageable pageable, String order) {
+        return switch (order) {
+            case "creationDate" -> postRepository.getPostsOfUserOrderByCreationDate(username, pageable);
+            case "lastModifiedDate" -> postRepository.getPostsOfUserOrderByLastModifiedDate(username, pageable);
+            case "likes" -> postRepository.getPostsOfUserOrderByLikes(username, pageable);
+            case "replies" -> postRepository.getPostsOfUserOrderByReplies(username, pageable);
+            default -> postRepository.findByAuthorUsername(username, pageable);
+        };
+    }
+
+    public Page<Post> searchPostsOfUser(String username, String query, Pageable pageable, String order) {
+        return switch (order) {
+            case "creationDate" -> postRepository.getPostsOfUserAndQueryOrderByCreationDate(username, query, pageable);
+            case "lastModifiedDate" -> postRepository.getPostsOfUserAndQueryOrderByLastModifiedDate(username, query, pageable);
+            case "likes" -> postRepository.getPostsOfUserAndQueryOrderByLikes(username, query, pageable);
+            case "replies" -> postRepository.getPostsOfUserAndQueryOrderByReplies(username, query, pageable);
+            default -> postRepository.getPostsOfUserAndQuery(username, query, pageable);
+        };
+    }
+
 }

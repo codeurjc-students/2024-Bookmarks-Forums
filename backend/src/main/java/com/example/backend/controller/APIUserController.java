@@ -450,6 +450,11 @@ public class APIUserController {
     })
     @DeleteMapping("/users/{username}")
     public ResponseEntity<String> deleteUser(HttpServletRequest request, @PathVariable String username) {
+        // is the user logged in?
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        
         User user = userService.getUserByUsername(username);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -458,6 +463,11 @@ public class APIUserController {
         // Check if user is authorized
         List<String> roles = userService.getUserByUsername(request.getUserPrincipal().getName()).getRoles();
         boolean isAdmin = roles.contains("ADMIN");
+
+        // the admin of the site can't delete their account
+        if (isAdmin && request.getUserPrincipal().getName().equals(username)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
         // Only admins can delete users or the user itself
         if (!request.getUserPrincipal().getName().equals(username) && !isAdmin) {

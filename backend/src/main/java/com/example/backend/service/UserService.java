@@ -182,6 +182,9 @@ public class UserService {
             messageRepository.save(message);
         }
 
+        user.setChats1(null);
+        user.setChats2(null);
+
         // Clear the list to avoid further issues
         user.getSentMessages().clear();
 

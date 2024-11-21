@@ -18,6 +18,8 @@
   --branding-forums-light-grey: #4e5056;
   --branding-forums-lighter-grey: #6c6e73;
   --branding-forums-taupe: #91818a;
+  --bs-red-hover: #bd1128;
+  --bs-red-active: #8a0c1f;
   /* -------- */
   --bs-blue: #0d6efd;
   --bs-indigo: #6610f2;
@@ -3198,4 +3200,62 @@ html {
 
 .red-text {
   color: var(--bs-red) !important;
+}
+
+.community-info-item.clickable{
+  cursor: pointer;
+  text-decoration: none !important;
+  color: var(--branding-light-grey) !important;
+}
+
+.community-info-item:hover.clickable{
+  color: var(--branding-peach) !important;
+  text-decoration: underline !important;
+}
+
+.community-info-item:active.clickable{
+  color: var(--branding-darkish-grey) !important;
+}
+
+.community-info-item.clickable i{
+  color: var(--branding-light-grey) !important;
+}
+
+.community-info-item:hover.clickable i{
+  color: var(--branding-peach) !important;
+}
+
+.community-info-item:active.clickable i{
+  color: var(--branding-darkish-grey) !important;
+}
+
+.community-info-item:hover.clickable p{
+  color: var(--branding-peach) !important;
+}
+
+.community-info-item:active.clickable p{
+  color: var(--branding-darkish-grey) !important;
+}
+
+.red-btn {
+  background-color: var(--bs-red) !important;
+  color: var(--branding-light-grey) !important;
+  border: 1px solid var(--bs-red) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.red-btn:hover {
+  background-color: var(--bs-red-hover) !important;
+  border: 1px solid var(--bs-red-hover) !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
+}
+
+.red-btn:active {
+  background-color: var(--bs-red-active) !important;
+  border: 1px solid var(--bs-red-active) !important;
+  scale: 0.95 !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }

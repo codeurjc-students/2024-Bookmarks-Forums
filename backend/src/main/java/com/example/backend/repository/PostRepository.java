@@ -164,4 +164,56 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                         "ORDER BY p.upvotes DESC")
         Page<Post> getMostLikedPostsOfMostFollowedUsersGeneral(Pageable pageable);
 
+        // Get posts of a specified user by username
+        @Query("SELECT p FROM Post p WHERE p.author.username = :username")
+        Page<Post> getPostsOfUser(@Param("username") String username, Pageable pageable);
+
+        // Get posts of a specified user by username and sort by recent date
+        @Query("SELECT p FROM Post p WHERE p.author.username = :username ORDER BY p.fullCreationDate DESC")
+        Page<Post> getPostsOfUserOrderByCreationDate(@Param("username") String username, Pageable pageable);
+
+        // Get posts of a specified user by username and sort by last modified date
+        @Query("SELECT p FROM Post p WHERE p.author.username = :username ORDER BY p.fullLastReplyDate DESC")
+        Page<Post> getPostsOfUserOrderByLastModifiedDate(@Param("username") String username, Pageable pageable);
+
+        // Get posts of a specified user by username and sort by number of likes
+        @Query("SELECT p FROM Post p WHERE p.author.username = :username ORDER BY p.upvotes DESC")
+        Page<Post> getPostsOfUserOrderByLikes(@Param("username") String username, Pageable pageable);
+
+        // Get posts of a specified user by username and sort by number of replies
+        @Query("SELECT p FROM Post p LEFT JOIN p.replyList r WHERE p.author.username = :username GROUP BY p ORDER BY COUNT(r) DESC")
+        Page<Post> getPostsOfUserOrderByReplies(@Param("username") String username, Pageable pageable);
+
+        // Get posts of a specified user by username and search by title or content
+        @Query("SELECT p FROM Post p WHERE p.author.username = :username AND " +
+                        "(p.title LIKE %:query% OR " +
+                        "p.content LIKE %:query%)")
+        Page<Post> getPostsOfUserAndQuery(@Param("username") String username, @Param("query") String query, Pageable pageable);
+
+        // Get posts of a specified user by username and search by title or content and sort by recent date
+        @Query("SELECT p FROM Post p WHERE p.author.username = :username AND " +
+                        "(p.title LIKE %:query% OR " +
+                        "p.content LIKE %:query%) ORDER BY p.fullCreationDate DESC")
+        Page<Post> getPostsOfUserAndQueryOrderByCreationDate(@Param("username") String username, @Param("query") String query,
+                        Pageable pageable);
+
+        // Get posts of a specified user by username and search by title or content and sort by last modified date
+        @Query("SELECT p FROM Post p WHERE p.author.username = :username AND " +
+                        "(p.title LIKE %:query% OR " +
+                        "p.content LIKE %:query%) ORDER BY p.fullLastReplyDate DESC")
+        Page<Post> getPostsOfUserAndQueryOrderByLastModifiedDate(@Param("username") String username, @Param("query") String query,
+                        Pageable pageable);
+
+        // Get posts of a specified user by username and search by title or content and sort by number of likes
+        @Query("SELECT p FROM Post p WHERE p.author.username = :username AND " +
+                        "(p.title LIKE %:query% OR " +
+                        "p.content LIKE %:query%) ORDER BY p.upvotes DESC")
+        Page<Post> getPostsOfUserAndQueryOrderByLikes(@Param("username") String username, @Param("query") String query, Pageable pageable);
+
+        // Get posts of a specified user by username and search by title or content and sort by number of replies
+        @Query("SELECT p FROM Post p LEFT JOIN p.replyList r WHERE p.author.username = :username AND " +
+                        "(p.title LIKE %:query% OR " +
+                        "p.content LIKE %:query%) GROUP BY p ORDER BY COUNT(r) DESC")
+        Page<Post> getPostsOfUserAndQueryOrderByReplies(@Param("username") String username, @Param("query") String query, Pageable pageable);
+        
 }

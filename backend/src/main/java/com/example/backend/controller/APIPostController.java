@@ -162,6 +162,37 @@ public class APIPostController {
         }
     }
 
+    // Get posts by username
+    @Operation(summary = "Get posts by username")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+            }),
+            @ApiResponse(responseCode = "204", description = "Posts not found"),
+    })
+    @JsonView(PostInfo.class)
+    @GetMapping("/users/{username}/posts")
+    public ResponseEntity<List<Post>> getPostsByUsername(@PathVariable String username,
+            @RequestParam(required = false) String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "creationDate") String order) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (query == null || query.isEmpty()) {
+            Page<Post> posts = postService.getPostsOfUser(username, pageable, order);
+            if (posts.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
+        } else {
+            Page<Post> posts = postService.searchPostsOfUser(username, query, pageable, order);
+            if (posts.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
+        }
+    }
+
     // Create a post
     @Operation(summary = "Create a post")
     @ApiResponses(value = {
@@ -257,11 +288,13 @@ public class APIPostController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // is the user the author of the post, a community admin, moderator or a site admin?
+        // is the user the author of the post, a community admin, moderator or a site
+        // admin?
         User author = userService.getUserByUsername(principal.getName());
         if (!post.getAuthor().equals(author) && !communityService.isUserAdminOfCommunity(author.getUsername(),
                 post.getCommunity().getIdentifier())
-                && !communityService.isUserModeratorOfCommunity(author.getUsername(), post.getCommunity().getIdentifier())
+                && !communityService.isUserModeratorOfCommunity(author.getUsername(),
+                        post.getCommunity().getIdentifier())
                 && !userService.getUserByUsername(principal.getName()).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -505,11 +538,13 @@ public class APIPostController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // is the user the author of the post, a community admin, moderator or a site admin?
+        // is the user the author of the post, a community admin, moderator or a site
+        // admin?
         User author = userService.getUserByUsername(principal.getName());
         if (!post.getAuthor().equals(author) && !communityService.isUserAdminOfCommunity(author.getUsername(),
                 post.getCommunity().getIdentifier())
-                && !communityService.isUserModeratorOfCommunity(author.getUsername(), post.getCommunity().getIdentifier())
+                && !communityService.isUserModeratorOfCommunity(author.getUsername(),
+                        post.getCommunity().getIdentifier())
                 && !userService.getUserByUsername(principal.getName()).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
