@@ -117,6 +117,7 @@
               [(ngModel)]="communityDescription"
               (input)="checkContentLength(); adjustTextareaHeight($event)"
               (keydown)="preventExceedingContent($event)"
+              (click)="adjustTextareaHeight($event)"
             ></textarea>
           </div>
         </div>
@@ -314,6 +315,7 @@
             </button>
             <button
               class="btn primary-btn"
+              id="cancelButton"
               title="Cancelar"
               (click)="closeAlertModal()"
               *ngIf="showCancelButton"

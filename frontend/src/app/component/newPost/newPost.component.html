@@ -44,17 +44,17 @@
       <header
         class="bg-branding-white py-1 page-hero"
         [ngClass]="
-          hasBanner(post?.community?.identifier) ? 'header-image-adapted' : ''
+          hasBanner(community?.identifier) ? 'header-image-adapted' : ''
         "
         [ngStyle]="{
           'background-image':
-            'url(' + communityBannerURL(post?.community?.identifier) + ')'
+            'url(' + communityBannerURL(community?.identifier) + ')'
         }"
       >
         <div class="header-top-info">
           <a
             class="card-link"
-            [routerLink]="['/community', post?.community?.identifier]"
+            [routerLink]="['/community', community?.identifier]"
           >
             <div
               class="card-community-name-container branding-hyperlink-container"
@@ -62,22 +62,19 @@
               <p
                 class="lead fw-normal text-white-50 mb-0 branding-hyperlink-text"
               >
-                {{ post?.community?.name }}<br />
+                {{ community?.name }}<br />
               </p>
             </div>
           </a>
         </div>
         <div class="container px-4 px-lg-5 my-5">
           <div class="text-start text-dark">
-            <a
-              [routerLink]="['/profile', post?.author?.username]"
-              class="card-link"
-            >
+            <a [routerLink]="['/profile', loggedUsername]" class="card-link">
               <div class="post-author-container">
                 <div class="post-author-profile-picture">
                   <img
                     class="profile-picture bm-rounded-circle"
-                    [src]="profilePicture(post?.author?.username)"
+                    [src]="profilePicture(loggedUsername)"
                     alt="Foto de perfil del usuario publicante"
                   />
                 </div>
@@ -85,7 +82,7 @@
                   class="display-4 fw-bolder header-main-text landing-hero hero-hyperlink hero-username"
                 >
                   <p>
-                    {{ post?.author?.username }}
+                    {{ loggedUsername }}
                   </p>
                 </h1>
               </div>
@@ -103,15 +100,6 @@
             <!-- Post card -->
             <div class="post-container-card card mb-6 featured-post">
               <div class="post-container-card-top">
-                <div
-                  class="post-top-info d-flex justify-content-between align-items-center"
-                >
-                  <div class="card-content small text-muted mb-1">
-                    {{
-                      post?.fullCreationDate | date : "dd-MM-yyyy 'a las' HH:mm"
-                    }}
-                  </div>
-                </div>
                 <!-- Post title (textfield with placeholder)-->
                 <input
                   id="postTitle"
@@ -120,7 +108,6 @@
                   name="postTitle"
                   placeholder="Título del post"
                   [(ngModel)]="postTitle"
-                  [value]="post?.title"
                   (input)="checkContentLength()"
                   (keydown)="preventExceedingContent($event)"
                 />
@@ -189,7 +176,6 @@
                   [(ngModel)]="postContent"
                   (input)="adjustTextareaHeight($event); checkContentLength()"
                   (keydown)="preventExceedingContent($event)"
-                  [innerHTML]="post?.content"
                   data-placeholder="Contenido del post"
                   placeholder="Contenido del post"
                 ></div>
@@ -201,30 +187,20 @@
                 </div>
                 <div class="post-container-card-body-image-container">
                   <img
-                    *ngIf="selectedImageURL; else postImage"
+                    *ngIf="selectedImageURL"
                     [src]="selectedImageURL"
                     alt="Post"
                     class="post-container-card-body-image"
                     (click)="openModal()"
                     (keydown)="handleKeyDown($event)"
                   />
-                  <ng-template #postImage>
-                    <img
-                      *ngIf="post?.hasImage"
-                      [src]="postImageURL(post?.identifier)"
-                      alt="Post"
-                      class="post-container-card-body-image"
-                      (click)="openModal()"
-                      (keydown)="handleKeyDown($event)"
-                    />
-                  </ng-template>
                 </div>
                 <div class="image-actions">
                   <button
-                    *ngIf="post?.hasImage || selectedImageURL"
+                    *ngIf="this.selectedImageURL"
                     class="btn primary-btn"
                     title="Eliminar imagen"
-                    (click)="deletePostImage(post?.identifier)"
+                    (click)="deletePostImage()"
                   >
                     <i class="fas fa-trash-alt"></i> Eliminar imagen
                   </button>
@@ -241,20 +217,6 @@
                 <div class="image-actions-helper-text">
                   <p class="text-muted">
                     Máximo 5MB. Formatos: .jpg, .jpeg, .png
-                  </p>
-                </div>
-              </div>
-              <!-- Post action buttons row-->
-              <div
-                class="post-container-card-action-buttons-container d-flex justify-content-end"
-              >
-                <!-- Alert container -->
-                <div class="post-container-alert">
-                  <p>
-                    Última modificación:
-                    {{
-                      post?.fullLastEditDate | date : "dd-MM-yyyy 'a las' HH:mm"
-                    }}
                   </p>
                 </div>
               </div>
@@ -275,45 +237,26 @@
               <div class="card-body">
                 <div class="post-editor-action-buttons-container">
                   <p class="text-muted card-helper-text">
-                    ¿Quieres guardar los cambios y publicarlos?
+                    ¿Quieres publicar tu post?
                   </p>
                   <div class="post-editor-action-buttons">
                     <!-- Confirmar -->
                     <button
-                      *ngIf="
-                        post?.author?.username === loggedUsername || isAdmin
-                      "
+                      *ngIf="isMember || isAdmin"
                       class="btn primary-btn"
                       title="Confirmar"
-                      (click)="confirmEditPost(post?.identifier)"
+                      (click)="confirmEditPost()"
                     >
                       <i class="fas fa-check"></i> Confirmar
                     </button>
                     <!-- Cancelar -->
-                    <button
+                    <a
+                      [routerLink]="['/community', community?.identifier]"
                       class="btn primary-btn"
                       title="Cancelar"
-                      (click)="cancelEditPost()"
                     >
                       <i class="fas fa-times"></i> Cancelar
-                    </button>
-                  </div>
-                  <hr class="post-container-divider" />
-                  <p class="text-muted card-helper-text">
-                    ¿Quieres eliminar el post?
-                  </p>
-                  <div class="post-editor-action-buttons">
-                    <!-- Eliminar -->
-                    <button
-                      *ngIf="
-                        post?.author?.username === loggedUsername || isAdmin
-                      "
-                      class="btn primary-btn"
-                      title="Eliminar post"
-                      (click)="deletePost(post?.identifier)"
-                    >
-                      <i class="fas fa-trash-alt"></i> Eliminar
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -331,21 +274,17 @@
           </span>
         </div>
         <div class="custom-modal-body">
-          <img
-            [src]="
-              selectedImageURL
-                ? selectedImageURL
-                : postImageURL(post?.identifier)
-            "
-            alt="Post Image"
-            class="modal-image"
-          />
+          <img [src]="selectedImageURL" alt="Post" class="modal-image" />
         </div>
       </div>
     </div>
 
     <!-- Alert modal with confirmation and cancel buttons -->
-    <div id="alertModal" class="custom-modal" [ngClass]="{ 'show': showAlertModal }">
+    <div
+      id="alertModal"
+      class="custom-modal"
+      [ngClass]="{ show: showAlertModal }"
+    >
       <div class="custom-modal-content no-scroll">
         <div class="custom-modal-header">
           <span class="action-btn close" (click)="closeAlertModal()">

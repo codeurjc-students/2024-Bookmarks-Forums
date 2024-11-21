@@ -3087,6 +3087,7 @@ html {
 .community-description-input:focus{
   border: 1px solid var(--branding-peach) !important;
   background-color: rgba(255, 255, 255, 0) !important;
+  outline: none !important;
 }
 
 .community-description-input:hover{

@@ -374,13 +374,14 @@
                   >
                     <!-- If the user is logged in and is a member of the community-->
                     <ng-container *ngIf="isMember; else joinCommunityButton">
-                      <button
+                      <a
                         class="btn primary-btn"
-                        (click)="joinOrLeaveCommunity()"
+                        
+                        [routerLink]= "['/community', community?.identifier, 'new', 'post']"
                       >
                         <i class="fas fa-plus me-1"></i>
                         Nuevo Post
-                      </button>
+                    </a>
                       <button
                         class="btn negative-btn"
                         (click)="joinOrLeaveCommunity()"

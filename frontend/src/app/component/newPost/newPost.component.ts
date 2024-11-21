@@ -15,11 +15,11 @@ Chart.register(...registerables);
 
 @Component({
   selector: 'app-modifyPost',
-  templateUrl: './modifyPost.component.html',
-  styleUrls: ['./modifyPost.component.css', '../../../animations.css'],
+  templateUrl: './newPost.component.html',
+  styleUrls: ['./newPost.component.css', '../../../animations.css'],
   providers: [DatePipe],
 })
-export class ModifyPostComponent implements OnInit {
+export class NewPostComponent implements OnInit {
   showModal: boolean = false;
   showAlertModal: boolean = false;
   alertModalText: string = '';
@@ -39,7 +39,7 @@ export class ModifyPostComponent implements OnInit {
   loggedUsername: string = '';
   loggedIn: boolean = false;
   isAdmin: boolean = false;
-
+  isMember: boolean = false;
 
   public chart: any;
 
@@ -59,7 +59,6 @@ export class ModifyPostComponent implements OnInit {
   ngOnInit(): void {
     // Check if user is logged in
     this.checkIfLoggedIn();
-    this.loadPost();
 
     // Add event listeners for selection change and input events
     document.addEventListener(
@@ -79,36 +78,39 @@ export class ModifyPostComponent implements OnInit {
     this.user = user;
     this.loggedUsername = user.username;
     this.isAdmin = user.roles.includes('ADMIN');
+    this.loadCommunity();              
+
   }
 
-  loadCommunity() {
-    if (this.post) {
+  loadIsMember() {
+    if (this.community && this.user) {
       this.communityService
-        .getCommunityById(this.post.community.identifier)
+        .isUserMember(this.community.identifier, this.user.username)
         .subscribe({
-          next: (community) => {
-            this.community = community;
+          next: (isMember) => {
+            this.isMember = isMember;
           },
           error: (r) => {
-            console.error('Error getting community: ' + JSON.stringify(r));
+            console.error('Error getting isMember: ' + JSON.stringify(r));
           },
         });
     }
   }
 
-  loadPost() {
-    let postID = Number(this.route.snapshot.paramMap.get('identifier'));
-    this.postService.getPostById(postID).subscribe({
-      next: (post) => {
-        this.post = post;
-        this.postTitle = post.title;
-        this.postContent = post.content; // Set the postContent property
-        this.loadCommunity();
-      },
-      error: (r) => {
-        console.error('Error getting post: ' + JSON.stringify(r));
-      },
-    });
+  loadCommunity() {
+    let communityID = Number(this.route.snapshot.paramMap.get('identifier'));
+      this.communityService
+        .getCommunityById(communityID)
+        .subscribe({
+          next: (community) => {
+            this.community = community;
+            this.loadIsMember();
+          },
+          error: (r) => {
+            console.error('Error getting community: ' + JSON.stringify(r));
+          },
+        });
+    
   }
 
   doesPostHaveImage(postID: number) {
@@ -157,6 +159,8 @@ export class ModifyPostComponent implements OnInit {
           this.loggedUsername = ''; // set the logged username to empty
           this.user = undefined;
           this.isAdmin = false;
+          this.loadCommunity();
+
         }
       },
       error: (r) => {
@@ -166,6 +170,8 @@ export class ModifyPostComponent implements OnInit {
             'Error checking if user is logged in: ' + JSON.stringify(r)
           );
         }
+        this.loadCommunity();
+
       },
     });
   }
@@ -250,16 +256,6 @@ export class ModifyPostComponent implements OnInit {
     }
   }
 
-  openSingleAlertModal(text: string, action: () => void) {
-    this.alertModalText = text;
-    let cancelButton = document.getElementById('cancelButton');
-    if (cancelButton) {
-      cancelButton.style.display = 'none';
-    }
-    this.confirmAction = action;
-    this.showAlertModal = true;
-  }
-
   openAlertModal(text: string, action: () => void, showCancel: boolean) {
     this.alertModalText = text;
     this.confirmAction = action;
@@ -270,15 +266,15 @@ export class ModifyPostComponent implements OnInit {
   closeAlertModal() {
     this.showAlertModal = false;
   }
-
+  
   isContentEmpty(content: string): boolean {
     const strippedContent = content.replace(/<[^>]*>/g, '').trim();
     return strippedContent === '';
   }
 
-  confirmEditPost(postID: number | undefined): void {
-    if (!postID) {
-      console.error('Post ID is undefined');
+  confirmEditPost(): void {
+    if (!this.community) {
+      console.error('Community is undefined');
       return;
     }
     this.postTitle = (
@@ -296,7 +292,7 @@ export class ModifyPostComponent implements OnInit {
       }, false);
       return;
     }
-    console.log(this.postContent);
+
     if (!this.postTitle || this.postTitle.trim() === '') {
       // modal alert
       this.openAlertModal('El título del post no puede estar vacío.', () => {
@@ -341,13 +337,13 @@ export class ModifyPostComponent implements OnInit {
       }
     }
 
-    this.postService.editPost(postID, postDTO, 'edit').subscribe({
-      next: () => {
-        // Redirect to the post page
-        window.location.href = '/post/' + postID;
+    this.postService.createPost(this.community?.identifier, postDTO).subscribe({
+      next: (post) => {
+        //redirect to post page
+        window.location.href = '/post/' + post.identifier;
       },
       error: (r) => {
-        console.error('Error editing post: ' + JSON.stringify(r));
+        console.error('Error creating post: ' + JSON.stringify(r));
       },
     });
   }
@@ -373,34 +369,9 @@ export class ModifyPostComponent implements OnInit {
     window.scrollTo(0, scrollTop); // Restore the scroll position
   }
 
-  deletePostImage(postID: number | undefined): void {
-    if (!postID) {
-      console.error('Post ID is undefined');
-      return;
-    }
-    if (!this.post) {
-      console.error('Post is undefined');
-      return;
-    }
-    if (this.post.hasImage) {
-      this.openAlertModal(
-        '¿Seguro que quieres eliminar la imagen de este post? Esta acción no se puede deshacer.',
-        () => {
-          this.postService.deletePostImage(postID).subscribe({
-            next: (response: string) => {
-              if (this.post) {
-                this.post.hasImage = false; // Update the post object to reflect the image deletion
-                this.selectedImageURL = null; // Clear the selected image URL if it exists
-              }
-            },
-            error: (r) => {
-              console.error('Error deleting image: ' + JSON.stringify(r));
-            },
-          });
-        }, true
-      );
-    } else if (this.selectedImageURL) {
-      this.selectedImageURL = null
+  deletePostImage(): void {
+    if (this.selectedImageURL) {
+      this.selectedImageURL = null;
     }
   }
 
@@ -529,6 +500,9 @@ export class ModifyPostComponent implements OnInit {
     ) as HTMLInputElement;
 
     // Check and trim post content
+    if (!postContentElement) {
+      return;
+    }
     if (postContentElement.innerText.length > this.contentMaxLength) {
       postContentElement.innerText = postContentElement.innerText.substring(
         0,
@@ -537,6 +511,9 @@ export class ModifyPostComponent implements OnInit {
     }
 
     // Check and trim post title
+    if (!postTitleElement) {
+      return;
+    }
     if (postTitleElement.value.length > this.titleMaxLength) {
       postTitleElement.value = postTitleElement.value.substring(
         0,

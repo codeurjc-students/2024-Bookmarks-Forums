@@ -307,22 +307,8 @@ export class ModifyCommunityComponent implements OnInit {
     );
   }
 
-  adjustTextareaHeightInit() {
-    const textarea = document.getElementById('communityDescription') as HTMLTextAreaElement;
-    textarea.style.height = 'auto';
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }
-
   toggleCommunityDescription() {
     this.showDescription = !this.showDescription;
-    if (this.showDescription) {
-      setTimeout(() => {
-        const textarea = document.getElementById('communityDescription') as HTMLTextAreaElement;
-        if (textarea) {
-          this.adjustTextareaHeightInit();
-        }
-      }, 100);
-    }
   }
 
   editCommunity() {
@@ -461,38 +447,35 @@ export class ModifyCommunityComponent implements OnInit {
       ) as HTMLInputElement;
       if (input.files && input.files.length > 0) {
         const file = input.files[0];
-        this.communityService.updateCommunityBanner(
-          this.community.identifier,
-          file,
-          undefined
-        ).subscribe({
-          next: () => {
-            this.showDoneModal();
-          },
-          error: (r) => {
-            console.error(
-              'Error updating community banner: ' + JSON.stringify(r)
-            );
-          },
-        });
+        this.communityService
+          .updateCommunityBanner(this.community.identifier, file, undefined)
+          .subscribe({
+            next: () => {
+              this.showDoneModal();
+            },
+            error: (r) => {
+              console.error(
+                'Error updating community banner: ' + JSON.stringify(r)
+              );
+            },
+          });
       }
     } else {
       this.showDoneModal();
     }
   }
 
-  showDoneModal(){
+  showDoneModal() {
     this.openAlertModal(
       '¡Los cambios han sido guardados!',
       () => {
-        window.location.href =
-          '/community/' + this.community?.identifier;
+        window.location.href = '/community/' + this.community?.identifier;
       },
       false
     );
   }
 
-  manageBanner(){
+  manageBanner() {
     if (this.wantsToDeleteBanner) {
       if (!this.community) {
         return;
@@ -536,7 +519,6 @@ export class ModifyCommunityComponent implements OnInit {
         .subscribe({
           next: () => {
             this.manageBanner();
-            
           },
           error: (r) => {
             console.error('Error editing community: ' + JSON.stringify(r));

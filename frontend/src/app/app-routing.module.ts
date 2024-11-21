@@ -8,6 +8,7 @@ import { ModifyPostComponent } from './component/modifyPost/modifyPost.component
 import { CommunityComponent } from './component/community/community.component';
 import { ModifyCommunityComponent } from './component/modifyCommunity/modifyCommunity.component';
 import { NewCommunityComponent } from './component/newCommunity/newCommunity.component';
+import { NewPostComponent } from './component/newPost/newPost.component';
 
 const routes: Routes = [
   {
@@ -26,6 +27,7 @@ const routes: Routes = [
   { path: 'community/:identifier', component: CommunityComponent },
   { path: 'community/:identifier/edit', component: ModifyCommunityComponent },
   { path: 'new/community', component: NewCommunityComponent },
+  { path: 'community/:identifier/new/post', component: NewPostComponent },
 ];
 
 @NgModule({
