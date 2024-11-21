@@ -72,6 +72,8 @@ export class PostComponent implements OnInit {
   alertModalText: string = '';
   confirmAction: () => void = () => {};
 
+  isUserBanned: boolean = false;
+
   constructor(
     private http: HttpClient,
     public loginService: LoginService,
@@ -84,7 +86,6 @@ export class PostComponent implements OnInit {
   ngOnInit(): void {
     // Check if user is logged in
     this.checkIfLoggedIn();
-    this.loadPost();
   }
 
   loadUserData(user: User) {
@@ -239,6 +240,27 @@ export class PostComponent implements OnInit {
     this.loadingMoreReplies = false;
   }
 
+  loadUserBanStatus() {
+    if (this.user && this.community) {
+      this.communityService
+        .isUserBanned(this.community.identifier, this.user.username)
+        .subscribe({
+          next: (banID) => {
+            if (banID != -1) {
+              this.isUserBanned = true;
+            } else {
+              this.isUserBanned = false;
+            }
+          },
+          error: (r) => {
+            console.error(
+              'Error checking if user is banned: ' + JSON.stringify(r)
+            );
+          },
+        });
+    }
+  }
+
   loadCommunity() {
     if (this.post) {
       this.communityService
@@ -246,6 +268,7 @@ export class PostComponent implements OnInit {
         .subscribe({
           next: (community) => {
             this.community = community;
+            this.loadUserBanStatus();
           },
           error: (r) => {
             console.error('Error getting community: ' + JSON.stringify(r));
@@ -343,9 +366,11 @@ export class PostComponent implements OnInit {
             next: (user) => {
               this.userLoaded = true;
               this.loadUserData(user); // load the user data
+              this.loadPost();
             },
             error: (r) => {
               console.error('Error getting logged user: ' + JSON.stringify(r));
+              this.loadPost();
             },
           });
         } else {
@@ -353,6 +378,7 @@ export class PostComponent implements OnInit {
           this.loggedUsername = ''; // set the logged username to empty
           this.user = undefined;
           this.isAdmin = false;
+          this.loadPost();
         }
       },
       error: (r) => {
@@ -362,6 +388,7 @@ export class PostComponent implements OnInit {
             'Error checking if user is logged in: ' + JSON.stringify(r)
           );
         }
+        this.loadPost();
       },
     });
   }

@@ -147,6 +147,9 @@
                 <div class="post-container-alert" *ngIf="!loggedIn">
                   <p>Inicia sesión para poder votar.</p>
                 </div>
+                <div class="post-container-alert" *ngIf="isUserBanned">
+                  <p class="red-text">Estás baneado de esta comunidad. No puedes votar.</p>
+                </div>
                 <button
                   *ngIf="post?.author?.username === loggedUsername || isAdmin"
                   class="btn action-btn"
@@ -169,7 +172,7 @@
                   [ngClass]="{ 'active-icon-btn': upvoted }"
                   title="Me gusta"
                   (click)="upvotePost(post?.identifier)"
-                  [disabled]="!loggedIn"
+                  [disabled]="!loggedIn || isUserBanned"
                 >
                   <i class="far fa-thumbs-up" [ngClass]="{ fas: upvoted }"></i>
                 </button>
@@ -186,7 +189,7 @@
                   [ngClass]="{ 'active-icon-btn': downvoted }"
                   title="No me gusta"
                   (click)="downvotePost(post?.identifier)"
-                  [disabled]="!loggedIn"
+                  [disabled]="!loggedIn || isUserBanned"
                 >
                   <i
                     class="far fa-thumbs-down flip-horizontal"
@@ -412,7 +415,7 @@
                         }"
                         title="Me gusta"
                         (click)="upvoteReply(reply.identifier)"
-                        [disabled]="!loggedIn"
+                        [disabled]="!loggedIn || isUserBanned"
                       >
                         <i
                           class="far fa-thumbs-up"
@@ -443,7 +446,7 @@
                 <div class="post-container-divider-container no-margins">
                   <hr class="post-container-divider" />
                 </div>
-                <ng-container *ngIf="loggedIn; else notLoggedInRepliesText">
+                <ng-container *ngIf="loggedIn && !isUserBanned">
                   <div class="reply-input-container">
                     <input
                       type="text"
@@ -467,7 +470,7 @@
                     </button>
                   </div>
                 </ng-container>
-                <ng-template #notLoggedInRepliesText>
+                <ng-container *ngIf="!loggedIn">
                   <div class="reply-input-container">
                     <p class="card-content card-text wrap-text center-text">
                       Inicia sesión para poder responder a este post, votar los
@@ -481,7 +484,14 @@
                       >
                     </div>
                   </div>
-                </ng-template>
+                </ng-container>
+                <ng-container *ngIf="isUserBanned">
+                  <div class="reply-input-container">
+                    <p class="card-content card-text wrap-text center-text red-text">
+                      Estás baneado de esta comunidad. No puedes escribir ni interactuar con los comentarios.
+                    </p>
+                  </div>
+                </ng-container>
               </div>
             </div>
           </div>

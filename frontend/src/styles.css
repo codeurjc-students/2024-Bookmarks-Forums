@@ -2256,7 +2256,7 @@ html {
 }
 
 .post-container-alert p {
-  color: var(--branding-forums-lighter-grey) !important;
+  color: var(--branding-forums-lighter-grey);
   margin: 0 !important;
 }
 
