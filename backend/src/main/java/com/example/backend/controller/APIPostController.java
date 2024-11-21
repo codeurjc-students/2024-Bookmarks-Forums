@@ -433,9 +433,6 @@ public class APIPostController {
                     } catch (IOException e) {
                         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                     }
-                } else {
-                    post.setImage(null);
-                    post.setHasImage(false);
                 }
 
                 postService.updatePost(post);

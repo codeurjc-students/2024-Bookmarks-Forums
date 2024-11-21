@@ -42,6 +42,34 @@
     <div class="main-body-container">
       <!-- Page hero ---------------------------------------------------- -->
       <header class="bg-branding-white py-1 page-hero">
+        <div class="header-top-info">
+          <div
+            *ngIf="this.following || this.followed"
+            class="card-community-name-container"
+          >
+            <p
+              *ngIf="this.following || !this.followed"
+              class="lead fw-normal text-white-50 mb-0"
+            >
+              Sigues a este usuario
+              <br />
+            </p>
+            <p
+              *ngIf="!this.following || this.followed"
+              class="lead fw-normal text-white-50 mb-0"
+            >
+              Este usuario te sigue
+              <br />
+            </p>
+            <p
+              *ngIf="this.following && this.followed"
+              class="lead fw-normal text-white-50 mb-0"
+            >
+              Os seguís mutuamente
+              <br />
+            </p>
+          </div>
+        </div>
         <div class="container px-4 px-lg-5 my-5">
           <div class="text-start text-dark">
             <div class="post-author-container">
@@ -52,13 +80,20 @@
                   alt="Foto de perfil del usuario"
                 />
               </div>
-              <h1
-                class="display-4 fw-bolder header-main-text landing-hero hero-username"
-              >
-                <p>
-                  {{ profileUser?.username }}
-                </p>
-              </h1>
+              <div class="user-hero-username-alias">
+                <!-- User username -->
+                <h1
+                  class="display-4 fw-bolder header-main-text landing-hero hero-username"
+                >
+                  <p>
+                    {{ profileUser?.username }}
+                  </p>
+                </h1>
+                <!-- User alias -->
+                <h1 class="display-4 fw-bolder landing-hero alias-text">
+                  <p>({{ profileUser?.alias }})</p>
+                </h1>
+              </div>
             </div>
           </div>
         </div>
@@ -187,20 +222,27 @@
                     <div
                       class="card-top-info d-flex justify-content-between align-items-center"
                     >
+                      <div class="d-flex align-items-center">
+                        <img
+                          [src]="profilePicture(post.author.username)"
+                          alt="Profile"
+                          class="card-profile-picture me-2"
+                        />
+                        <p
+                          class="card-content card-text mb-0 card-user-username"
+                        >
+                          {{ post.author.username }}
+                        </p>
+                      </div>
                       <a
-                        [routerLink]="['/profile', post.author.username]"
                         class="card-link"
+                        [routerLink]="['/community', post.community.identifier]"
                       >
-                        <div class="d-flex align-items-center card-user-info">
-                          <img
-                            [src]="profilePicture(post.author.username)"
-                            alt="Profile"
-                            class="card-profile-picture me-2"
-                          />
+                        <div class="card-community-name-container">
                           <p
-                            class="card-content card-text mb-0 card-user-username"
+                            class="card-content card-text card-community-name-text mb-0"
                           >
-                            {{ post.author.username }}
+                            {{ post.community.name }}
                           </p>
                         </div>
                       </a>
@@ -264,6 +306,59 @@
 
           <!-- Profile Info + Actions column -->
           <div class="col-lg-4">
+            <!-- Follow / Unfollow widget -->
+            <div
+            *ngIf="loggedIn && loggedUsername !== profileUser?.username"
+            class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">
+                  Sigue a {{ profileUser?.username }}
+                </h5>
+              </div>
+              <div class="card-body">
+                <!-- Follow, unfollow -->
+                <div
+                  class="community-actions-container"
+                  *ngIf="loggedIn; else loginToFollow"
+                >
+                  <ng-container
+                    *ngIf="this.loggedUsername !== this.profileUser?.username"
+                  >
+                    <button
+                      *ngIf="!following"
+                      class="btn primary-btn"
+                      (click)="followUser()"
+                    >
+                      <i class="fas fa-user-plus me-1"></i>
+                      Seguir
+                    </button>
+                    <button
+                      *ngIf="following"
+                      class="btn negative-btn"
+                      (click)="unfollowUser()"
+                    >
+                      <i class="fas fa-user-minus me-1"></i>
+                      Dejar de seguir
+                    </button>
+                  </ng-container>
+                </div>
+                <!-- If the user is not logged in -->
+                <ng-template #loginToFollow>
+                  <div class="community-actions-container-text">
+                    <p class="card-content card-text wrap-text center-text">
+                      Inicia sesión para seguir a este usuario y más...
+                    </p>
+                    <!-- Login button -->
+                    <div class="d-grid gap-2">
+                      <a class="btn primary-btn" [routerLink]="['/login']">
+                        <i class="fas fa-sign-in-alt me-1"></i>
+                        Iniciar sesión</a
+                      >
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
             <!-- User Info widget -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
@@ -271,7 +366,10 @@
               </div>
               <div class="card-body">
                 <div class="community-info-container">
-                  <a class="community-info-item clickable" (click)="openFollowersModal()">
+                  <a
+                    class="community-info-item clickable"
+                    (click)="openUsersModal(1)"
+                  >
                     <div class="community-info-icon-title">
                       <i class="fas fa-user"></i>
                       <p class="community-info-text">Seguidores:</p>
@@ -282,7 +380,10 @@
                       </p>
                     </div>
                   </a>
-                  <a class="community-info-item clickable" (click)="openFollowingModal()">
+                  <a
+                    class="community-info-item clickable"
+                    (click)="openUsersModal(2)"
+                  >
                     <div class="community-info-icon-title">
                       <i class="fas fa-user"></i>
                       <p class="community-info-text">Siguiendo:</p>
@@ -304,68 +405,97 @@
                       </p>
                     </div>
                   </div>
+                  <div class="community-info-item">
+                    <div class="community-info-icon-title">
+                      <i class="fas fa-calendar"></i>
+                      <p class="community-info-text">Se unió:</p>
+                    </div>
+                    <div class="community-info-text-container">
+                      <p class="community-info-text-counter">
+                        {{
+                          this.profileUser?.fullCreationDate
+                            | date : "dd-MM-yyyy"
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                  <hr class="post-container-divider" />
+                  <div class="community-info-item-buttons-container">
+                    <button
+                      class="btn primary-dimmed-btn"
+                      (click)="openCommunitiesModal(false)"
+                    >
+                      <i class="fas fa-users me-1"></i>
+                      Comunidades
+                    </button>
+                    <button
+                      class="btn primary-dimmed-btn"
+                      (click)="openCommunitiesModal(true)"
+                    >
+                      <i class="fas fa-crown me-1"></i>
+                      Comunidades administradas
+                    </button>
+                  </div>
+                  <ng-container
+                    *ngIf="
+                      (loggedIn && loggedUsername === profileUser?.username) ||
+                      isAdmin
+                    "
+                  >
+                    <hr class="post-container-divider" />
+                    <div class="community-info-item-buttons-container">
+                      <ng-container
+                        *ngIf="
+                          (loggedIn &&
+                            loggedUsername === profileUser?.username) ||
+                          isAdmin
+                        "
+                      >
+                        <a
+                          class="btn primary-dimmed-btn"
+                          [routerLink]="[
+                            '/edit-profile',
+                            profileUser?.username
+                          ]"
+                        >
+                          <i class="fas fa-edit me-1"></i>
+                          Editar perfil
+                        </a>
+                      </ng-container>
+                      <ng-container *ngIf="isAdmin">
+                        <button
+                          class="btn red-btn"
+                          (click)="deleteUser()"
+                          title="Eliminar usuario"
+                        >
+                          <i class="fas fa-trash me-1"></i>
+                          Eliminar cuenta
+                        </button>
+                      </ng-container>
+                    </div>
+                  </ng-container>
                 </div>
               </div>
             </div>
             <!-- Community Actions widget -->
-            <div class="card dark-card mb-4">
+            <div
+              *ngIf="
+                (loggedIn && loggedUsername === profileUser?.username) ||
+                isAdmin
+              "
+              class="card dark-card mb-4"
+            >
               <div class="post-container-card-top">
-                <h5 class="card-title mb-0">Acciones sobre el usuario</h5>
+                <h5 class="card-title mb-0">Descripción del usario</h5>
               </div>
               <div class="card-body">
-                <!-- Follow, unfollow -->
-                <div
-                  class="community-actions-container"
-                  *ngIf="loggedIn; else loginToFollow"
-                >
-                  <button class="btn primary-btn" (click)="followUser()">
-                    <i class="fas fa-user-plus me-1"></i>
-                    Seguir
-                  </button>
-                  <button class="btn negative-btn" (click)="unfollowUser()">
-                    <i class="fas fa-user-minus me-1"></i>
-                    Dejar de seguir
-                  </button>
-                  <!-- If the user is logged in and is the user being viewed -->
-                  <ng-container
-                    *ngIf="loggedIn && loggedUsername === profileUser?.username"
-                  >
-                    <hr class="post-container-divider" />
-                    <a
-                      class="btn primary-dimmed-btn"
-                      [routerLink]="['/edit-profile', profileUser?.username]"
-                    >
-                      <i class="fas fa-edit me-1"></i>
-                      Editar perfil
-                    </a>
-                  </ng-container>
-                  <ng-container *ngIf="isAdmin">
-                    <hr class="post-container-divider" />
-                    <button
-                      class="btn red-btn"
-                      (click)="deleteUser()"
-                      title="Eliminar usuario"
-                    >
-                      <i class="fas fa-trash me-1"></i>
-                      Eliminar cuenta
-                    </button>
-                  </ng-container>
+                <!-- Description -->
+                <div class="user-description-container">
+                  <p
+                    class="card-content card-text wrap-text"
+                    [innerHTML]="profileUser?.description"
+                  ></p>
                 </div>
-                <!-- If the user is not logged in -->
-                <ng-template #loginToFollow>
-                  <div class="community-actions-container-text">
-                    <p class="card-content card-text wrap-text center-text">
-                      Inicia sesión para seguir a este usuario y más...
-                    </p>
-                    <!-- Login button -->
-                    <div class="d-grid gap-2">
-                      <a class="btn primary-btn" [routerLink]="['/login']">
-                        <i class="fas fa-sign-in-alt me-1"></i>
-                        Iniciar sesión</a
-                      >
-                    </div>
-                  </div>
-                </ng-template>
               </div>
             </div>
           </div>
@@ -407,6 +537,150 @@
             >
               <i class="fas fa-times"></i> Cancelar
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert modal with a list of users and an OK button -->
+    <div
+      id="usersModal"
+      class="custom-modal"
+      [ngClass]="{ show: showUsersModal }"
+    >
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header with-title">
+          <h5 class="modal-title">{{ this.usersModalTitle }}</h5>
+          <span
+            class="action-btn close"
+            (click)="closeUsersModal()"
+            (keypress)="closeUsersModal()"
+          >
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <div class="card dark-card banned-users-list">
+            <a
+              class="banned-member-card card-hyperlink"
+              *ngFor="let user of usersModalList"
+              [routerLink]="['/profile', user.username]"
+            >
+              <div class="ban-info-container">
+                <div class="banned-user-info">
+                  <div class="community-ban-info">
+                    <img
+                      [src]="profilePicture(user.username)"
+                      alt="Profile"
+                      class="community-member-profile-picture"
+                    />
+                    <p class="community-member-username">
+                      {{ user.username }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </a>
+            <!-- Load more users button -->
+            <div class="load-more-replies-container">
+              <button
+                class="btn primary-btn"
+                (click)="loadMoreUsers()"
+                *ngIf="!usersModalListNoMore; else noMoreUsersText"
+              >
+                Cargar más
+              </button>
+              <ng-template #noMoreUsersText>
+                <p
+                  class="card-content card-text wrap-text center-text text-muted"
+                >
+                  No hay más usuarios para mostrar
+                </p>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert modal with a list of communities and an OK button -->
+    <div
+      id="communitiesModal"
+      class="custom-modal"
+      [ngClass]="{ show: showCommunitiesModal }"
+    >
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header with-title">
+          <div class="modal-title-container">
+            <h5 class="modal-title">{{ this.communitiesModalTitle }}</h5>
+            <h5 class="modal-title dimmed-text">{{ this.communityCount }}</h5>
+          </div>
+
+          <span
+            class="action-btn close"
+            (click)="closeCommunitiesModal()"
+            (keypress)="closeCommunitiesModal()"
+          >
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <div class="card dark-card banned-users-list">
+            <div
+              class="community-card-frame card mb-1 featured-post"
+              *ngFor="let community of communities"
+            >
+              <a
+                [routerLink]="['/community', community.identifier]"
+                class="card-link community-card"
+                [ngClass]="{
+                  'card-body-with-image': community.hasBanner,
+                  'card-body': !community.hasBanner
+                }"
+                [ngStyle]="
+                  community.hasBanner
+                    ? {
+                        'background-image':
+                          'url(' +
+                          communityBannerURL(community.identifier) +
+                          ')'
+                      }
+                    : {}
+                "
+              >
+                <div
+                  class="community-card-body"
+                  [ngClass]="
+                    community.hasBanner ? 'card-body-image-adapted' : ''
+                  "
+                >
+                  <div class="card-big-community-name-container">
+                    <p
+                      class="card-content card-text single-line-card-text card-big-community-name"
+                    >
+                      {{ community.name }}
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <!-- Load more communities button -->
+            <div class="load-more-replies-container">
+              <button
+                class="btn primary-btn"
+                (click)="loadMoreCommunities()"
+                *ngIf="!communitiesModalListNoMore; else noMoreCommunitiesText"
+              >
+                Cargar más
+              </button>
+              <ng-template #noMoreCommunitiesText>
+                <p
+                  class="card-content card-text wrap-text center-text text-muted"
+                >
+                  No hay más comunidades para mostrar
+                </p>
+              </ng-template>
+            </div>
           </div>
         </div>
       </div>

@@ -201,7 +201,7 @@
                 </div>
                 <div class="post-container-card-body-image-container">
                   <img
-                    *ngIf="selectedImageURL; else postImage"
+                    *ngIf="selectedImageURL && !this.hasToDeleteImage; else postImage"
                     [src]="selectedImageURL"
                     alt="Post"
                     class="post-container-card-body-image"
@@ -210,7 +210,7 @@
                   />
                   <ng-template #postImage>
                     <img
-                      *ngIf="post?.hasImage"
+                      *ngIf="post?.hasImage && !this.hasToDeleteImage"
                       [src]="postImageURL(post?.identifier)"
                       alt="Post"
                       class="post-container-card-body-image"
@@ -221,7 +221,7 @@
                 </div>
                 <div class="image-actions">
                   <button
-                    *ngIf="post?.hasImage || selectedImageURL"
+                    *ngIf="(post?.hasImage || selectedImageURL) && !this.hasToDeleteImage"
                     class="btn primary-btn"
                     title="Eliminar imagen"
                     (click)="deletePostImage(post?.identifier)"

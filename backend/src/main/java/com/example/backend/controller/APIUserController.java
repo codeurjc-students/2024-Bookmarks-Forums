@@ -153,6 +153,30 @@ public class APIUserController {
         }
     }
 
+    // Is user following another user
+    @Operation(summary = "Check if user is following another user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User is following", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = boolean.class)),
+            }),
+            @ApiResponse(responseCode = "200", description = "User is not following", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = boolean.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+    })
+    @GetMapping("/users/{follower}/following/{following}")
+    public ResponseEntity<Boolean> isUserFollowing(@PathVariable String follower, @PathVariable String following) {
+        if (userService.getUserByUsername(follower) == null || userService.getUserByUsername(following) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        
+        if (userService.isUserFollowing(follower, following)){
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(false, HttpStatus.OK);
+        }
+    }
+
     // Get User Following list
     @JsonView(UserBasicView.class)
     @Operation(summary = "Get user's following list (pageable)")

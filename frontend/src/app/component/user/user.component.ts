@@ -22,6 +22,19 @@ Chart.register(...registerables);
 })
 export class UserComponent implements OnInit {
   showModal: boolean = false;
+  showUsersModal: boolean = false;
+  usersModalMode: number = 0; // 1 -> followers, 2 -> following
+  usersModalTitle: string = 'Siguiendo'; // Default title
+
+  showCommunitiesModal: boolean = false;
+  communitiesModalMode: boolean = false; // true -> administrated, false -> joined
+  communitiesModalTitle: string = 'Comunidades'; // Default title
+
+  usersModalList: User[] = [];
+  usersModalListPage: number = 0;
+  usersModalListSize: number = 10;
+  usersModalListNoMore: boolean = false;
+  usersModalListLoading: boolean = false;
 
   showAdvancedMenu: boolean = false;
 
@@ -34,6 +47,13 @@ export class UserComponent implements OnInit {
   posts: Post[] = [];
   postCount: number = 0;
 
+  communities: Community[] = [];
+  communityCount: number = 0;
+  communitiesPage: number = 0;
+  communitiesSize: number = 10;
+  communitiesModalListNoMore: boolean = false;
+  communitiesModalListLoading: boolean = false;
+
   title = 'Bookmarks';
   userLoaded = false;
 
@@ -41,6 +61,9 @@ export class UserComponent implements OnInit {
   loggedUsername: string = '';
   loggedIn: boolean = false;
   isAdmin: boolean = false;
+
+  following: boolean = false;
+  followed: boolean = false;
 
   public chart: any;
 
@@ -78,11 +101,90 @@ export class UserComponent implements OnInit {
           this.profileUser = user;
           this.loadPosts();
           this.getPostsCount();
+          this.checkFollowing();
         },
         error: (r) => {
           console.error('Error getting user: ' + JSON.stringify(r));
         },
       });
+    }
+  }
+
+  checkFollowing() {
+    if (!this.profileUser || !this.loggedIn) {
+      return;
+    }
+    this.profileService
+      .isUserFollowing(this.loggedUsername, this.profileUser.username)
+      .subscribe({
+        next: (following) => {
+          this.following = following;
+        },
+        error: (r) => {
+          console.error(
+            'Error checking if user is following: ' + JSON.stringify(r)
+          );
+        },
+      });
+    this.profileService
+      .isUserFollowing(this.profileUser.username, this.loggedUsername)
+      .subscribe({
+        next: (followed) => {
+          this.followed = followed;
+        },
+        error: (r) => {
+          console.error(
+            'Error checking if user is followed: ' + JSON.stringify(r)
+          );
+        },
+      });
+  }
+
+  loadCommunities(admin: boolean) {
+    if (this.profileUser) {
+      this.profileService
+        .getUserCommunities(
+          this.profileUser.username,
+          admin,
+          this.communitiesPage,
+          this.communitiesSize
+        )
+        .subscribe({
+          next: (communities) => {
+            if (!communities || communities.length == 0) {
+              this.communitiesModalListNoMore = true;
+              this.communitiesModalListLoading = false;
+              return;
+            }
+            this.communities = communities;
+            this.communityCount = communities.length;
+            this.communitiesPage += 1;
+            this.communitiesModalListNoMore =
+              communities.length < this.communitiesSize;
+          },
+          error: (r) => {
+            console.error(
+              'Error getting user communities: ' + JSON.stringify(r)
+            );
+          },
+        });
+    }
+  }
+
+  loadCommunitiesCount(admin: boolean) {
+    if (this.profileUser) {
+      this.profileService
+        .getUserCommunitiesCount(this.profileUser.username, admin)
+        .subscribe({
+          next: (count) => {
+            this.communityCount = count;
+          },
+          error: (r) => {
+            console.error(
+              'Error getting user communities count: ' + JSON.stringify(r)
+            );
+          },
+        });
     }
   }
 
@@ -205,6 +307,13 @@ export class UserComponent implements OnInit {
     return this.postService.getPostImageURL(postID);
   }
 
+  communityBannerURL(communityID: number | undefined): string {
+    if (!communityID) {
+      return '';
+    }
+    return this.communityService.getCommunityImageURL(communityID);
+  }
+
   // Get user profile picture
   profilePicture(username: string | undefined): string {
     if (!username) {
@@ -311,13 +420,176 @@ export class UserComponent implements OnInit {
     }
   }
 
-  openFollowersModal() {}
+  loadFollowing() {
+    if (this.profileUser) {
+      this.profileService
+        .getFollowing(
+          this.profileUser.username,
+          this.usersModalListPage,
+          this.usersModalListSize
+        )
+        .subscribe({
+          next: (users) => {
+            if (!users || users.length == 0) {
+              this.usersModalListNoMore = true;
+              this.usersModalListLoading = false;
+              return;
+            }
+            this.usersModalList = this.usersModalList.concat(users);
+            this.usersModalListLoading = false;
+            this.usersModalListPage += 1;
+            this.usersModalListNoMore = users.length < this.usersModalListSize;
+          },
+          error: (r) => {
+            console.error('Error getting following: ' + JSON.stringify(r));
+          },
+        });
+    }
+  }
 
-  openFollowingModal() {}
+  loadFollowers() {
+    if (this.profileUser) {
+      this.profileService
+        .getFollowers(
+          this.profileUser.username,
+          this.usersModalListPage,
+          this.usersModalListSize
+        )
+        .subscribe({
+          next: (users) => {
+            if (!users || users.length == 0) {
+              this.usersModalListNoMore = true;
+              this.usersModalListLoading = false;
+              return;
+            }
+            this.usersModalList = this.usersModalList.concat(users);
+            this.usersModalListLoading = false;
+            this.usersModalListPage += 1;
+            this.usersModalListNoMore = users.length < this.usersModalListSize;
+          },
+          error: (r) => {
+            console.error('Error getting followers: ' + JSON.stringify(r));
+          },
+        });
+    }
+  }
 
-  followUser() {}
+  loadUsersList(mode: number) {
+    if (mode == 1) {
+      this.usersModalTitle = 'Seguidores';
+      this.loadFollowers();
+    } else if (mode == 2) {
+      this.usersModalTitle = 'Siguiendo';
+      this.loadFollowing();
+    }
+  }
 
-  unfollowUser() {}
+  loadMoreUsers() {
+    this.usersModalListLoading = true;
+
+    if (this.usersModalMode == 1) {
+      this.loadFollowers();
+    } else if (this.usersModalMode == 2) {
+      this.loadFollowing();
+    }
+
+    this.usersModalListLoading = false;
+  }
+
+  openUsersModal(mode: number) {
+    if (!this.profileUser) {
+      return;
+    }
+
+    // mode = 1 -> followers, mode = 2 -> following
+    this.usersModalList = [];
+    this.usersModalListPage = 0;
+    this.usersModalListNoMore = false;
+    this.usersModalListLoading = false;
+    this.showUsersModal = true;
+    this.usersModalMode = mode;
+    this.loadUsersList(mode);
+  }
+
+  closeUsersModal() {
+    this.showUsersModal = false;
+  }
+
+  openCommunitiesModal(admin: boolean) {
+    if (!this.profileUser) {
+      return;
+    }
+
+    // mode = 1 -> administrated, mode = 2 -> joined
+    if (admin) {
+      this.communitiesModalTitle = 'Comunidades administradas:';
+    } else {
+      this.communitiesModalTitle = 'Comunidades a las que pertenece:';
+    }
+    this.communities = [];
+    this.communitiesPage = 0;
+    this.communitiesSize = 10;
+    this.showCommunitiesModal = true;
+    this.communitiesModalMode = admin;
+    this.loadCommunities(admin);
+    this.loadCommunitiesCount(admin);
+  }
+
+  closeCommunitiesModal() {
+    this.showCommunitiesModal = false;
+  }
+
+  loadMoreCommunities() {
+    this.communitiesModalListLoading = true;
+
+    if (this.communitiesModalMode) {
+      this.loadCommunities(true);
+    } else {
+      this.loadCommunities(false);
+    }
+
+    this.communitiesModalListLoading = false;
+  }
+
+  followUser() {
+    if (!this.profileUser) {
+      return;
+    }
+    this.profileService
+      .followUser(this.loggedUsername, this.profileUser.username)
+      .subscribe({
+        next: () => {
+          if (!this.profileUser) {
+            return;
+          }
+          this.profileUser.followers += 1;
+          this.following = true;
+        },
+        error: (r) => {
+          console.error('Error following user: ' + JSON.stringify(r));
+        },
+      });
+  }
+
+  unfollowUser() {
+    if (!this.profileUser) {
+      return;
+    }
+    this.profileService
+      .unfollowUser(this.loggedUsername, this.profileUser.username)
+      .subscribe({
+        next: () => {
+          if (!this.profileUser) {
+            return;
+          }
+          this.profileUser.followers -= 1;
+          this.following = false;
+        },
+        error: (r) => {
+          console.error('Error unfollowing user: ' + JSON.stringify(r));
+        },
+      });
+  }
 
   deleteUser() {
     if (!this.profileUser) {

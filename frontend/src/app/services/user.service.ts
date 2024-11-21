@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { User } from '../models/user.model';
+import { Community } from '../models/community.model';
 
 type UsersLikesCount = [string, number];
 
@@ -64,10 +65,10 @@ export class UserService {
     username: string,
     page: number,
     size: number
-  ): Observable<Map<string, Object>> {
+  ): Observable<User[]> {
     let params = new HttpParams().set('page', page).set('size', size);
     return this.http
-      .get<Map<string, Object>>(API_URL + '/' + username + '/followers', {
+      .get<User[]>(API_URL + '/' + username + '/followers', {
         params: params,
       })
       .pipe(catchError((error) => throwError(() => error)));
@@ -77,10 +78,10 @@ export class UserService {
     username: string,
     page: number,
     size: number
-  ): Observable<Map<string, Object>> {
+  ): Observable<User[]> {
     let params = new HttpParams().set('page', page).set('size', size);
     return this.http
-      .get<Map<string, Object>>(API_URL + '/' + username + '/following', {
+      .get<User[]>(API_URL + '/' + username + '/following', {
         params: params,
       })
       .pipe(catchError((error) => throwError(() => error)));
@@ -91,13 +92,13 @@ export class UserService {
     admin: boolean,
     page: number,
     size: number
-  ): Observable<Map<string, Object>> {
+  ): Observable<Community[]> {
     let params = new HttpParams()
       .set('page', page)
       .set('size', size)
       .set('admin', admin);
     return this.http
-      .get<Map<string, Object>>(API_URL + '/' + username + '/communities', {
+      .get<Community[]>(API_URL + '/' + username + '/communities', {
         params: params,
       })
       .pipe(catchError((error) => throwError(() => error)));
@@ -162,9 +163,9 @@ export class UserService {
       .pipe(catchError((error) => throwError(() => error)));
   }
 
-  deleteUser(username: string): Observable<any> {
+  deleteUser(username: string): Observable<string> {
     return this.http
-      .delete(API_URL + '/' + username)
+      .delete(API_URL + '/' + username, { responseType: 'text' })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -194,6 +195,12 @@ export class UserService {
     let params = new HttpParams().set('size', size);
     return this.http
       .get<UsersLikesCount[]>(API_URL + '/most-popular', { params: params })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  isUserFollowing(username: string, otherUsername: string): Observable<boolean> {
+    return this.http
+      .get<boolean>(API_URL + '/' + username + '/following/' + otherUsername)
       .pipe(catchError((error) => throwError(() => error)));
   }
 }

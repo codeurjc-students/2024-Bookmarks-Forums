@@ -31,6 +31,7 @@ export class ModifyPostComponent implements OnInit {
   postTitle: string = '';
   postContent: string = '';
   selectedImageURL: string | ArrayBuffer | null = null;
+  hasToDeleteImage: boolean = false;
 
   title = 'Bookmarks Forums - Edit post';
   userLoaded = false;
@@ -39,7 +40,6 @@ export class ModifyPostComponent implements OnInit {
   loggedUsername: string = '';
   loggedIn: boolean = false;
   isAdmin: boolean = false;
-
 
   public chart: any;
 
@@ -226,7 +226,8 @@ export class ModifyPostComponent implements OnInit {
             console.error('Error deleting post: ' + JSON.stringify(r));
           },
         });
-      }, true
+      },
+      true
     );
   }
 
@@ -291,17 +292,24 @@ export class ModifyPostComponent implements OnInit {
 
     if (this.isContentEmpty(this.postContent)) {
       // modal alert
-      this.openAlertModal('El contenido del post no puede estar vacío.', () => {
-        this.closeAlertModal();
-      }, false);
+      this.openAlertModal(
+        'El contenido del post no puede estar vacío.',
+        () => {
+          this.closeAlertModal();
+        },
+        false
+      );
       return;
     }
-    console.log(this.postContent);
     if (!this.postTitle || this.postTitle.trim() === '') {
       // modal alert
-      this.openAlertModal('El título del post no puede estar vacío.', () => {
-        this.closeAlertModal();
-      }, false);
+      this.openAlertModal(
+        'El título del post no puede estar vacío.',
+        () => {
+          this.closeAlertModal();
+        },
+        false
+      );
       return;
     }
 
@@ -330,26 +338,67 @@ export class ModifyPostComponent implements OnInit {
     postDTO.append('title', this.postTitle);
     postDTO.append('content', this.postContent);
 
-    // Upload the image if selected
-    if (this.selectedImageURL) {
-      const input = document.querySelector(
-        'input[type="file"]'
-      ) as HTMLInputElement;
-      if (input.files && input.files.length > 0) {
-        const file = input.files[0];
-        postDTO.append('image', file);
-      }
-    }
-
     this.postService.editPost(postID, postDTO, 'edit').subscribe({
       next: () => {
-        // Redirect to the post page
-        window.location.href = '/post/' + postID;
+        this.managePostImage();
       },
       error: (r) => {
         console.error('Error editing post: ' + JSON.stringify(r));
       },
     });
+  }
+
+  managePostImage() {
+    if (!this.post) {
+      console.error('Post is undefined');
+      return;
+    }
+    if (this.hasToDeleteImage) {
+      this.postService.deletePostImage(this.post.identifier).subscribe({
+        next: (response: string) => {
+          if (this.post) {
+            this.post.hasImage = false; // Update the post object to reflect the image deletion
+            this.selectedImageURL = null; // Clear the selected image URL if it exists
+            window.location.href = '/post/' + this.post.identifier;
+          }
+        },
+        error: (r) => {
+          console.error('Error deleting image: ' + JSON.stringify(r));
+        },
+      });
+    } else {
+      this.setPostImage();
+    }
+  }
+
+  setPostImage() {
+    if (!this.post) {
+      console.error('Post is undefined');
+      return;
+    }
+    if (this.selectedImageURL) {
+      console.log('Selected image URL: ' + this.selectedImageURL);
+      const input = document.querySelector(
+        'input[type="file"]'
+      ) as HTMLInputElement;
+      if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+        this.postService.updatePostImage(this.post.identifier, file).subscribe({
+          next: () => {
+            if(!this.post) {
+              return;
+            }
+            this.selectedImageURL = null; // Clear the selected image URL
+            window.location.href = '/post/' + this.post.identifier;
+          },
+          error: (r) => {
+            console.error('Error updating image: ' + JSON.stringify(r));
+          },
+        });
+      }
+    } else {
+      window.location.href = '/post/' + this.post.identifier;
+    }
   }
 
   cancelEditPost(): void {
@@ -386,21 +435,14 @@ export class ModifyPostComponent implements OnInit {
       this.openAlertModal(
         '¿Seguro que quieres eliminar la imagen de este post? Esta acción no se puede deshacer.',
         () => {
-          this.postService.deletePostImage(postID).subscribe({
-            next: (response: string) => {
-              if (this.post) {
-                this.post.hasImage = false; // Update the post object to reflect the image deletion
-                this.selectedImageURL = null; // Clear the selected image URL if it exists
-              }
-            },
-            error: (r) => {
-              console.error('Error deleting image: ' + JSON.stringify(r));
-            },
-          });
-        }, true
+          this.hasToDeleteImage = true;
+          this.selectedImageURL = null;
+          this.closeAlertModal();
+        },
+        true
       );
     } else if (this.selectedImageURL) {
-      this.selectedImageURL = null
+      this.selectedImageURL = null;
     }
   }
 
@@ -426,6 +468,7 @@ export class ModifyPostComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = () => {
         this.selectedImageURL = reader.result; // Set the selected image URL
+        this.hasToDeleteImage = false; 
       };
       reader.readAsDataURL(file);
     }
