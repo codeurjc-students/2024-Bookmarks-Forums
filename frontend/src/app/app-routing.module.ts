@@ -12,6 +12,7 @@ import { NewPostComponent } from './component/newPost/newPost.component';
 import { UserComponent } from './component/user/user.component';
 import { ModifyUserComponent } from './component/modifyUser/modifyUser.component';
 import { SearchComponent } from './component/search/search.component';
+import { ErrorComponent } from './component/error/error.component';
 
 const routes: Routes = [
   {
@@ -34,6 +35,7 @@ const routes: Routes = [
   { path: 'profile/:username', component: UserComponent },
   { path: 'profile/:username/edit', component: ModifyUserComponent },
   { path: 'search', component: SearchComponent },
+  { path: 'error', component: ErrorComponent },
 ];
 
 @NgModule({

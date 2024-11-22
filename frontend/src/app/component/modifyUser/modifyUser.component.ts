@@ -11,6 +11,7 @@ import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Ban } from '../../models/ban.model';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -63,7 +64,8 @@ export class ModifyUserComponent implements OnInit {
     public profileService: UserService,
     public postService: PostService,
     public communityService: CommunityService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -80,7 +82,13 @@ export class ModifyUserComponent implements OnInit {
           this.currentEmail = user.email;
         },
         error: (r) => {
-          console.error('Error getting user: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error cargando perfil',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
     }
@@ -107,7 +115,13 @@ export class ModifyUserComponent implements OnInit {
               this.loadUserData(user); // load the user data
             },
             error: (r) => {
-              console.error('Error getting logged user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error cargando usuario',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
             },
           });
         } else {
@@ -121,9 +135,13 @@ export class ModifyUserComponent implements OnInit {
       error: (r) => {
         // if error is 401, user is not logged in, do not print error
         if (r.status != 401) {
-          console.error(
-            'Error checking if user is logged in: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error cargando usuario',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         }
         this.loadProfile();
       },
@@ -205,7 +223,6 @@ export class ModifyUserComponent implements OnInit {
           return;
         }
         if (this.newEmail.length == 0) {
-          console.error('Email field is empty');
           this.alertModalText = 'El campo de email no puede estar vacío.';
           return;
         }
@@ -221,7 +238,13 @@ export class ModifyUserComponent implements OnInit {
               this.openConfirmationModal('E-mail cambiado con éxito.');
             },
             error: (r) => {
-              console.error('Error editing user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error cambiando e-mail',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
             },
           });
       },
@@ -275,7 +298,13 @@ export class ModifyUserComponent implements OnInit {
               this.openConfirmationModal('Contraseña cambiada con éxito.');
             },
             error: (r) => {
-              console.error('Error editing user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error cambiando contraseña',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
             },
           });
       },
@@ -315,9 +344,13 @@ export class ModifyUserComponent implements OnInit {
               window.location.href = '/profile/' + this.profileUser?.username;
             },
             error: (r) => {
-              console.error(
-                'Error uploading profile picture: ' + JSON.stringify(r)
-              );
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error subiendo imagen',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
             },
           });
       }
@@ -344,7 +377,13 @@ export class ModifyUserComponent implements OnInit {
           this.manageProfilePicture();
         },
         error: (r) => {
-          console.error('Error editing user: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error editando usuario',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
   }

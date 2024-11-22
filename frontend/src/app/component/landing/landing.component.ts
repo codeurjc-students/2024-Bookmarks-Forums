@@ -9,6 +9,7 @@ import { Post } from '../../models/post.model';
 import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -58,7 +59,8 @@ export class LandingComponent implements OnInit {
     public loginService: LoginService,
     public profileService: UserService,
     public postService: PostService,
-    public communityService: CommunityService
+    public communityService: CommunityService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -79,10 +81,13 @@ export class LandingComponent implements OnInit {
         this.communitiesMembersCount = communities;
       },
       error: (r) => {
-        console.error(
-          'Error getting most popular communities members count: ' +
-            JSON.stringify(r)
-        );
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error obteniendo comunidades populares',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
   }
@@ -101,7 +106,13 @@ export class LandingComponent implements OnInit {
         post = p;
       },
       error: (r) => {
-        console.error('Error getting post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error obteniendo post',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
 
@@ -111,7 +122,13 @@ export class LandingComponent implements OnInit {
           return true;
         },
         error: (r) => {
-          console.error('Error getting post image: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error obteniendo imagen del post',
+              description: r.error.message,
+              code: 500,
+            },
+          });
           return false;
         },
       });
@@ -143,9 +160,13 @@ export class LandingComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error getting recommended posts: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo posts recomendados',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     } else if (option === 'most-recent-communities' || option === 'default') {
@@ -172,9 +193,13 @@ export class LandingComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error getting recommended posts: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo posts recomendados',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     } else if (option === 'no-following' || option === 'most-liked-users') {
@@ -201,9 +226,13 @@ export class LandingComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error getting recommended posts: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo posts recomendados',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     } else if (
@@ -233,9 +262,13 @@ export class LandingComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error getting recommended posts: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo posts recomendados sin seguir a nadie',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     } else {
@@ -262,9 +295,13 @@ export class LandingComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error getting recommended posts: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo posts recomendados para el usuario',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -296,9 +333,13 @@ export class LandingComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error getting recommended posts: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo posts recomendados',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     } else if (option === 'most-recent-communities' || option === 'default') {
@@ -325,9 +366,13 @@ export class LandingComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error getting recommended posts: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo posts recomendados',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     } else {
@@ -354,9 +399,13 @@ export class LandingComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error getting recommended posts: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo posts recomendados',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -396,7 +445,13 @@ export class LandingComponent implements OnInit {
               this.loadLists();
             },
             error: (r) => {
-              console.error('Error getting logged user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error obteniendo usuario logueado',
+                  description: r.error.message,
+                  code: 500,
+                },
+              });
             },
           });
         } else {
@@ -410,9 +465,13 @@ export class LandingComponent implements OnInit {
       error: (r) => {
         // if error is 401, user is not logged in, do not print error
         if (r.status != 401) {
-          console.error(
-            'Error checking if user is logged in: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error obteniendo usuario logueado',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         }
       },
     });
@@ -432,7 +491,13 @@ export class LandingComponent implements OnInit {
           window.location.reload();
         },
         error: (r) => {
-          console.error('Login failed: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al iniciar sesión',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
   }
@@ -445,7 +510,13 @@ export class LandingComponent implements OnInit {
         window.location.reload();
       },
       error: (r) => {
-        console.error('Logout failed: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al cerrar sesión',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
   }
@@ -521,9 +592,13 @@ export class LandingComponent implements OnInit {
         this.loadingChart = false;
       },
       error: (r) => {
-        console.error(
-          'Error getting most popular users likes count: ' + JSON.stringify(r)
-        );
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error obteniendo usuarios populares',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
   }

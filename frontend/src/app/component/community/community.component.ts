@@ -11,6 +11,7 @@ import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Ban } from '../../models/ban.model';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -107,7 +108,8 @@ export class CommunityComponent implements OnInit {
     public profileService: UserService,
     public postService: PostService,
     public communityService: CommunityService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -128,7 +130,13 @@ export class CommunityComponent implements OnInit {
           this.admin = admin;
         },
         error: (r) => {
-          console.error('Error getting community admin: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error obteniendo administrador de la comunidad',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
     }
@@ -156,13 +164,23 @@ export class CommunityComponent implements OnInit {
             this.noMoreModerators = moderators.length < this.moderatorsSize;
           },
           error: (r) => {
-            console.error(
-              'Error getting community moderators: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo moderadores de la comunidad',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     } else {
-      // TODO: redirect to error page
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error obteniendo moderadores de la comunidad',
+          description: 'No se ha podido obtener la comunidad',
+          code: 500,
+        },
+      });
     }
   }
 
@@ -179,7 +197,13 @@ export class CommunityComponent implements OnInit {
           this.userBan = ban;
         },
         error: (r) => {
-          console.error('Error getting user ban: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error obteniendo información del ban',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
     }
@@ -199,9 +223,13 @@ export class CommunityComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error checking if user is banned: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo información del ban',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -221,7 +249,13 @@ export class CommunityComponent implements OnInit {
         this.loadPosts();
       },
       error: (r) => {
-        console.error('Error getting community: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error obteniendo comunidad',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
   }
@@ -248,13 +282,23 @@ export class CommunityComponent implements OnInit {
             this.noMorePosts = posts.length < this.size;
           },
           error: (r) => {
-            console.error(
-              'Error getting community posts: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo posts de la comunidad',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     } else {
-      // TODO: redirect to error page
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error obteniendo posts de la comunidad',
+          description: 'No se ha podido obtener la comunidad',
+          code: 500,
+        },
+      });
     }
   }
 
@@ -272,7 +316,13 @@ export class CommunityComponent implements OnInit {
         post = p;
       },
       error: (r) => {
-        console.error('Error getting post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error obteniendo post',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
 
@@ -282,7 +332,6 @@ export class CommunityComponent implements OnInit {
           return true;
         },
         error: (r) => {
-          console.error('Error getting post image: ' + JSON.stringify(r));
           return false;
         },
       });
@@ -298,9 +347,13 @@ export class CommunityComponent implements OnInit {
             this.isModerator = isModerator;
           },
           error: (r) => {
-            console.error(
-              'Error checking if user is moderator: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error comprobando si el usuario es moderador',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -323,9 +376,13 @@ export class CommunityComponent implements OnInit {
             if (r.status == 401) {
               this.isMember = false;
             } else {
-              console.error(
-                'Error checking if user is member: ' + JSON.stringify(r)
-              );
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error comprobando si el usuario es miembro',
+                  description: r.error.message,
+                  code: 500,
+                },
+              });
             }
             this.loadUserBan();
           },
@@ -364,9 +421,13 @@ export class CommunityComponent implements OnInit {
       error: (r) => {
         // if error is 401, user is not logged in, do not print error
         if (r.status != 401) {
-          console.error(
-            'Error checking if user is logged in: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error comprobando si el usuario está logueado',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         }
         this.loadCommunity();
       },
@@ -447,7 +508,13 @@ export class CommunityComponent implements OnInit {
           this.noMorePosts = posts.length < this.size;
         },
         error: (r) => {
-          console.error('Error searching posts: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error buscando posts',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
   }
@@ -536,13 +603,23 @@ export class CommunityComponent implements OnInit {
             this.noMoreMembers = members.length < this.size;
           },
           error: (r) => {
-            console.error(
-              'Error getting community members: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo miembros de la comunidad',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     } else {
-      // TODO: redirect to error page
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error obteniendo miembros de la comunidad',
+          description: 'No se ha podido obtener la comunidad',
+          code: 500,
+        },
+      });
     }
   }
 
@@ -561,9 +638,13 @@ export class CommunityComponent implements OnInit {
             this.communityMembersCount = count;
           },
           error: (r) => {
-            console.error(
-              'Error getting community members count: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo miembros de la comunidad',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -576,9 +657,13 @@ export class CommunityComponent implements OnInit {
           this.communityPostsCount = count;
         },
         error: (r) => {
-          console.error(
-            'Error getting community posts count: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error obteniendo posts de la comunidad',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
     }
@@ -608,7 +693,13 @@ export class CommunityComponent implements OnInit {
                   false
                 );
               } else {
-                console.error('Error leaving community: ' + JSON.stringify(r));
+                this.router.navigate(['/error'], {
+                  queryParams: {
+                    title: 'Error abandonando comunidad',
+                    description: r.error.message,
+                    code: 500,
+                  },
+                });
               }
             },
           });
@@ -621,7 +712,13 @@ export class CommunityComponent implements OnInit {
               this.reloadAllMembersList();
             },
             error: (r) => {
-              console.error('Error joining community: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error uniéndose a la comunidad',
+                  description: r.error.message,
+                  code: 500,
+                },
+              });
             },
           });
       }
@@ -706,7 +803,13 @@ export class CommunityComponent implements OnInit {
           this.reloadAllMembersList();
         },
         error: (r) => {
-          console.error('Error banning user: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error baneando usuario',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
   }
@@ -756,7 +859,13 @@ export class CommunityComponent implements OnInit {
             this.reloadAllMembersList();
           },
           error: (r) => {
-            console.error('Error setting admin: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error haciendo administrador',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -794,7 +903,13 @@ export class CommunityComponent implements OnInit {
             this.reloadAllMembersList();
           },
           error: (r) => {
-            console.error('Error adding moderator: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error añadiendo moderador',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -818,9 +933,13 @@ export class CommunityComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error checking if user is moderator: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error añadiendo moderador',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -840,7 +959,13 @@ export class CommunityComponent implements OnInit {
             this.reloadAllMembersList();
           },
           error: (r) => {
-            console.error('Error removing moderator: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error eliminando moderador',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -985,7 +1110,13 @@ export class CommunityComponent implements OnInit {
           this.noMoreMembers = members.length < this.membersSize;
         },
         error: (r) => {
-          console.error('Error searching members: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error buscando miembros',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
   }
@@ -1026,7 +1157,13 @@ export class CommunityComponent implements OnInit {
             this.loadingMoreBannedUsers = false;
           },
           error: (r) => {
-            console.error('Error getting banned users: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo usuarios baneados',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -1056,7 +1193,13 @@ export class CommunityComponent implements OnInit {
           this.showAlertModal = false;
         },
         error: (r) => {
-          console.error('Error unbanning user: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error desbaneando usuario',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
     }

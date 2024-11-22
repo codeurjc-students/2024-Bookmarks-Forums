@@ -494,6 +494,11 @@ public class APIUserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // Is the user the admin of any community?
+        if (userService.getNumberOfAdminCommunities(username) > 0) {
+            return new ResponseEntity<>("User is the admin of one or more communities", HttpStatus.UNAUTHORIZED);
+        }
+
         // Remove references to the user in other entities
         userService.removeUserReferences(user);
 

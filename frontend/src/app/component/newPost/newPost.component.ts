@@ -10,6 +10,7 @@ import { Post } from '../../models/post.model';
 import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -53,7 +54,8 @@ export class NewPostComponent implements OnInit {
     public profileService: UserService,
     public postService: PostService,
     public communityService: CommunityService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -91,7 +93,13 @@ export class NewPostComponent implements OnInit {
             this.isMember = isMember;
           },
           error: (r) => {
-            console.error('Error getting isMember: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al cargar la comunidad',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     }
@@ -107,35 +115,16 @@ export class NewPostComponent implements OnInit {
             this.loadIsMember();
           },
           error: (r) => {
-            console.error('Error getting community: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al cargar la comunidad',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     
-  }
-
-  doesPostHaveImage(postID: number) {
-    let post: Post | undefined;
-
-    this.postService.getPostById(postID).subscribe({
-      next: (p) => {
-        post = p;
-      },
-      error: (r) => {
-        console.error('Error getting post: ' + JSON.stringify(r));
-      },
-    });
-
-    if (post) {
-      this.postService.getPostImage(postID).subscribe({
-        next: () => {
-          return true;
-        },
-        error: (r) => {
-          console.error('Error getting post image: ' + JSON.stringify(r));
-          return false;
-        },
-      });
-    }
   }
 
   checkIfLoggedIn() {
@@ -151,7 +140,13 @@ export class NewPostComponent implements OnInit {
               this.loadUserData(user); // load the user data
             },
             error: (r) => {
-              console.error('Error getting logged user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error al cargar el usuario',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
             },
           });
         } else {
@@ -166,9 +161,13 @@ export class NewPostComponent implements OnInit {
       error: (r) => {
         // if error is 401, user is not logged in, do not print error
         if (r.status != 401) {
-          console.error(
-            'Error checking if user is logged in: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al cargar el usuario',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         }
         this.loadCommunity();
 
@@ -212,7 +211,13 @@ export class NewPostComponent implements OnInit {
 
   deletePost(postId: number | undefined): void {
     if (!postId) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error al eliminar el post',
+          description: 'No se ha encontrado el post a eliminar.',
+          code: 404,
+        },
+      });
       return;
     }
     this.openAlertModal(
@@ -229,7 +234,13 @@ export class NewPostComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error('Error deleting post: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al eliminar el post',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
       }, true
@@ -274,7 +285,13 @@ export class NewPostComponent implements OnInit {
 
   confirmEditPost(): void {
     if (!this.community) {
-      console.error('Community is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error al editar el post',
+          description: 'No se ha encontrado la comunidad a la que pertenece el post.',
+          code: 404,
+        },
+      });
       return;
     }
     this.postTitle = (
@@ -343,7 +360,13 @@ export class NewPostComponent implements OnInit {
         window.location.href = '/post/' + post.identifier;
       },
       error: (r) => {
-        console.error('Error creating post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al crear el post',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }
@@ -377,7 +400,13 @@ export class NewPostComponent implements OnInit {
 
   uploadPostImage(postID: number | undefined, file: File): void {
     if (!postID) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error al subir la imagen',
+          description: 'No se ha encontrado el post al que pertenece la imagen.',
+          code: 404,
+        },
+      });
       return;
     }
     this.postService.updatePostImage(postID, file).subscribe({
@@ -385,7 +414,13 @@ export class NewPostComponent implements OnInit {
         this.post = post;
       },
       error: (r) => {
-        console.error('Error uploading image: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al subir la imagen',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }

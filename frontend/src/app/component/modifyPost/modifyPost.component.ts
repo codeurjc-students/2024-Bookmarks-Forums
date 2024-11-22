@@ -10,6 +10,7 @@ import { Post } from '../../models/post.model';
 import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -53,7 +54,8 @@ export class ModifyPostComponent implements OnInit {
     public profileService: UserService,
     public postService: PostService,
     public communityService: CommunityService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -90,7 +92,13 @@ export class ModifyPostComponent implements OnInit {
             this.community = community;
           },
           error: (r) => {
-            console.error('Error getting community: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error cargando la comunidad',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -106,7 +114,13 @@ export class ModifyPostComponent implements OnInit {
         this.loadCommunity();
       },
       error: (r) => {
-        console.error('Error getting post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error cargando el post',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
   }
@@ -119,7 +133,13 @@ export class ModifyPostComponent implements OnInit {
         post = p;
       },
       error: (r) => {
-        console.error('Error getting post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error cargando el post',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
 
@@ -129,7 +149,13 @@ export class ModifyPostComponent implements OnInit {
           return true;
         },
         error: (r) => {
-          console.error('Error getting post image: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error cargando la imagen del post',
+              description: r.error.message,
+              code: 500,
+            },
+          });
           return false;
         },
       });
@@ -149,22 +175,36 @@ export class ModifyPostComponent implements OnInit {
               this.loadUserData(user); // load the user data
             },
             error: (r) => {
-              console.error('Error getting logged user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error cargando el usuario',
+                  description: r.error.message,
+                  code: 500,
+                },
+              });
             },
           });
         } else {
-          // if user is not logged in
-          this.loggedUsername = ''; // set the logged username to empty
-          this.user = undefined;
-          this.isAdmin = false;
+          // if user is not logged in redirect to error page
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error cargando la sesión',
+              description: 'No se ha podido cargar la sesión del usuario.',
+              code: 500,
+            },
+          });
         }
       },
       error: (r) => {
         // if error is 401, user is not logged in, do not print error
         if (r.status != 401) {
-          console.error(
-            'Error checking if user is logged in: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error cargando la sesión',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         }
       },
     });
@@ -206,7 +246,14 @@ export class ModifyPostComponent implements OnInit {
 
   deletePost(postId: number | undefined): void {
     if (!postId) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error eliminando el post',
+          description:
+            'No se ha podido eliminar el post porque no se ha encontrado el identificador del post.',
+          code: 500,
+        },
+      });
       return;
     }
     this.openAlertModal(
@@ -223,7 +270,13 @@ export class ModifyPostComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error('Error deleting post: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error eliminando el post',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
       },
@@ -279,7 +332,14 @@ export class ModifyPostComponent implements OnInit {
 
   confirmEditPost(postID: number | undefined): void {
     if (!postID) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error editando el post',
+          description:
+            'No se ha podido editar el post porque no se ha encontrado el identificador del post.',
+          code: 500,
+        },
+      });
       return;
     }
     this.postTitle = (
@@ -343,14 +403,27 @@ export class ModifyPostComponent implements OnInit {
         this.managePostImage();
       },
       error: (r) => {
-        console.error('Error editing post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error editando el post',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
   }
 
   managePostImage() {
     if (!this.post) {
-      console.error('Post is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error editando la imagen del post',
+          description:
+            'No se ha podido editar la imagen del post porque no se ha encontrado el identificador del post.',
+          code: 500,
+        },
+      });
       return;
     }
     if (this.hasToDeleteImage) {
@@ -363,7 +436,13 @@ export class ModifyPostComponent implements OnInit {
           }
         },
         error: (r) => {
-          console.error('Error deleting image: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error eliminando la imagen del post',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
     } else {
@@ -373,7 +452,14 @@ export class ModifyPostComponent implements OnInit {
 
   setPostImage() {
     if (!this.post) {
-      console.error('Post is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error editando la imagen del post',
+          description:
+            'No se ha podido editar la imagen del post porque no se ha encontrado el identificador del post.',
+          code: 500,
+        },
+      });
       return;
     }
     if (this.selectedImageURL) {
@@ -391,7 +477,13 @@ export class ModifyPostComponent implements OnInit {
             window.location.href = '/post/' + this.post.identifier;
           },
           error: (r) => {
-            console.error('Error updating image: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error editando la imagen del post',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
       }
@@ -423,11 +515,25 @@ export class ModifyPostComponent implements OnInit {
 
   deletePostImage(postID: number | undefined): void {
     if (!postID) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error eliminando la imagen del post',
+          description:
+            'No se ha podido eliminar la imagen del post porque no se ha encontrado el identificador del post.',
+          code: 500,
+        },
+      });
       return;
     }
     if (!this.post) {
-      console.error('Post is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error eliminando la imagen del post',
+          description:
+            'No se ha podido eliminar la imagen del post porque no se ha encontrado el post.',
+          code: 500,
+        },
+      });
       return;
     }
     if (this.post.hasImage) {
@@ -440,7 +546,14 @@ export class ModifyPostComponent implements OnInit {
 
   uploadPostImage(postID: number | undefined, file: File): void {
     if (!postID) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error subiendo la imagen del post',
+          description:
+            'No se ha podido subir la imagen del post porque no se ha encontrado el identificador del post.',
+          code: 500,
+        },
+      });
       return;
     }
     this.postService.updatePostImage(postID, file).subscribe({
@@ -448,7 +561,13 @@ export class ModifyPostComponent implements OnInit {
         this.post = post;
       },
       error: (r) => {
-        console.error('Error uploading image: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error subiendo la imagen del post',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
   }

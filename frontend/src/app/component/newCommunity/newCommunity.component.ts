@@ -10,6 +10,7 @@ import { Post } from '../../models/post.model';
 import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -58,7 +59,8 @@ export class NewCommunityComponent implements OnInit {
     public profileService: UserService,
     public postService: PostService,
     public communityService: CommunityService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -85,22 +87,36 @@ export class NewCommunityComponent implements OnInit {
               this.loadUserData(user); // load the user data
             },
             error: (r) => {
-              console.error('Error getting logged user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error al cargar el usuario',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
             },
           });
         } else {
           // if user is not logged in
-          this.loggedUsername = ''; // set the logged username to empty
-          this.user = undefined;
-          this.isAdmin = false;
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al cargar el usuario',
+              description: 'Debes iniciar sesión para crear una comunidad.',
+              code: 401,
+            },
+          });
         }
       },
       error: (r) => {
         // if error is 401, user is not logged in, do not print error
         if (r.status != 401) {
-          console.error(
-            'Error checking if user is logged in: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al comprobar la sesión',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         }
       },
     });
@@ -272,9 +288,13 @@ export class NewCommunityComponent implements OnInit {
               this.showDoneModal();
             },
             error: (r) => {
-              console.error(
-                'Error updating community banner: ' + JSON.stringify(r)
-              );
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error al subir la imagen',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
             },
           });
       }
@@ -305,9 +325,13 @@ export class NewCommunityComponent implements OnInit {
             this.showDoneModal();
           },
           error: (r) => {
-            console.error(
-              'Error deleting community banner: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al borrar la imagen',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     } else {
@@ -345,7 +369,13 @@ export class NewCommunityComponent implements OnInit {
             false
           );
         } else {
-          console.error('Error creating community: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al crear la comunidad',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         }
       },
     });

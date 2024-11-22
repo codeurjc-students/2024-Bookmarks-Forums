@@ -11,6 +11,7 @@ import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Ban } from '../../models/ban.model';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -85,7 +86,8 @@ export class UserComponent implements OnInit {
     public profileService: UserService,
     public postService: PostService,
     public communityService: CommunityService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -104,7 +106,13 @@ export class UserComponent implements OnInit {
           this.checkFollowing();
         },
         error: (r) => {
-          console.error('Error getting user: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Usuario no encontrado',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
     }
@@ -121,9 +129,13 @@ export class UserComponent implements OnInit {
           this.following = following;
         },
         error: (r) => {
-          console.error(
-            'Error checking if user is following: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al comprobar si sigues al usuario',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
     this.profileService
@@ -133,9 +145,13 @@ export class UserComponent implements OnInit {
           this.followed = followed;
         },
         error: (r) => {
-          console.error(
-            'Error checking if user is followed: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al comprobar si el usuario te sigue',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
   }
@@ -163,9 +179,13 @@ export class UserComponent implements OnInit {
               communities.length < this.communitiesSize;
           },
           error: (r) => {
-            console.error(
-              'Error getting user communities: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al obtener las comunidades del usuario',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     }
@@ -180,9 +200,13 @@ export class UserComponent implements OnInit {
             this.communityCount = count;
           },
           error: (r) => {
-            console.error(
-              'Error getting user communities count: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al obtener el número de comunidades del usuario',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     }
@@ -219,13 +243,23 @@ export class UserComponent implements OnInit {
             this.noMorePosts = posts.length < this.size;
           },
           error: (r) => {
-            console.error(
-              'Error getting community posts: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al obtener los posts del usuario',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     } else {
-      // TODO: redirect to error page
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Usuario no encontrado',
+          description: 'No se ha encontrado el usuario',
+          code: 404,
+        },
+      });
     }
   }
 
@@ -243,7 +277,13 @@ export class UserComponent implements OnInit {
         post = p;
       },
       error: (r) => {
-        console.error('Error getting post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al obtener el post',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
 
@@ -253,7 +293,13 @@ export class UserComponent implements OnInit {
           return true;
         },
         error: (r) => {
-          console.error('Error getting post image: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al obtener la imagen del post',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
           return false;
         },
       });
@@ -273,7 +319,13 @@ export class UserComponent implements OnInit {
               this.loadUserData(user); // load the user data
             },
             error: (r) => {
-              console.error('Error getting logged user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error al obtener el usuario logueado',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
             },
           });
         } else {
@@ -287,9 +339,13 @@ export class UserComponent implements OnInit {
       error: (r) => {
         // if error is 401, user is not logged in, do not print error
         if (r.status != 401) {
-          console.error(
-            'Error checking if user is logged in: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al comprobar si estás logueado',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         }
         this.loadProfile();
       },
@@ -412,9 +468,13 @@ export class UserComponent implements OnInit {
           this.postCount = count;
         },
         error: (r) => {
-          console.error(
-            'Error getting community posts count: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al obtener el número de posts del usuario',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
     }
@@ -441,7 +501,13 @@ export class UserComponent implements OnInit {
             this.usersModalListNoMore = users.length < this.usersModalListSize;
           },
           error: (r) => {
-            console.error('Error getting following: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al obtener los usuarios seguidos',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     }
@@ -468,7 +534,13 @@ export class UserComponent implements OnInit {
             this.usersModalListNoMore = users.length < this.usersModalListSize;
           },
           error: (r) => {
-            console.error('Error getting followers: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al obtener los seguidores',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     }
@@ -566,7 +638,13 @@ export class UserComponent implements OnInit {
           this.following = true;
         },
         error: (r) => {
-          console.error('Error following user: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al seguir al usuario',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
   }
@@ -586,7 +664,13 @@ export class UserComponent implements OnInit {
           this.following = false;
         },
         error: (r) => {
-          console.error('Error unfollowing user: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al dejar de seguir al usuario',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
   }
@@ -620,7 +704,13 @@ export class UserComponent implements OnInit {
               );
               return;
             } else {
-              console.error('Error deleting user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error al eliminar la cuenta',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
             }
           },
         });

@@ -750,10 +750,7 @@ public class APIPostController {
 
         // is the user a member of the community?
         User author = userService.getUserByUsername(principal.getName());
-        if (!post.getCommunity().getMembers().contains(author)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
+        
         // is the user banned from the community?
         if (communityService.isUserBannedFromCommunity(author.getUsername(), post.getCommunity().getIdentifier())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

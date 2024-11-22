@@ -11,6 +11,7 @@ import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Reply } from '../../models/reply.model';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -80,7 +81,8 @@ export class PostComponent implements OnInit {
     public profileService: UserService,
     public postService: PostService,
     public communityService: CommunityService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -153,8 +155,13 @@ export class PostComponent implements OnInit {
     };
 
     if (!postId) {
-      //TODO: redirect to error page
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error al crear respuesta',
+          description: 'No se ha encontrado el post al que responder.',
+          code: 404,
+        },
+      });
       return;
     }
 
@@ -174,7 +181,13 @@ export class PostComponent implements OnInit {
         }
       },
       error: (r) => {
-        console.error('Error creating reply: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al crear respuesta',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }
@@ -191,9 +204,13 @@ export class PostComponent implements OnInit {
             this.likedReplyList.set(reply.identifier, liked);
           },
           error: (r) => {
-            console.error(
-              'Error checking if user liked reply: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al cargar respuestas',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     });
@@ -225,12 +242,23 @@ export class PostComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error('Error getting replies: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al cargar respuestas',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     } else {
-      // TODO: redirect to error page
-      console.error('Post is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error al cargar respuestas',
+          description: 'No se ha encontrado el post al que responder.',
+          code: 404,
+        },
+      });
     }
   }
 
@@ -253,9 +281,13 @@ export class PostComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error(
-              'Error checking if user is banned: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al cargar estado de baneo',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     }
@@ -271,7 +303,13 @@ export class PostComponent implements OnInit {
             this.loadUserBanStatus();
           },
           error: (r) => {
-            console.error('Error getting community: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al cargar comunidad',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     }
@@ -286,9 +324,13 @@ export class PostComponent implements OnInit {
             this.upvoted = voted;
           },
           error: (r) => {
-            console.error(
-              'Error checking if user upvoted post: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al cargar votos de post',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
 
@@ -299,9 +341,13 @@ export class PostComponent implements OnInit {
             this.downvoted = voted;
           },
           error: (r) => {
-            console.error(
-              'Error checking if user downvoted post: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al cargar votos de post',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
     }
@@ -325,7 +371,13 @@ export class PostComponent implements OnInit {
         this.loadPostVotes();
       },
       error: (r) => {
-        console.error('Error getting post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al cargar post',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }
@@ -338,7 +390,13 @@ export class PostComponent implements OnInit {
         post = p;
       },
       error: (r) => {
-        console.error('Error getting post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al cargar post',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
 
@@ -348,7 +406,13 @@ export class PostComponent implements OnInit {
           return true;
         },
         error: (r) => {
-          console.error('Error getting post image: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al cargar imagen de post',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
           return false;
         },
       });
@@ -369,7 +433,13 @@ export class PostComponent implements OnInit {
               this.loadPost();
             },
             error: (r) => {
-              console.error('Error getting logged user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error al cargar usuario',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
               this.loadPost();
             },
           });
@@ -384,9 +454,13 @@ export class PostComponent implements OnInit {
       error: (r) => {
         // if error is 401, user is not logged in, do not print error
         if (r.status != 401) {
-          console.error(
-            'Error checking if user is logged in: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al comprobar si está logueado',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         }
         this.loadPost();
       },
@@ -437,7 +511,13 @@ export class PostComponent implements OnInit {
         this.postReplies -= 1;
       },
       error: (r) => {
-        console.error('Error deleting reply: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al eliminar respuesta',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }
@@ -454,7 +534,13 @@ export class PostComponent implements OnInit {
 
   deletePost(postId: number | undefined): void {
     if (!postId) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error al eliminar post',
+          description: 'No se ha encontrado el post a eliminar.',
+          code: 404,
+        },
+      });
       return;
     }
     this.openAlertModal(
@@ -471,7 +557,13 @@ export class PostComponent implements OnInit {
             }
           },
           error: (r) => {
-            console.error('Error deleting post: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al eliminar post',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
           },
         });
       }
@@ -480,7 +572,13 @@ export class PostComponent implements OnInit {
 
   editPost(postId: number | undefined): void {
     if (!postId) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error al editar post',
+          description: 'No se ha encontrado el post a editar.',
+          code: 404,
+        },
+      });
       return;
     }
     // Redirects to post/:identifier/edit
@@ -489,7 +587,13 @@ export class PostComponent implements OnInit {
 
   downvotePost(postId: number | undefined): void {
     if (!postId) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error al votar post',
+          description: 'No se ha encontrado el post a votar.',
+          code: 404,
+        },
+      });
       return;
     }
     this.postService.editPost(postId, new FormData(), 'downvote').subscribe({
@@ -511,14 +615,26 @@ export class PostComponent implements OnInit {
         }
       },
       error: (r) => {
-        console.error('Error downvoting post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al votar post',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }
 
   upvotePost(postId: number | undefined): void {
     if (!postId) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error al votar post',
+          description: 'No se ha encontrado el post a votar.',
+          code: 404,
+        },
+      });
       return;
     }
     this.postService.editPost(postId, new FormData(), 'upvote').subscribe({
@@ -540,7 +656,13 @@ export class PostComponent implements OnInit {
         }
       },
       error: (r) => {
-        console.error('Error upvoting post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al votar post',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }
@@ -569,7 +691,13 @@ export class PostComponent implements OnInit {
         });
       },
       error: (r) => {
-        console.error('Error upvoting reply: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al votar respuesta',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }
@@ -584,7 +712,13 @@ export class PostComponent implements OnInit {
 
   searchReplies(postId: number | undefined) {
     if (!postId) {
-      console.error('Post ID is undefined');
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error al buscar respuestas',
+          description: 'No se ha encontrado el post al que responder.',
+          code: 404,
+        },
+      });
       return;
     }
     if (this.post) {

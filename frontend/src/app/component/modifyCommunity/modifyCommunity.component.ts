@@ -10,6 +10,7 @@ import { Post } from '../../models/post.model';
 import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -73,7 +74,8 @@ export class ModifyCommunityComponent implements OnInit {
     public profileService: UserService,
     public postService: PostService,
     public communityService: CommunityService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -95,7 +97,13 @@ export class ModifyCommunityComponent implements OnInit {
           this.admin = admin;
         },
         error: (r) => {
-          console.error('Error getting community admin: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error obteniendo administrador de la comunidad',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
     }
@@ -105,7 +113,7 @@ export class ModifyCommunityComponent implements OnInit {
     let communityID = Number(this.route.snapshot.paramMap.get('identifier'));
     this.communityService.getCommunityById(communityID).subscribe({
       next: (community) => {
-        this.community = community;
+        this.community = community;        
         this.communityName = community.name;
         this.communityDescription = community.description;
         this.isUserMember();
@@ -114,7 +122,13 @@ export class ModifyCommunityComponent implements OnInit {
         this.getPostsCount();
       },
       error: (r) => {
-        console.error('Error getting community: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error obteniendo comunidad',
+            description: r.error.message,
+            code: 500,
+          },
+        });
       },
     });
   }
@@ -128,9 +142,13 @@ export class ModifyCommunityComponent implements OnInit {
             this.isModerator = isModerator;
           },
           error: (r) => {
-            console.error(
-              'Error checking if user is moderator: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error comprobando si el usuario es moderador',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -152,9 +170,13 @@ export class ModifyCommunityComponent implements OnInit {
             if (r.status == 401) {
               this.isMember = false;
             } else {
-              console.error(
-                'Error checking if user is member: ' + JSON.stringify(r)
-              );
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error comprobando si el usuario es miembro',
+                  description: r.error.message,
+                  code: 500,
+                },
+              });
             }
           },
         });
@@ -174,7 +196,6 @@ export class ModifyCommunityComponent implements OnInit {
               this.loadUserData(user); // load the user data
             },
             error: (r) => {
-              console.error('Error getting logged user: ' + JSON.stringify(r));
               this.loadCommunity();
             },
           });
@@ -189,9 +210,13 @@ export class ModifyCommunityComponent implements OnInit {
       error: (r) => {
         // if error is 401, user is not logged in, do not print error
         if (r.status != 401) {
-          console.error(
-            'Error checking if user is logged in: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error comprobando si el usuario está logueado',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         }
         this.loadCommunity();
       },
@@ -275,9 +300,13 @@ export class ModifyCommunityComponent implements OnInit {
             this.communityMembersCount = count;
           },
           error: (r) => {
-            console.error(
-              'Error getting community members count: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo el número de miembros de la comunidad',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }
@@ -290,9 +319,13 @@ export class ModifyCommunityComponent implements OnInit {
           this.communityPostsCount = count;
         },
         error: (r) => {
-          console.error(
-            'Error getting community posts count: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error obteniendo el número de posts de la comunidad',
+              description: r.error.message,
+              code: 500,
+            },
+          });
         },
       });
     }
@@ -448,15 +481,19 @@ export class ModifyCommunityComponent implements OnInit {
       if (input.files && input.files.length > 0) {
         const file = input.files[0];
         this.communityService
-          .updateCommunityBanner(this.community.identifier, file, undefined)
+          .updateCommunityBanner(this.community.identifier, file)
           .subscribe({
             next: () => {
               this.showDoneModal();
             },
             error: (r) => {
-              console.error(
-                'Error updating community banner: ' + JSON.stringify(r)
-              );
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error subiendo la imagen de la comunidad',
+                  description: r.error.message,
+                  code: 500,
+                },
+              });
             },
           });
       }
@@ -487,9 +524,13 @@ export class ModifyCommunityComponent implements OnInit {
             this.showDoneModal();
           },
           error: (r) => {
-            console.error(
-              'Error deleting community banner: ' + JSON.stringify(r)
-            );
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error eliminando la imagen de la comunidad',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     } else {
@@ -521,7 +562,13 @@ export class ModifyCommunityComponent implements OnInit {
             this.manageBanner();
           },
           error: (r) => {
-            console.error('Error editing community: ' + JSON.stringify(r));
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error editando la comunidad',
+                description: r.error.message,
+                code: 500,
+              },
+            });
           },
         });
     }

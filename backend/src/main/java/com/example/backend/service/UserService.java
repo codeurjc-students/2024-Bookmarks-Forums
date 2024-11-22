@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.entity.Community;
+import com.example.backend.entity.Post;
 import com.example.backend.entity.Reply;
 import com.example.backend.entity.User;
 import com.example.backend.repository.CommunityRepository;
@@ -171,6 +172,23 @@ public class UserService {
             communityRepository.save(community);
         }
         user.getCommunities().clear();
+
+        // clear the liked replies
+        for (Reply reply : user.getLikedReplies()) {
+            reply.getLikedBy().remove(user);
+            replyRepository.save(reply);
+        }
+
+        for (Post post : user.getUpvotedPosts()) {
+            post.getUpvotedBy().remove(user);
+            postRepository.save(post);
+        }
+
+        for (Post post : user.getDownvotedPosts()) {
+            post.getDownvotedBy().remove(user);
+            postRepository.save(post);
+        }
+
         // Save the user
         userRepository.save(user);
     }

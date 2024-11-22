@@ -83,15 +83,15 @@ public class User {
     private List<User> followingList = new ArrayList<>();
 
     // A user may have upvoted 0 or multiple posts
-    @ManyToMany(mappedBy = "upvotedBy", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "upvotedBy")
     private List<Post> upvotedPosts = new ArrayList<>();
 
     // A user may have downvoted 0 or multiple posts
-    @ManyToMany(mappedBy = "downvotedBy", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "downvotedBy")
     private List<Post> downvotedPosts = new ArrayList<>();
 
     // A user may have liked 0 or multiple replies
-    @ManyToMany(mappedBy = "likedBy", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "likedBy")
     private List<Reply> likedReplies = new ArrayList<>();
 
     // A user can have 0 or multiple posts

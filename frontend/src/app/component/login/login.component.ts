@@ -26,7 +26,6 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/'])
       },
       error: r => {
-        console.error("Login failed: " + JSON.stringify(r));
         this.errorMessage = "Nombre de usuario o contraseña incorrectos";
       }
     });

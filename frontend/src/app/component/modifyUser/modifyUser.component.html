@@ -148,7 +148,8 @@
           <!-- Profile Actions Column -->
           <div class="col-lg-4">
             <!-- Save changes / Exit -->
-            <div *ngIf="loggedIn" class="card dark-card mb-4">
+            <div *ngIf="loggedIn && (loggedUsername === profileUser?.username || isAdmin)"
+            class="card dark-card mb-4">
               <div class="post-container-card-top">
                 <h5 class="card-title mb-0">Guardar cambios o cancelar</h5>
               </div>
@@ -171,7 +172,8 @@
             </div>
 
             <!-- Change email / Change password -->
-            <div *ngIf="loggedIn" class="card dark-card mb-4">
+            <div *ngIf="loggedIn && (loggedUsername === profileUser?.username || isAdmin)"
+            class="card dark-card mb-4">
               <div class="post-container-card-top">
                 <h5 class="card-title mb-0">
                   Cambiar dirección de E-mail o contraseña

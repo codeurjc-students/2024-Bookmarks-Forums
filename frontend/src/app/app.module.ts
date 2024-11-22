@@ -25,6 +25,7 @@ import { NewPostComponent } from './component/newPost/newPost.component';
 import { UserComponent } from './component/user/user.component';
 import { ModifyUserComponent } from './component/modifyUser/modifyUser.component';
 import { SearchComponent } from './component/search/search.component';
+import { ErrorComponent } from './component/error/error.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { SearchComponent } from './component/search/search.component';
     UserComponent,
     ModifyUserComponent,
     SearchComponent,
+    ErrorComponent,
   ],
   imports: [
     BrowserModule,

@@ -12,6 +12,7 @@ import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Ban } from '../../models/ban.model';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -44,6 +45,7 @@ export class SearchComponent implements OnInit {
   // Search term
   searchTerm: string = '';
 
+  searchTitle: string = '';
   searching: boolean = false;
 
   // Posts
@@ -82,7 +84,8 @@ export class SearchComponent implements OnInit {
     public postService: PostService,
     public communityService: CommunityService,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -154,7 +157,13 @@ export class SearchComponent implements OnInit {
           this.noMorePosts = posts.length < this.postsSize;
         },
         error: (r) => {
-          console.error('Error getting posts: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al cargar posts',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
   }
@@ -181,7 +190,13 @@ export class SearchComponent implements OnInit {
           this.noMoreCommunities = communities.length < this.communitiesSize;
         },
         error: (r) => {
-          console.error('Error getting communities: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al cargar comunidades',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
   }
@@ -207,7 +222,13 @@ export class SearchComponent implements OnInit {
           this.noMoreUsers = users.length < this.usersSize;
         },
         error: (r) => {
-          console.error('Error getting users: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al cargar usuarios',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         },
       });
   }
@@ -238,7 +259,13 @@ export class SearchComponent implements OnInit {
         post = p;
       },
       error: (r) => {
-        console.error('Error getting post: ' + JSON.stringify(r));
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al cargar post',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
 
@@ -248,7 +275,13 @@ export class SearchComponent implements OnInit {
           return true;
         },
         error: (r) => {
-          console.error('Error getting post image: ' + JSON.stringify(r));
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al cargar imagen de post',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
           return false;
         },
       });
@@ -268,7 +301,13 @@ export class SearchComponent implements OnInit {
               this.loadUserData(user); // load the user data
             },
             error: (r) => {
-              console.error('Error getting logged user: ' + JSON.stringify(r));
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error al cargar usuario',
+                  description: r.error.message,
+                  code: r.status,
+                },
+              });
             },
           });
         } else {
@@ -276,15 +315,21 @@ export class SearchComponent implements OnInit {
           this.loggedUsername = ''; // set the logged username to empty
           this.user = undefined;
           this.isAdmin = false;
+          this.startSearch();
         }
       },
       error: (r) => {
         // if error is 401, user is not logged in, do not print error
         if (r.status != 401) {
-          console.error(
-            'Error checking if user is logged in: ' + JSON.stringify(r)
-          );
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al comprobar si está logueado',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
         }
+        this.startSearch();
       },
     });
   }
@@ -440,6 +485,14 @@ export class SearchComponent implements OnInit {
   }
 
   search() {
+
+    if(this.searchTerm.trim() === '') {
+      this.searchTitle = 'Aquí tienes todo Bookmarks Forums';
+    } else {
+      this.searchTitle = 'Resultados de la búsqueda para: "' + this.searchTerm + '"';
+    }
+
+
     // get query from url if not set yet in the search box
     if (!this.searchTerm || this.searchTerm.trim() === '') {
       // get query from url
