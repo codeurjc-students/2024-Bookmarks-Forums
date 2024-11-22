@@ -23,6 +23,7 @@ import { ModifyCommunityComponent } from './component/modifyCommunity/modifyComm
 import { NewCommunityComponent } from './component/newCommunity/newCommunity.component';
 import { NewPostComponent } from './component/newPost/newPost.component';
 import { UserComponent } from './component/user/user.component';
+import { ModifyUserComponent } from './component/modifyUser/modifyUser.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { UserComponent } from './component/user/user.component';
     NewCommunityComponent,
     NewPostComponent,
     UserComponent,
+    ModifyUserComponent,
   ],
   imports: [
     BrowserModule,

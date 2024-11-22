@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <title>Bookmarks Forums - Post</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/8f3c0a721b.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Chart.js script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.js"></script>
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- ----------------------------------------------------------------- -->
+  </head>
+  <body>
+    <div class="main-body-container">
+      <!-- Page hero ---------------------------------------------------- -->
+      <header class="bg-branding-white py-1 page-hero">
+        <div class="header-top-info">
+          <div class="card-community-name-container">
+            <p class="lead fw-normal text-white-50 mb-0">
+              Editor de perfil
+              <br />
+            </p>
+          </div>
+        </div>
+        <div class="container px-4 px-lg-5 my-5">
+          <div class="text-start text-dark">
+            <div class="post-author-container">
+              <div class="post-author-profile-picture">
+                <img
+                  class="profile-picture bm-rounded-circle"
+                  [src]="
+                    selectedImageURL
+                      ? selectedImageURL
+                      : profilePicture(profileUser?.username)
+                  "
+                  alt="Foto de perfil del usuario"
+                />
+              </div>
+              <div class="user-hero-username-alias">
+                <!-- User username -->
+                <h1
+                  class="display-4 fw-bolder header-main-text landing-hero hero-username"
+                >
+                  <p>
+                    {{ profileUser?.username }}
+                  </p>
+                </h1>
+                <!-- User alias -->
+                <h1 class="display-4 fw-bolder landing-hero alias-text">
+                  <p>({{ profileUser?.alias }})</p>
+                </h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <!-- ----------------------------------------------------------------- -->
+
+      <!-- Page content-->
+      <div class="container">
+        <div class="row justify-content-between">
+          <!-- Posts Column -->
+          <div class="col-lg-7">
+            <!-- Post search bar and sorting -->
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Modifica tu perfil</h5>
+              </div>
+              <div class="card-body">
+                <div class="input-fields-group">
+                  <div class="user-info-field-group">
+                    <p class="user-info-field-label">Alias:</p>
+                    <hr class="post-container-divider" />
+                    <input
+                      type="text"
+                      [value]="profileUser?.alias"
+                      class="form-control branding-input-field"
+                      placeholder="Introduce un alias"
+                      [(ngModel)]="newAlias"
+                    />
+                  </div>
+                  <div class="user-info-field-group">
+                    <p class="user-info-field-label">Descripción:</p>
+                    <hr class="post-container-divider" />
+                    <textarea
+                      [value]="profileUser?.description"
+                      class="form-control branding-textarea"
+                      placeholder="Introduce una descripción"
+                      [(ngModel)]="newDescription"
+                    ></textarea>
+                  </div>
+                  <div class="user-info-field-group">
+                    <p class="user-info-field-label">Foto de perfil:</p>
+                    <hr class="post-container-divider" />
+                    <div class="branding-modify-profile-field-button">
+                      <label class="btn primary-btn" title="Subir imagen">
+                        <i class="fas fa-upload"></i> Subir
+                        <input
+                          type="file"
+                          accept="image/jpeg, image/png"
+                          (change)="onFileSelected($event)"
+                          hidden
+                        />
+                      </label>
+                      <button
+                        *ngIf="selectedImageURL"
+                        class="btn negative-btn"
+                        title="Descartar"
+                        (click)="discardSelectedImage()"
+                      >
+                        <i class="fas fa-times"></i> Descartar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Actions Column -->
+          <div class="col-lg-4">
+            <!-- Save changes / Exit -->
+            <div *ngIf="loggedIn" class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Guardar cambios o cancelar</h5>
+              </div>
+              <div class="card-body">
+                <!-- Save, Exit -->
+                <div class="community-actions-container" *ngIf="loggedIn">
+                  <button class="btn primary-btn" (click)="saveChanges()">
+                    <i class="fas fa-save me-1"></i>
+                    Guardar
+                  </button>
+                  <a
+                    class="btn primary-dimmed-btn"
+                    [routerLink]="['/profile/', profileUser?.username]"
+                  >
+                    <i class="fas fa-times me-1"></i>
+                    Cancelar
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Change email / Change password -->
+            <div *ngIf="loggedIn" class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">
+                  Cambiar dirección de E-mail o contraseña
+                </h5>
+              </div>
+              <div class="card-body">
+                <!-- Change email, Change password -->
+                <div class="community-actions-container" *ngIf="loggedIn">
+                  <button
+                    class="btn primary-btn"
+                    (click)="showChangeEmailModal()"
+                  >
+                    <i class="fas fa-envelope me-1"></i>
+                    Cambiar E-mail
+                  </button>
+                  <button
+                    class="btn primary-btn"
+                    (click)="showChangePasswordModal()"
+                  >
+                    <i class="fas fa-key me-1"></i>
+                    Cambiar contraseña
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Alert modal with text fields (email and password + confirm password) confirmation and cancel buttons -->
+    <div
+      id="alertModal"
+      class="custom-modal"
+      [ngClass]="{ show: showAlertModal }"
+      style="z-index: 1060"
+    >
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header" [ngClass]="{'with-title': showEmailField || showPasswordFields}">
+          <h5 *ngIf="showEmailField" class="modal-title">
+            Cambiar dirección de E-mail
+          </h5>
+          <h5 *ngIf="showPasswordFields" class="modal-title">
+            Cambiar contraseña
+          </h5>
+
+          <span
+            class="action-btn close"
+            (click)="closeAlertModal()"
+            (keypress)="closeAlertModal()"
+          >
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <p class="alert-modal-text">{{ confirmationModalText }}</p>
+          <p class="alert-modal-text red-text">{{ alertModalText }}</p>
+          <div class="alert-modal-inputs mb-4">
+            <div *ngIf="showEmailField" class="user-info-field-group centered mb-3">
+              <p class="user-info-field-label">E-mail:</p>
+              <input
+                type="text"
+                id="email-field"
+                class="form-control branding-input-field"
+                placeholder="Introduce un correo electrónico"
+                [(ngModel)]="newEmail"
+              />
+            </div>
+            <div *ngIf="showEmailField" class="user-info-field-group centered">
+              <p class="user-info-field-label dimmed-text">
+                E-mail actual: {{ this.currentEmail }}
+              </p>
+            </div>
+            <div
+              *ngIf="showPasswordFields"
+              class="user-info-field-group mb-3 centered"
+            >
+              <p class="user-info-field-label password-modal-adapted">
+                Contraseña:
+              </p>
+              <input
+                type="password"
+                class="form-control branding-input-field"
+                placeholder="Introduce tu contraseña"
+                [(ngModel)]="newPassword"
+              />
+            </div>
+            <div
+              *ngIf="showPasswordFields"
+              class="user-info-field-group centered"
+            >
+              <p class="user-info-field-label password-modal-adapted">
+                Confirma tu contraseña:
+              </p>
+              <input
+                type="password"
+                class="form-control branding-input-field"
+                placeholder="Confirma tu contraseña"
+                [(ngModel)]="newPasswordConfirm"
+              />
+            </div>
+          </div>
+          <div class="alert-modal-buttons">
+            <button
+              class="btn primary-btn"
+              title="Confirmar"
+              (click)="confirmAction()"
+            >
+              <i class="fas fa-check"></i> Confirmar
+            </button>
+            <button
+              class="btn primary-btn"
+              title="Cancelar"
+              (click)="closeAlertModal()"
+              *ngIf="showCancelButton"
+            >
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

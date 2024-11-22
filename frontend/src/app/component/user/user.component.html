@@ -308,8 +308,9 @@
           <div class="col-lg-4">
             <!-- Follow / Unfollow widget -->
             <div
-            *ngIf="loggedIn && loggedUsername !== profileUser?.username"
-            class="card dark-card mb-4">
+              *ngIf="loggedIn && loggedUsername !== profileUser?.username"
+              class="card dark-card mb-4"
+            >
               <div class="post-container-card-top">
                 <h5 class="card-title mb-0">
                   Sigue a {{ profileUser?.username }}
@@ -453,10 +454,7 @@
                       >
                         <a
                           class="btn primary-dimmed-btn"
-                          [routerLink]="[
-                            '/edit-profile',
-                            profileUser?.username
-                          ]"
+                          [routerLink]="['edit']"
                         >
                           <i class="fas fa-edit me-1"></i>
                           Editar perfil

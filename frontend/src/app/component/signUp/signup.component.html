@@ -23,7 +23,6 @@
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 
     <!-- NEEDED FOR THE NAVBAR AND FOOTER BRANDING -->
-    <link href="/css/navbarAndBranding.css" rel="stylesheet" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
       rel="stylesheet"
@@ -144,8 +143,9 @@
                       style="color: #ffffff"
                       *ngIf="passwordMissingRequirements"
                     >
-                      La contraseña debe incluir al menos 4 caracteres y un
-                      número
+                      La contraseña debe tener al menos 8 caracteres, una letra
+                      mayúscula, una letra minúscula, un número y un carácter
+                      especial.
                     </p>
 
                     <p

@@ -3321,14 +3321,13 @@ html {
   height: 100% !important;
 }
 
-.community-card-frame{
+.community-card-frame {
   --bs-card-height: ;
   background-color: var(--branding-forums-dark-grey);
   outline-color: var(--branding-forums-light-grey);
   outline-style: solid;
   outline-width: 1px;
-  transition: outline-color 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
+  transition: outline-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .community-card-frame:hover {
@@ -3357,12 +3356,114 @@ html {
   gap: 1rem;
 }
 
-.user-hero-username-alias{
+.user-hero-username-alias {
   display: flex;
   flex-direction: row;
 }
 
-.alias-text{
+.alias-text {
   color: rgba(255, 255, 255, 0.349) !important;
   font-size: 1.5rem !important;
+}
+
+.input-fields-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-info-field-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.user-info-field-group.centered {
+  justify-content: center;
+}
+
+.user-info-field-label {
+  color: var(--branding-light-grey);
+  margin-bottom: 0 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: max-content;
+}
+
+.branding-input-field {
+  background-color: var(--branding-forums-dark-grey) !important;
+  color: var(--branding-light-grey) !important;
+  border: 1px solid var(--branding-forums-light-grey) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.2s ease-in-out !important;
+  width: 100% !important;
+  max-width: 300px !important;
+  resize: none !important;
+}
+
+.branding-input-field:focus {
+  border: 1px solid var(--branding-peach) !important;
+}
+
+.branding-input-field::placeholder {
+  color: var(--branding-light-grey) !important;
+  opacity: 0.6 !important;
+}
+
+.branding-input-field:hover {
+  background-color: var(--branding-forums-light-grey) !important;
+}
+
+.branding-textarea {
+  background-color: var(--branding-forums-dark-grey) !important;
+  color: var(--branding-light-grey) !important;
+  border: 1px solid var(--branding-forums-light-grey) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.2s ease-in-out !important;
+  width: 100% !important;
+  max-width: 300px !important;
+  height: 150px !important;
+  resize: none !important;
+}
+
+.branding-textarea:focus {
+  border: 1px solid var(--branding-peach) !important;
+}
+
+.branding-textarea::placeholder {
+  color: var(--branding-light-grey) !important;
+  opacity: 0.6 !important;
+}
+
+.branding-textarea:hover {
+  background-color: var(--branding-forums-light-grey) !important;
+}
+
+.password-modal-adapted {
+  min-width: 200px !important;
+  text-align: right;
+}
+
+.branding-modify-profile-field-button{
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  width: 100% !important;
+  max-width: 300px !important;
+}
+
+.branding-modify-profile-field-button button{
+  width: 100% !important;
+}
+
+.branding-modify-profile-field-button label{
+  width: 100% !important;
 }

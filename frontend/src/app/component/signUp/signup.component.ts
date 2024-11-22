@@ -54,8 +54,13 @@ export class SignupComponent implements OnInit {
   }
 
   checkPasswordRequirements(password: string): boolean {
-    // Check if password meets the minimum requirements
-    return password.length >= 4 && /\d/.test(password);
+    // Password requirements
+    // At least 8 characters
+    // At least 1 digit
+    // At least 1 lowercase letter
+    // At least 1 uppercase letter
+    // At least 1 special character
+    return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}$/.test(password);
   }
 
   signUp(

@@ -145,7 +145,7 @@ export class UserService {
   ): Observable<User> {
     const params = new HttpParams().set('action', 'edit');
     return this.http
-      .put<User>(API_URL + '/' + username, userInfo, { params: params })
+      .put<User>(`${API_URL}/${username}`, userInfo, { params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -187,7 +187,7 @@ export class UserService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http
-      .post<User>(API_URL + '/' + username + '/pictures', formData)
+      .put<User>(API_URL + '/' + username + '/pictures', formData)
       .pipe(catchError((error) => throwError(() => error)));
   }
 
