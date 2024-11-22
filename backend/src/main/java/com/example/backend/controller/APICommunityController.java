@@ -96,7 +96,7 @@ public class APICommunityController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBasicInfo.class))
 
             }),
-            @ApiResponse(responseCode = "404", description = "Communities not found", content = @Content),
+            @ApiResponse(responseCode = "204", description = "No content", content = @Content),
             @ApiResponse(responseCode = "400", description = "Missing parameter", content = @Content)
     })
     @GetMapping("/communities")
@@ -124,7 +124,7 @@ public class APICommunityController {
                 break;
         }
         if (communities.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(communities.getContent(), HttpStatus.OK);
         }

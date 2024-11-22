@@ -11,6 +11,7 @@ import { NewCommunityComponent } from './component/newCommunity/newCommunity.com
 import { NewPostComponent } from './component/newPost/newPost.component';
 import { UserComponent } from './component/user/user.component';
 import { ModifyUserComponent } from './component/modifyUser/modifyUser.component';
+import { SearchComponent } from './component/search/search.component';
 
 const routes: Routes = [
   {
@@ -32,6 +33,7 @@ const routes: Routes = [
   { path: 'community/:identifier/new/post', component: NewPostComponent },
   { path: 'profile/:username', component: UserComponent },
   { path: 'profile/:username/edit', component: ModifyUserComponent },
+  { path: 'search', component: SearchComponent },
 ];
 
 @NgModule({

@@ -169,8 +169,8 @@ public class APIUserController {
         if (userService.getUserByUsername(follower) == null || userService.getUserByUsername(following) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        
-        if (userService.isUserFollowing(follower, following)){
+
+        if (userService.isUserFollowing(follower, following)) {
             return new ResponseEntity<>(true, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(false, HttpStatus.OK);
@@ -215,14 +215,10 @@ public class APIUserController {
             @RequestParam boolean orderByCreationDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        if (query == null || query.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else {
-            List<User> users = orderByCreationDate
-                    ? userService.searchUsersOrderByCreationDate(query, PageRequest.of(page, size)).getContent()
-                    : userService.searchUsers(query, PageRequest.of(page, size)).getContent();
-            return new ResponseEntity<>(users, HttpStatus.OK);
-        }
+        List<User> users = orderByCreationDate
+                ? userService.searchUsersOrderByCreationDate(query, PageRequest.of(page, size)).getContent()
+                : userService.searchUsers(query, PageRequest.of(page, size)).getContent();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     // Get User's Communities
@@ -478,7 +474,7 @@ public class APIUserController {
         if (request.getUserPrincipal() == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        
+
         User user = userService.getUserByUsername(username);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -642,7 +638,7 @@ public class APIUserController {
     })
     @GetMapping("/users/most-popular")
     public ResponseEntity<List<Object[]>> getMostPopularUsers(@RequestParam(defaultValue = "10") int size) {
-            return new ResponseEntity<>(userService.getMostPopularUsersCount(size), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getMostPopularUsersCount(size), HttpStatus.OK);
 
     }
 }

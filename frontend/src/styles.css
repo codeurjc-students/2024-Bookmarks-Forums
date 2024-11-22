@@ -3452,7 +3452,7 @@ html {
   text-align: right;
 }
 
-.branding-modify-profile-field-button{
+.branding-modify-profile-field-button {
   display: flex;
   flex-direction: row;
   gap: 1rem;
@@ -3460,10 +3460,78 @@ html {
   max-width: 300px !important;
 }
 
-.branding-modify-profile-field-button button{
+.branding-modify-profile-field-button button {
   width: 100% !important;
 }
 
-.branding-modify-profile-field-button label{
+.branding-modify-profile-field-button label {
   width: 100% !important;
 }
+
+.search-page-sorting-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.scale-effect {
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.scale-effect:hover {
+  transform: scale(1.025) !important;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon input {
+  width: 100%;
+  padding-right: 5rem; /* Adjust padding to make space for both icons */
+}
+
+.input-with-icon .clear-icon-button {
+  position: absolute;
+  right: 4.5rem; /* Position it to the left of the search icon */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--branding-light-grey);
+  padding: 0;
+  font-size: 2.5rem; /* Make the icon bigger */
+  transition: color 0.3s ease; /* Smooth transition for color change */
+}
+
+.input-with-icon .clear-icon-button:hover {
+  color: var(--branding-peach); /* Change color on hover */
+}
+
+.input-with-icon .search-icon-button {
+  position: absolute;
+  right: 0.5rem; /* Adjust position as needed */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--branding-light-grey);
+  padding: 0;
+  font-size: 2rem; 
+  transition: color 0.3s ease; 
+}
+
+.input-with-icon .search-icon-button:hover {
+  color: var(--branding-peach); 
+}
+
+.input-with-icon .search-icon,
+.input-with-icon .clear-icon {
+  pointer-events: none; 
+}
+

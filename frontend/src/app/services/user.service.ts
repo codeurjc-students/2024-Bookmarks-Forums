@@ -28,14 +28,14 @@ export class UserService {
     page: number,
     size: number,
     orderByCreationDate: boolean
-  ): Observable<Map<string, Object>> {
+  ): Observable<User[]> {
     let params = new HttpParams()
       .set('query', username)
       .set('page', page)
       .set('size', size)
       .set('orderByCreationDate', orderByCreationDate);
     return this.http
-      .get<Map<string, Object>>(API_URL, { params: params })
+      .get<User[]>(API_URL, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 

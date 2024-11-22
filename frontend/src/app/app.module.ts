@@ -24,6 +24,7 @@ import { NewCommunityComponent } from './component/newCommunity/newCommunity.com
 import { NewPostComponent } from './component/newPost/newPost.component';
 import { UserComponent } from './component/user/user.component';
 import { ModifyUserComponent } from './component/modifyUser/modifyUser.component';
+import { SearchComponent } from './component/search/search.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { ModifyUserComponent } from './component/modifyUser/modifyUser.component
     NewPostComponent,
     UserComponent,
     ModifyUserComponent,
+    SearchComponent,
   ],
   imports: [
     BrowserModule,

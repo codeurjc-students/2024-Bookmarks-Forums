@@ -460,7 +460,7 @@
                           Editar perfil
                         </a>
                       </ng-container>
-                      <ng-container *ngIf="isAdmin">
+                      <ng-container *ngIf="isAdmin || loggedUsername === profileUser?.username">
                         <button
                           class="btn red-btn"
                           (click)="deleteUser()"

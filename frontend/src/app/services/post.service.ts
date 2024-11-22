@@ -27,14 +27,14 @@ export class PostService {
     page: number,
     size: number,
     order: string
-  ): Observable<Map<string, Object>> {
+  ): Observable<Post[]> {
     let params = new HttpParams()
       .set('query', query)
       .set('page', page)
       .set('size', size)
       .set('order', order);
     return this.http
-      .get<Map<string, Object>>(API_URL, { params: params })
+      .get<Post[]>(API_URL, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
   }
 

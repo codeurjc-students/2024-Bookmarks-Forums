@@ -29,13 +29,15 @@ export class CommunityService {
     query: string,
     page: number,
     size: number,
-    order: string
+    order: string,
+    by: string
   ): Observable<Community[]> {
     let params = new HttpParams()
       .set('query', query)
       .set('page', page)
       .set('size', size)
-      .set('order', order);
+      .set('sort', order)
+      .set('by', by);
     return this.http
       .get<Community[]>(API_URL, { params: params })
       .pipe(catchError((error) => throwError(() => error)));
