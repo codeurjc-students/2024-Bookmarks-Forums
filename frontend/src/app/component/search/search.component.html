@@ -512,26 +512,22 @@
                 </div>
                 <div class="mt-4">
                   <hr class="post-container-divider mb-4" />
-                  <div
-                    class="community-member-card scale-effect mb-3"
+                  <a
+                    class="community-member-card scale-effect mb-3 card-hyperlink"
+                    [routerLink]="['/profile', member.username]"
                     *ngFor="let member of users"
                   >
-                    <a
-                      [routerLink]="['/profile', member.username]"
-                      class="card-link"
-                    >
-                      <div class="community-member-info">
-                        <img
-                          [src]="profilePicture(member.username)"
-                          alt="Profile"
-                          class="community-member-profile-picture"
-                        />
-                        <p class="community-member-username">
-                          {{ member.username }}
-                        </p>
-                      </div>
-                    </a>
-                  </div>
+                    <div class="community-member-info">
+                      <img
+                        [src]="profilePicture(member.username)"
+                        alt="Profile"
+                        class="community-member-profile-picture"
+                      />
+                      <p class="community-member-username">
+                        {{ member.username }}
+                      </p>
+                    </div>
+                  </a>
                 </div>
                 <!-- LOAD MORE BUTTON -->
                 <nav aria-label="Pagination">

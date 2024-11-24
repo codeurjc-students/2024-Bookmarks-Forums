@@ -63,7 +63,7 @@ public class APIPostController {
         this.replyService = replyService;
     }
 
-    // Get post by ID
+    // Get post by ID | SECURITY: CHECKED
     @Operation(summary = "Get post by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Post found", content = {
@@ -88,7 +88,7 @@ public class APIPostController {
      * - lastModifiedDate
      * - replies
      * - likes
-     */
+     */ // SECURITY: CHECKED
     @Operation(summary = "Search posts")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -116,7 +116,7 @@ public class APIPostController {
      * - lastModifiedDate
      * - replies
      * - likes
-     */
+     */ // SECURITY: CHECKED
     // Get posts of a community
     @Operation(summary = "Get posts of a community using its ID")
     @ApiResponses(value = {
@@ -162,7 +162,7 @@ public class APIPostController {
         }
     }
 
-    // Get posts by username
+    // Get posts by username | SECURITY: CHECKED
     @Operation(summary = "Get posts by username")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -193,7 +193,7 @@ public class APIPostController {
         }
     }
 
-    // Create a post
+    // Create a post | SECURITY: CHECKED
     @Operation(summary = "Create a post")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Post created", content = {
@@ -266,7 +266,7 @@ public class APIPostController {
         return ResponseEntity.created(location).body(post);
     }
 
-    // Delete post image
+    // Delete post image | SECURITY: CHECKED
     @Operation(summary = "Delete post image")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Post image deleted"),
@@ -311,7 +311,7 @@ public class APIPostController {
         return new ResponseEntity<>("Post image deleted", HttpStatus.OK);
     }
 
-    // Has user upvoted or downvoted a post?
+    // Has user upvoted or downvoted a post? | SECURITY: CHECKED
     @Operation(summary = "Returns whether the user has upvoted or downvoted a post")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User has upvoted or downvoted the post", content = {
@@ -342,7 +342,7 @@ public class APIPostController {
         }
     }
 
-    // Edit a post (or upvote/downvote)
+    // Edit a post (or upvote/downvote) | SECURITY: CHECKED
     @Operation(summary = "Edit a post (or upvote/downvote)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Post edited", content = {
@@ -443,7 +443,7 @@ public class APIPostController {
 
     }
 
-    // Update post image (if action = "delete", the image will be deleted)
+    // Update post image (if action = "delete", the image will be deleted) | SECURITY: CHECKED
     @Operation(summary = "Update post image")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Post image updated", content = {
@@ -518,7 +518,7 @@ public class APIPostController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    // Delete a post
+    // Delete a post | SECURITY: CHECKED
     @Operation(summary = "Delete a post")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Post deleted"),
@@ -561,7 +561,7 @@ public class APIPostController {
         return new ResponseEntity<>("Post deleted", HttpStatus.OK);
     }
 
-    // Get post image
+    // Get post image | SECURITY: CHECKED
     @Operation(summary = "Get post image")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Post image found", content = {
@@ -593,7 +593,7 @@ public class APIPostController {
 
     // REPLIES ----------------------------------------------------------------
 
-    // Get replies of a post
+    // Get replies of a post | SECURITY: CHECKED
     @Operation(summary = "Get replies of a post")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Replies found", content = {
@@ -614,7 +614,7 @@ public class APIPostController {
         return new ResponseEntity<>(replies.getContent(), HttpStatus.OK);
     }
 
-    // Get reply by ID
+    // Get reply by ID | SECURITY: CHECKED
     @Operation(summary = "Get reply by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reply found", content = {
@@ -638,7 +638,7 @@ public class APIPostController {
      * - title
      * - content
      * - author
-     */
+     */ // SECURITY: CHECKED
     @Operation(summary = "Search replies")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Replies found", content = {
@@ -680,7 +680,7 @@ public class APIPostController {
      * - content
      * - author
      * - query (searches by title and content) (default)
-     */
+     */ // SECURITY: CHECKED
     @Operation(summary = "Search replies by post")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Replies found", content = {
@@ -715,7 +715,7 @@ public class APIPostController {
         return new ResponseEntity<>(replies.getContent(), HttpStatus.OK);
     }
 
-    // Create a reply
+    // Create a reply | SECURITY: CHECKED
     @Operation(summary = "Create a reply")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Reply created", content = {
@@ -777,7 +777,7 @@ public class APIPostController {
         return ResponseEntity.created(location).body(reply);
     }
 
-    // Like a reply
+    // Like a reply | SECURITY: CHECKED
     @Operation(summary = "Modify a reply (like)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reply liked", content = {
@@ -826,7 +826,7 @@ public class APIPostController {
         }
     }
 
-    // Has user liked a reply?
+    // Has user liked a reply? | SECURITY: CHECKED
     @Operation(summary = "Returns whether the user has liked a reply")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User has liked the reply", content = {
@@ -849,7 +849,7 @@ public class APIPostController {
         return new ResponseEntity<>(replyService.hasUserLikedReply(username, replyId), HttpStatus.OK);
     }
 
-    // Delete a reply
+    // Delete a reply | SECURITY: CHECKED
     @Operation(summary = "Delete a reply")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Reply deleted"),
@@ -898,7 +898,7 @@ public class APIPostController {
     }
 
     // Get the most liked posts of the most followed users the user follows (sorting
-    // the posts by upvotes)
+    // the posts by upvotes) | SECURITY: CHECKED
     @Operation(summary = "Get the most liked posts of the most followed users the user follows")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -924,7 +924,7 @@ public class APIPostController {
     }
 
     // Get the most liked posts of the user's communities (sorting the posts by
-    // upvotes)
+    // upvotes) | SECURITY: CHECKED
     @Operation(summary = "Get the most liked posts of the user's communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -950,7 +950,7 @@ public class APIPostController {
     }
 
     // Get the most recent posts of the user's communities (sorting the posts by
-    // creation date)
+    // creation date) | SECURITY: CHECKED
     @Operation(summary = "Get the most recent posts of the user's communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -975,7 +975,7 @@ public class APIPostController {
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }
 
-    // Get the most liked posts of all communities
+    // Get the most liked posts of all communities (sorting the posts by upvotes) | SECURITY: CHECKED
     @Operation(summary = "Get the most liked posts of the most followed (popular) communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -995,7 +995,7 @@ public class APIPostController {
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }
 
-    // Get the most liked posts of the most followed users
+    // Get the most liked posts of the most followed users (sorting the posts by upvotes) | SECURITY: CHECKED
     @Operation(summary = "Get the most liked posts of the most followed users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -1015,7 +1015,7 @@ public class APIPostController {
         return new ResponseEntity<>(posts.getContent(), HttpStatus.OK);
     }
 
-    // Get the most recent posts of the most followed communities
+    // Get the most recent posts of the most followed communities (sorting the posts by creation date) | SECURITY: CHECKED
     @Operation(summary = "Get the most recent posts of the most followed communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {

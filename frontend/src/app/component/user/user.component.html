@@ -85,7 +85,7 @@
                 <h1
                   class="display-4 fw-bolder header-main-text landing-hero hero-username"
                 >
-                  <p>
+                  <p [ngClass]="{ 'red-text': this.isProfileOfAdmin }">
                     {{ profileUser?.username }}
                   </p>
                 </h1>
@@ -460,7 +460,11 @@
                           Editar perfil
                         </a>
                       </ng-container>
-                      <ng-container *ngIf="isAdmin || loggedUsername === profileUser?.username">
+                      <ng-container
+                        *ngIf="
+                          isAdmin || loggedUsername === profileUser?.username
+                        "
+                      >
                         <button
                           class="btn red-btn"
                           (click)="deleteUser()"

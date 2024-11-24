@@ -75,6 +75,16 @@ export class ModifyUserComponent implements OnInit {
   // User profile data (doesn't have to be the logged user)
   loadProfile() {
     let username = this.route.snapshot.paramMap.get('username');
+    // if the logged user is not the same as the profile user or the logged user is not an admin, redirect to error page
+    if (this.loggedUsername != username && !this.isAdmin) {
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Error de autenticación',
+          description: 'No tienes permisos para acceder a esta página.',
+          code: 403,
+        },
+      });
+    }
     if (username) {
       this.profileService.getUser(username).subscribe({
         next: (user) => {
@@ -82,13 +92,24 @@ export class ModifyUserComponent implements OnInit {
           this.currentEmail = user.email;
         },
         error: (r) => {
-          this.router.navigate(['/error'], {
-            queryParams: {
-              title: 'Error cargando perfil',
-              description: r.error.message,
-              code: r.status,
-            },
-          });
+          // if error is 404, redirect to error page with a custom message
+          if (r.status == 404) {
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Usuario no encontrado',
+                description: 'El usuario que buscas no existe.',
+                code: '404',
+              },
+            });
+          } else {
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error cargando perfil',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
+          }
         },
       });
     }
@@ -125,25 +146,23 @@ export class ModifyUserComponent implements OnInit {
             },
           });
         } else {
-          // if user is not logged in
-          this.loggedUsername = ''; // set the logged username to empty
-          this.user = undefined;
-          this.isAdmin = false;
-          this.loadProfile();
-        }
-      },
-      error: (r) => {
-        // if error is 401, user is not logged in, do not print error
-        if (r.status != 401) {
           this.router.navigate(['/error'], {
             queryParams: {
-              title: 'Error cargando usuario',
-              description: r.error.message,
-              code: r.status,
+              title: 'Error de autenticación',
+              description: 'Debes iniciar sesión para acceder a esta página.',
+              code: 401,
             },
           });
         }
-        this.loadProfile();
+      },
+      error: (r) => {
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error cargando usuario',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }

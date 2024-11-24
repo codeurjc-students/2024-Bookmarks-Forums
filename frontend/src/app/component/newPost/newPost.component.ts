@@ -80,8 +80,7 @@ export class NewPostComponent implements OnInit {
     this.user = user;
     this.loggedUsername = user.username;
     this.isAdmin = user.roles.includes('ADMIN');
-    this.loadCommunity();              
-
+    this.loadCommunity();
   }
 
   loadIsMember() {
@@ -91,6 +90,16 @@ export class NewPostComponent implements OnInit {
         .subscribe({
           next: (isMember) => {
             this.isMember = isMember;
+            // if user is not a member or an admin, redirect to error page
+            if (!this.isMember) {
+              this.router.navigate(['/error'], {
+                queryParams: {
+                  title: 'Error al cargar la comunidad',
+                  description: 'No tienes permiso para acceder a esta página.',
+                  code: 403,
+                },
+              });
+            }
           },
           error: (r) => {
             this.router.navigate(['/error'], {
@@ -107,24 +116,21 @@ export class NewPostComponent implements OnInit {
 
   loadCommunity() {
     let communityID = Number(this.route.snapshot.paramMap.get('identifier'));
-      this.communityService
-        .getCommunityById(communityID)
-        .subscribe({
-          next: (community) => {
-            this.community = community;
-            this.loadIsMember();
-          },
-          error: (r) => {
-            this.router.navigate(['/error'], {
-              queryParams: {
-                title: 'Error al cargar la comunidad',
-                description: r.error.message,
-                code: r.status,
-              },
-            });
+    this.communityService.getCommunityById(communityID).subscribe({
+      next: (community) => {
+        this.community = community;
+        this.loadIsMember();
+      },
+      error: (r) => {
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al cargar la comunidad',
+            description: r.error.message,
+            code: r.status,
           },
         });
-    
+      },
+    });
   }
 
   checkIfLoggedIn() {
@@ -151,26 +157,23 @@ export class NewPostComponent implements OnInit {
           });
         } else {
           // if user is not logged in
-          this.loggedUsername = ''; // set the logged username to empty
-          this.user = undefined;
-          this.isAdmin = false;
-          this.loadCommunity();
-
-        }
-      },
-      error: (r) => {
-        // if error is 401, user is not logged in, do not print error
-        if (r.status != 401) {
           this.router.navigate(['/error'], {
             queryParams: {
               title: 'Error al cargar el usuario',
-              description: r.error.message,
-              code: r.status,
+              description: 'Debes iniciar sesión para acceder a esta página.',
+              code: 401,
             },
           });
         }
-        this.loadCommunity();
-
+      },
+      error: (r) => {
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error al cargar el usuario',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }
@@ -243,7 +246,8 @@ export class NewPostComponent implements OnInit {
             });
           },
         });
-      }, true
+      },
+      true
     );
   }
 
@@ -277,7 +281,7 @@ export class NewPostComponent implements OnInit {
   closeAlertModal() {
     this.showAlertModal = false;
   }
-  
+
   isContentEmpty(content: string): boolean {
     const strippedContent = content.replace(/<[^>]*>/g, '').trim();
     return strippedContent === '';
@@ -288,7 +292,8 @@ export class NewPostComponent implements OnInit {
       this.router.navigate(['/error'], {
         queryParams: {
           title: 'Error al editar el post',
-          description: 'No se ha encontrado la comunidad a la que pertenece el post.',
+          description:
+            'No se ha encontrado la comunidad a la que pertenece el post.',
           code: 404,
         },
       });
@@ -304,17 +309,25 @@ export class NewPostComponent implements OnInit {
 
     if (this.isContentEmpty(this.postContent)) {
       // modal alert
-      this.openAlertModal('El contenido del post no puede estar vacío.', () => {
-        this.closeAlertModal();
-      }, false);
+      this.openAlertModal(
+        'El contenido del post no puede estar vacío.',
+        () => {
+          this.closeAlertModal();
+        },
+        false
+      );
       return;
     }
 
     if (!this.postTitle || this.postTitle.trim() === '') {
       // modal alert
-      this.openAlertModal('El título del post no puede estar vacío.', () => {
-        this.closeAlertModal();
-      }, false);
+      this.openAlertModal(
+        'El título del post no puede estar vacío.',
+        () => {
+          this.closeAlertModal();
+        },
+        false
+      );
       return;
     }
 
@@ -403,7 +416,8 @@ export class NewPostComponent implements OnInit {
       this.router.navigate(['/error'], {
         queryParams: {
           title: 'Error al subir la imagen',
-          description: 'No se ha encontrado el post al que pertenece la imagen.',
+          description:
+            'No se ha encontrado el post al que pertenece la imagen.',
           code: 404,
         },
       });

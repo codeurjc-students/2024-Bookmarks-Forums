@@ -58,6 +58,8 @@ export class PostComponent implements OnInit {
   loggedIn: boolean = false;
   isAdmin: boolean = false;
 
+  isModerator: boolean = false;
+
   public chart: any;
 
   // replies pagination
@@ -293,6 +295,27 @@ export class PostComponent implements OnInit {
     }
   }
 
+  checkModerator() {
+    if (this.user && this.community) {
+      this.communityService
+        .isModerator(this.community.identifier, this.user.username)
+        .subscribe({
+          next: (moderator) => {
+            this.isModerator = moderator;
+          },
+          error: (r) => {
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error al cargar moderador',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
+          },
+        });
+    }
+  }
+
   loadCommunity() {
     if (this.post) {
       this.communityService
@@ -301,6 +324,7 @@ export class PostComponent implements OnInit {
           next: (community) => {
             this.community = community;
             this.loadUserBanStatus();
+            this.checkModerator();
           },
           error: (r) => {
             this.router.navigate(['/error'], {
@@ -371,13 +395,24 @@ export class PostComponent implements OnInit {
         this.loadPostVotes();
       },
       error: (r) => {
-        this.router.navigate(['/error'], {
-          queryParams: {
-            title: 'Error al cargar post',
-            description: r.error.message,
-            code: r.status,
-          },
-        });
+        // if error is 404, post does not exist
+        if (r.status == 404) {
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al cargar post',
+              description: 'No se ha encontrado el post.',
+              code: '404',
+            },
+          });
+        } else {
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error al cargar post',
+              description: r.error.message,
+              code: r.status,
+            },
+          });
+        }
       },
     });
   }

@@ -249,13 +249,24 @@ export class CommunityComponent implements OnInit {
         this.loadPosts();
       },
       error: (r) => {
-        this.router.navigate(['/error'], {
-          queryParams: {
-            title: 'Error obteniendo comunidad',
-            description: r.error.message,
-            code: 500,
-          },
-        });
+        // if error is 404, community does not exist
+        if (r.status == 404) {
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Comunidad no encontrada',
+              description: 'La comunidad que buscas no existe',
+              code: 404,
+            },
+          });
+        } else {
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error obteniendo comunidad',
+              description: r.error.message,
+              code: 500,
+            },
+          });
+        }
       },
     });
   }
@@ -803,6 +814,15 @@ export class CommunityComponent implements OnInit {
           this.reloadAllMembersList();
         },
         error: (r) => {
+          // if error code == forbidden, user is trying to ban site admin
+          if (r.status == 403) {
+            this.openAlertModal(
+              'No puedes banear a un administrador del sitio.',
+              () => {},
+              false
+            );
+            return;
+          }
           this.router.navigate(['/error'], {
             queryParams: {
               title: 'Error baneando usuario',

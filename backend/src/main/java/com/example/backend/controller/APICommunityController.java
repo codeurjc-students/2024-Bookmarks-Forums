@@ -62,7 +62,7 @@ public class APICommunityController {
         this.userService = userService;
     }
 
-    // Get communities by ID
+    // Get communities by ID | SECURITY: CHECKED
     @JsonView(CommunityBasicInfo.class)
     @Operation(summary = "Get a community by ID")
     @ApiResponses(value = {
@@ -83,7 +83,7 @@ public class APICommunityController {
     }
 
     // Get communities (order: creationDate, members, lastPostDate) (by: name,
-    // description, admin, default, general) DEFAULT = by name and description
+    // description, admin, default, general) DEFAULT = by name and description | SECURITY: CHECKED
     @JsonView(CommunityBasicInfo.class)
     @Operation(summary = "Get communities by specified criteria and sort:\n"
             + "Default: search by name and description. Sortings: creationDate, members, lastPostDate, alphabetical (default)\n"
@@ -130,7 +130,7 @@ public class APICommunityController {
         }
     }
 
-    // Get members of a community
+    // Get members of a community (pageable) | SECURITY: CHECKED
     @Operation(summary = "Get members of a community (pageable)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found members", content = {
@@ -175,7 +175,7 @@ public class APICommunityController {
         }
     }
 
-    // Get pageable of moderators of a community
+    // Get pageable of moderators of a community | SECURITY: CHECKED
     @Operation(summary = "Get moderators of a community (pageable)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found moderators", content = {
@@ -198,7 +198,7 @@ public class APICommunityController {
         }
     }
 
-    // Get admin of a community
+    // Get admin of a community | SECURITY: CHECKED
     @Operation(summary = "Get admin of a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the admin", content = {
@@ -218,7 +218,7 @@ public class APICommunityController {
         }
     }
 
-    // Update community (format this as the UserController update method)
+    // Update community (format this as the UserController update method) | SECURITY: CHECKED
     @Operation(summary = "Update a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Updated the community", content = {
@@ -280,7 +280,7 @@ public class APICommunityController {
         return new ResponseEntity<>(community, HttpStatus.OK);
     }
 
-    // Delete community
+    // Delete community | SECURITY: CHECKED
     @Operation(summary = "Delete a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Deleted the community", content = {
@@ -314,7 +314,7 @@ public class APICommunityController {
         return new ResponseEntity<>("Community " + id + " deleted!", HttpStatus.OK);
     }
 
-    // Create community
+    // Create community | SECURITY: CHECKED
     @Operation(summary = "Create a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created the community", content = {
@@ -364,7 +364,7 @@ public class APICommunityController {
     }
 
     // Manage users in community (add, remove, ban, unban)
-    // ban durations: day, week, 2weeks, month, 6months, year, forever
+    // ban durations: day, week, 2weeks, month, 6months, year, forever | SECURITY: CHECKED
     @Operation(summary = "Add, remove or ban a user from a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Action succesfully performed", content = {
@@ -475,7 +475,7 @@ public class APICommunityController {
     }
 
     // Ban user from community (can be banned for a day, 1 week, 2 weeks, 1 month, 6
-    // months, a year or forever)
+    // months, a year or forever) | SECURITY: CHECKED
     @Operation(summary = "Ban a user from a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Banned the user from the community", content = {
@@ -484,7 +484,8 @@ public class APICommunityController {
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)
     })
     @PostMapping("/bans")
     @JsonView(Ban.BasicInfo.class)
@@ -544,6 +545,11 @@ public class APICommunityController {
             communityService.demoteUserFromModerator(user.getUsername(), community.getIdentifier());
         }
 
+        // the site admin cannot be banned
+        if (userService.getUserByUsername(user.getUsername()).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         switch (duration) {
             case "day":
                 communityService.banUserFromCommunity(user.getUsername(), community.getIdentifier(), 1, reason);
@@ -576,7 +582,7 @@ public class APICommunityController {
         return ResponseEntity.created(location).body(ban);
     }
 
-    // Is user a moderator of a community
+    // Is user a moderator of a community | SECURITY: CHECKED
     @Operation(summary = "Check if a user is a moderator of a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the moderator", content = {
@@ -606,7 +612,7 @@ public class APICommunityController {
                 HttpStatus.OK);
     }
 
-    // Unban user from community
+    // Unban user from community | SECURITY: CHECKED
     @Operation(summary = "Unban a user from a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Unbanned the user from the community", content = {
@@ -699,7 +705,7 @@ public class APICommunityController {
         return new ResponseEntity<>(community, HttpStatus.OK);
     }
 
-    // Upload banner
+    // Upload banner to community | SECURITY: CHECKED
     @Operation(summary = "Upload a banner to a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Uploaded the banner to the community", content = {
@@ -774,7 +780,7 @@ public class APICommunityController {
         }
     }
 
-    // Get banner
+    // Get banner of a community | SECURITY: CHECKED
     @Operation(summary = "Get the banner of a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the banner", content = {
@@ -806,7 +812,7 @@ public class APICommunityController {
         }
     }
 
-    // Get ban info of a user in a community
+    // Get ban info of a user in a community | SECURITY: CHECKED
     @Operation(summary = "Get ban info of a user in a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the ban info", content = {
@@ -881,7 +887,7 @@ public class APICommunityController {
 
     }
 
-    // Check if user is banne from community given the username and community id
+    // Check if user is banned from community given the username and community id
     @Operation(summary = "Check if a user is banned from a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User is banned from the community", content = {
@@ -924,7 +930,7 @@ public class APICommunityController {
         }
     }
 
-    // Get all banned users in a community (pageable)
+    // Get all banned users in a community (pageable) | SECURITY: CHECKED
     @Operation(summary = "Get all banned users in a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the banned users", content = {
@@ -967,7 +973,7 @@ public class APICommunityController {
         }
     }
 
-    // Gets a list of community names and their respective member count
+    // Gets a list of community names and their respective member count | SECURITY: CHECKED
     @Operation(summary = "Get a list of community names and their respective member count")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the community names and member counts", content = {
@@ -985,7 +991,7 @@ public class APICommunityController {
         return new ResponseEntity<>(communities, HttpStatus.OK);
     }
 
-    // Is the given username a member of the community?
+    // Is the given username a member of the community? | SECURITY: CHECKED
     @Operation(summary = "Check if a user is a member of a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User is a member of the community", content = {

@@ -66,7 +66,7 @@ public class APIUserController {
         this.mailService = mailService;
     }
 
-    // Get current user
+    // Get current user | SECURITY: CHECKED
     @JsonView(UserBasicView.class)
     @Operation(summary = "Get current user")
     @ApiResponses(value = {
@@ -90,7 +90,7 @@ public class APIUserController {
         }
     }
 
-    // Get User Info by username
+    // Get User Info by username | SECURITY: CHECKED
     @JsonView(UserBasicView.class)
     @Operation(summary = "Get user by username or email")
     @ApiResponses(value = {
@@ -112,7 +112,7 @@ public class APIUserController {
         }
     }
 
-    // Is username taken
+    // Is username taken | SECURITY: CHECKED
     @Operation(summary = "Check if username is taken")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Username is available", content = {
@@ -132,7 +132,7 @@ public class APIUserController {
         }
     }
 
-    // Get User Followers list
+    // Get User Followers list | SECURITY: CHECKED
     @JsonView(UserBasicView.class)
     @Operation(summary = "Get user's followers list (pageable)")
     @ApiResponses(value = {
@@ -153,7 +153,7 @@ public class APIUserController {
         }
     }
 
-    // Is user following another user
+    // Is user following another user | SECURITY: CHECKED
     @Operation(summary = "Check if user is following another user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User is following", content = {
@@ -177,7 +177,7 @@ public class APIUserController {
         }
     }
 
-    // Get User Following list
+    // Get User Following list | SECURITY: CHECKED
     @JsonView(UserBasicView.class)
     @Operation(summary = "Get user's following list (pageable)")
     @ApiResponses(value = {
@@ -199,7 +199,7 @@ public class APIUserController {
         }
     }
 
-    // SEARCH ENGINE: USERS
+    // SEARCH ENGINE: USERS | SECURITY: CHECKED
     @JsonView(UserBasicView.class)
     @Operation(summary = "Search users by username, email, alias or description. Search Engine's default behaviour")
     @ApiResponses(value = {
@@ -221,7 +221,7 @@ public class APIUserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    // Get User's Communities
+    // Get User's Communities list | SECURITY: CHECKED
     @JsonView(CommunitiesBasicView.class)
     @Operation(summary = "Get user's communities list (pageable). If admin=true, returns the communities the user is an admin of")
     @ApiResponses(value = {
@@ -247,7 +247,7 @@ public class APIUserController {
         }
     }
 
-    // Get User's Communities Count
+    // Get User's Communities Count | SECURITY: CHECKED
     @Operation(summary = "Get the number of communities a user is a member of. If admin=true, returns the number of communities the user is an admin of")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Communities found", content = {
@@ -280,7 +280,7 @@ public class APIUserController {
         }
     }
 
-    // Get User's Posts Count
+    // Get User's Posts Count | SECURITY: CHECKED
     @Operation(summary = "Get the number of posts a user has made")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
@@ -298,7 +298,7 @@ public class APIUserController {
         }
     }
 
-    // Register User
+    // Register User | SECURITY: CHECKED
     @Operation(summary = "Register a new user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User registered", content = {
@@ -355,7 +355,7 @@ public class APIUserController {
         return ResponseEntity.created(location).body(user);
     }
 
-    // Update User (modify data)
+    // Update User (modify data) | SECURITY: CHECKED
     @Operation(summary = "Update user data")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User updated", content = {
@@ -461,12 +461,13 @@ public class APIUserController {
         return password.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
     }
 
-    // Delete User
+    // Delete User | SECURITY: CHECKED
     @Operation(summary = "Delete user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User deleted"),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
     })
     @DeleteMapping("/users/{username}")
     public ResponseEntity<String> deleteUser(HttpServletRequest request, @PathVariable String username) {
@@ -496,7 +497,7 @@ public class APIUserController {
 
         // Is the user the admin of any community?
         if (userService.getNumberOfAdminCommunities(username) > 0) {
-            return new ResponseEntity<>("User is the admin of one or more communities", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("User is the admin of one or more communities", HttpStatus.FORBIDDEN);
         }
 
         // Remove references to the user in other entities
@@ -519,7 +520,7 @@ public class APIUserController {
         return new ResponseEntity<>(username + " has been deleted", HttpStatus.OK);
     }
 
-    // Change Profile Picture
+    // Change Profile Picture | SECURITY: CHECKED
     @Operation(summary = "Change user's profile picture")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Profile picture changed", content = {
@@ -580,7 +581,7 @@ public class APIUserController {
         }
     }
 
-    // Get Profile Picture
+    // Get Profile Picture | SECURITY: CHECKED
     @Operation(summary = "Get user's profile picture")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Profile picture found", content = {
@@ -632,7 +633,7 @@ public class APIUserController {
         }
     }
 
-    // Get users with the most liked posts
+    // Get users with the most liked posts | SECURITY: CHECKED
     @JsonView(UserBasicView.class)
     @Operation(summary = "Get users with the most liked posts")
     @ApiResponses(value = {

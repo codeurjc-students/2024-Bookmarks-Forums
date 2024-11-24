@@ -95,6 +95,15 @@ export class ModifyCommunityComponent implements OnInit {
       this.communityService.getAdmin(this.community.identifier).subscribe({
         next: (admin) => {
           this.admin = admin;
+          if (admin.username !== this.loggedUsername && !this.isAdmin) {
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Error obteniendo administrador de la comunidad',
+                description: 'No eres el administrador de esta comunidad',
+                code: 401,
+              },
+            });
+          }
         },
         error: (r) => {
           this.router.navigate(['/error'], {
@@ -113,7 +122,7 @@ export class ModifyCommunityComponent implements OnInit {
     let communityID = Number(this.route.snapshot.paramMap.get('identifier'));
     this.communityService.getCommunityById(communityID).subscribe({
       next: (community) => {
-        this.community = community;        
+        this.community = community;
         this.communityName = community.name;
         this.communityDescription = community.description;
         this.isUserMember();
@@ -122,13 +131,24 @@ export class ModifyCommunityComponent implements OnInit {
         this.getPostsCount();
       },
       error: (r) => {
-        this.router.navigate(['/error'], {
-          queryParams: {
-            title: 'Error obteniendo comunidad',
-            description: r.error.message,
-            code: 500,
-          },
-        });
+        // if error is 404, community doesn't exist
+        if (r.status == 404) {
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Comunidad no encontrada',
+              description: 'La comunidad que buscas no existe',
+              code: 404,
+            },
+          });
+        } else {
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error obteniendo comunidad',
+              description: r.error.message,
+              code: 500,
+            },
+          });
+        }
       },
     });
   }
@@ -201,24 +221,24 @@ export class ModifyCommunityComponent implements OnInit {
           });
         } else {
           // if user is not logged in
-          this.loggedUsername = ''; // set the logged username to empty
-          this.user = undefined;
-          this.isAdmin = false;
-          this.loadCommunity();
-        }
-      },
-      error: (r) => {
-        // if error is 401, user is not logged in, do not print error
-        if (r.status != 401) {
           this.router.navigate(['/error'], {
             queryParams: {
               title: 'Error comprobando si el usuario está logueado',
-              description: r.error.message,
-              code: 500,
+              description: 'El usuario no está logueado',
+              code: 401,
             },
           });
         }
-        this.loadCommunity();
+      },
+      error: (r) => {
+        // if error is 401, user is not logged in: user can't access this page
+        this.router.navigate(['/error'], {
+          queryParams: {
+            title: 'Error comprobando si el usuario está logueado',
+            description: r.error.message,
+            code: r.status,
+          },
+        });
       },
     });
   }

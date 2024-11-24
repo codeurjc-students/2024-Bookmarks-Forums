@@ -63,10 +63,34 @@ public class RestSecurityConfig {
 
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        // PRIVATE ENDPOINTS
+                        // PRIVATE ENDPOINTS ----------------------------
+
+                        // session endpoints
                         .requestMatchers(HttpMethod.POST, "/api/v1/logout").hasAnyRole("USER")
 
-                        // PUBLIC ENDPOINTS
+                        // community & ban endpoints
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/communities/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/communities/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/communities/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/bans/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/bans/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/bans/**").hasAnyRole("USER")
+
+                        // post endpoints
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/posts/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/posts/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/posts/**").hasAnyRole("USER")
+
+                        // reply endpoints
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/replies/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/replies/**").hasAnyRole("USER")
+
+                        // user endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/me/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAnyRole("USER")
+
+                        // PUBLIC ENDPOINTS ----------------------------
                         .anyRequest().permitAll()
                 );
 

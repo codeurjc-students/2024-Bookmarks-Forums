@@ -239,9 +239,9 @@
                   *ngIf="loggedIn; else loginToJoin"
                 >
                   <!-- If the user is logged in and is a member of the community-->
-                  <ng-container *ngIf="isMember">
+                  <ng-container *ngIf="isMember || this.isAdmin">
                     <!-- If the user is an admin of the community -->
-                    <ng-container *ngIf="isCommunityAdmin">
+                    <ng-container *ngIf="isCommunityAdmin || this.isAdmin">
                       <button
                         class="btn primary-btn"
                         (click)="confirmChanges()"

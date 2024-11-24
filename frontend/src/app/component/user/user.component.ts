@@ -45,6 +45,8 @@ export class UserComponent implements OnInit {
 
   profileUser: User | undefined;
 
+  isProfileOfAdmin: boolean = false;
+
   posts: Post[] = [];
   postCount: number = 0;
 
@@ -101,18 +103,30 @@ export class UserComponent implements OnInit {
       this.profileService.getUser(username).subscribe({
         next: (user) => {
           this.profileUser = user;
+          this.isProfileOfAdmin = user.roles.includes('ADMIN');
           this.loadPosts();
           this.getPostsCount();
           this.checkFollowing();
         },
         error: (r) => {
-          this.router.navigate(['/error'], {
-            queryParams: {
-              title: 'Usuario no encontrado',
-              description: r.error.message,
-              code: r.status,
-            },
-          });
+          // if error is 404, user is not found, redirect to error page
+          if (r.status == 404) {
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Usuario no encontrado',
+                description: 'No se ha encontrado el usuario',
+                code: 404,
+              },
+            });
+          } else {
+            this.router.navigate(['/error'], {
+              queryParams: {
+                title: 'Usuario no encontrado',
+                description: r.error.message,
+                code: r.status,
+              },
+            });
+          }
         },
       });
     }
@@ -696,7 +710,15 @@ export class UserComponent implements OnInit {
             // if error is unauthorized, show modal
             if (r.status == 401) {
               this.openAlertModal(
-                'No puedes realizar esta acción. No puedes cerrar la cuenta del administrador del sitio ni la de otro usuario a no ser que estés logueado en esa cuenta.',
+                'No puedes realizar esta acción. Si eres el administrador del sitio, no puedes cerrar tu cuenta.',
+                () => {
+                  this.closeAlertModal();
+                },
+                false
+              );
+            } else if (r.status == 403) {
+              this.openAlertModal(
+                'No puedes cerrar tu cuenta: aún eres administrador de una o más comunidades. Deja de ser administrador de todas las comunidades antes de cerrar tu cuenta.',
                 () => {
                   this.closeAlertModal();
                 },

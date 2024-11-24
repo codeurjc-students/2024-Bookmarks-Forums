@@ -384,7 +384,7 @@
                       <!-- Reply delete button -->
                       <button
                         *ngIf="
-                          reply.author.username === loggedUsername || isAdmin
+                          reply.author.username === loggedUsername || isAdmin || this.community?.admin?.username === loggedUsername || this.isModerator
                         "
                         class="btn danger-btn delete-reply-btn"
                         (click)="deleteReply(reply.identifier)"

@@ -373,16 +373,21 @@
                     *ngIf="loggedIn; else loginToJoin"
                   >
                     <!-- If the user is logged in and is a member of the community-->
-                    <ng-container *ngIf="isMember; else joinCommunityButton">
+                    <ng-container *ngIf="isMember || this.isAdmin">
                       <a
                         class="btn primary-btn"
-                        
-                        [routerLink]= "['/community', community?.identifier, 'new', 'post']"
+                        [routerLink]="[
+                          '/community',
+                          community?.identifier,
+                          'new',
+                          'post'
+                        ]"
                       >
                         <i class="fas fa-plus me-1"></i>
                         Nuevo Post
-                    </a>
+                      </a>
                       <button
+                        *ngIf="isMember"
                         class="btn negative-btn"
                         (click)="joinOrLeaveCommunity()"
                       >
@@ -390,7 +395,7 @@
                         Salir
                       </button>
                       <!-- If the user is an admin of the community -->
-                      <ng-container *ngIf="isCommunityAdmin">
+                      <ng-container *ngIf="isCommunityAdmin || this.isAdmin">
                         <a
                           class="btn primary-dimmed-btn"
                           [routerLink]="[
@@ -412,9 +417,12 @@
                       </ng-container>
                     </ng-container>
                     <!-- If the user is logged in and is not a member of the community-->
-                    <ng-template #joinCommunityButton>
+                    <ng-container *ngIf="this.community && !isMember">
                       <div class="community-actions-container-text">
-                        <p class="card-content card-text wrap-text center-text">
+                        <p
+                          *ngIf="!isAdmin"
+                          class="card-content card-text wrap-text center-text"
+                        >
                           Únete a la comunidad para crear posts, comentar, y
                           más...
                         </p>
@@ -427,7 +435,7 @@
                           Unirse
                         </button>
                       </div>
-                    </ng-template>
+                    </ng-container>
                   </div>
                   <!-- If the user is not logged in -->
                   <ng-template #loginToJoin>
@@ -448,7 +456,9 @@
                 </ng-container>
                 <ng-template #userBanned>
                   <div class="community-actions-container-text">
-                    <p class="card-content card-text wrap-text center-text red-text">
+                    <p
+                      class="card-content card-text wrap-text center-text red-text"
+                    >
                       Has sido baneado de esta comunidad
                     </p>
                   </div>
@@ -626,7 +636,10 @@
                   </div>
                 </div>
                 <!-- Button to open the ban manager modal -->
-                <div class="card-header-actions-container" *ngIf="isCommunityAdmin">
+                <div
+                  class="card-header-actions-container"
+                  *ngIf="isCommunityAdmin"
+                >
                   <button
                     class="btn negative-btn"
                     (click)="openBanManagerModal()"

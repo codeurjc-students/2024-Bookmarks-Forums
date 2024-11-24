@@ -61,7 +61,6 @@ export class ModifyPostComponent implements OnInit {
   ngOnInit(): void {
     // Check if user is logged in
     this.checkIfLoggedIn();
-    this.loadPost();
 
     // Add event listeners for selection change and input events
     document.addEventListener(
@@ -81,6 +80,7 @@ export class ModifyPostComponent implements OnInit {
     this.user = user;
     this.loggedUsername = user.username;
     this.isAdmin = user.roles.includes('ADMIN');
+    this.loadPost();
   }
 
   loadCommunity() {
@@ -109,18 +109,43 @@ export class ModifyPostComponent implements OnInit {
     this.postService.getPostById(postID).subscribe({
       next: (post) => {
         this.post = post;
+        if (
+          post.author.username !== this.loggedUsername &&
+          (!this.isAdmin ||
+            post.community.admin.username !== this.loggedUsername)
+        ) {
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error cargando el post',
+              description:
+                'No tienes permiso para editar este post. Solo el autor o un administrador de la comunidad pueden editar un post.',
+              code: 403,
+            },
+          });
+        }
         this.postTitle = post.title;
         this.postContent = post.content; // Set the postContent property
         this.loadCommunity();
       },
       error: (r) => {
-        this.router.navigate(['/error'], {
-          queryParams: {
-            title: 'Error cargando el post',
-            description: r.error.message,
-            code: 500,
-          },
-        });
+        // if error is 404, post does not exist, redirect to error page
+        if (r.status == 404) {
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error cargando el post',
+              description: 'El post que intentas editar no existe.',
+              code: 404,
+            },
+          });
+        } else {
+          this.router.navigate(['/error'], {
+            queryParams: {
+              title: 'Error cargando el post',
+              description: r.error.message,
+              code: 500,
+            },
+          });
+        }
       },
     });
   }
