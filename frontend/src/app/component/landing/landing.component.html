@@ -335,9 +335,11 @@
               <h3 class="fw-semibold mb-4 page-title">Tu perfil, y más</h3>
             </ng-template>
             <!-- Users widget-->
-            <div class="card mb-4">
+            <div class="card dark-card mb-4">
               <ng-container *ngIf="!loggedIn; else loggedUserActionsPanel">
-                <div class="card-header">Acceso usuarios</div>
+                <div class="post-container-card-top">
+                  <h5 class="card-title mb-0">Acceso usuarios</h5>
+                </div>
                 <div class="card-body">
                   <p>
                     ¡Publica, únete a comunidades interesantes y sigue a otros
@@ -362,7 +364,9 @@
 
               <!-- User profile widget -->
               <ng-template #loggedUserActionsPanel>
-                <div class="card-header">Acceso rápido a tu perfil</div>
+                <div class="post-container-card-top">
+                  <h5 class="card-title mb-0">Acceso rápido a tu perfil</h5>
+                </div>
                 <div class="card-body profile-card" *ngIf="userLoaded">
                   <img
                     class="profile-picture bm-rounded-circle"
@@ -382,8 +386,10 @@
             </div>
 
             <!-- Side widget-->
-            <div class="card mb-4">
-              <div class="card-header">Lo están petando</div>
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Lo están petando</h5>
+              </div>
               <div class="card-body">
                 <div id="mostReadGenresChartContainer">
                   <canvas id="mostPopularUsersChart">{{ chart }}</canvas>
@@ -398,8 +404,10 @@
             </div>
 
             <!-- Side widget-->
-            <div class="card mb-4">
-              <div class="card-header">Las comunidades más populares</div>
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Usuarios más populares</h5>
+              </div>
               <div class="card-body">
                 <div class="row">
                   <ul class="list-styled mb-0 stats-list">
@@ -429,8 +437,13 @@
             </div>
 
             <!-- Side widget (create community button) -->
-            <div class="card mb-4" *ngIf="loggedIn else notLoggedInCreateCommunity">
-              <div class="card-header">Crea tu propia comunidad</div>
+            <div
+              class="card dark-card mb-4"
+              *ngIf="loggedIn; else notLoggedInCreateCommunity"
+            >
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Crea tu propia comunidad</h5>
+              </div>
               <div class="card-body">
                 <p>
                   ¿No encuentras una comunidad que te guste? ¡Crea la tuya
@@ -447,11 +460,14 @@
               </div>
             </div>
             <ng-template #notLoggedInCreateCommunity>
-              <div class="card mb-4">
-                <div class="card-header">Crea tu propia comunidad</div>
+              <div class="card dark-card mb-4">
+                <div class="post-container-card-top">
+                  <h5 class="card-title mb-0">Crea tu propia comunidad</h5>
+                </div>
                 <div class="card-body">
                   <p class="mb-0">
-                    ¿No encuentras una comunidad que te guste? ¡Inicia sesión más arriba y crea la tuya!
+                    ¿No encuentras una comunidad que te guste? ¡Inicia sesión
+                    más arriba y crea la tuya!
                   </p>
                 </div>
               </div>

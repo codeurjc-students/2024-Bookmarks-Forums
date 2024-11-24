@@ -1460,7 +1460,7 @@ html {
   margin-left: 1rem;
   margin-right: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 0.8rem !important;
+  border-radius: 25px !important;
 }
 
 .main-body-container {
@@ -1478,7 +1478,7 @@ html {
 .page-hero {
   display: flex;
   align-items: center;
-  border-radius: 1rem;
+  border-radius: 25px;
   position: relative;
   background-size: cover;
   background-position: center;
@@ -1516,7 +1516,7 @@ html {
   background-color: var(--branding-forums-dark-grey);
   outline-color: var(--branding-forums-light-grey);
   outline-style: solid;
-  outline-width: 1px;
+  outline-width: 2px;
   transition: outline-color 0.3s ease-in-out,
     transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55),
     box-shadow 0.3s ease-in-out;
@@ -1536,7 +1536,8 @@ html {
   flex-shrink: 0;
   padding: 1rem !important;
   background-color: var(--branding-forums-dark-grey) !important;
-  border-radius: 12px 12px 0 0 !important;
+  margin: 0.5rem !important;
+  border-radius: 20px !important;
 }
 
 .post-container-card-body {
@@ -1567,7 +1568,7 @@ html {
   --bs-card-title-spacer-y: 0.5rem;
   --bs-card-border-width: 1px;
   --bs-card-border-color: var(--bs-border-color-translucent);
-  --bs-card-border-radius: 12px;
+  --bs-card-border-radius: 25px;
   --bs-card-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   --bs-card-inner-border-radius: calc(0.375rem - 1px);
   --bs-card-cap-padding-y: 0.5rem;
@@ -1586,11 +1587,11 @@ html {
   height: var(--bs-card-height);
   word-wrap: break-word;
   background-color: var(--branding-forums-dark-grey);
-  outline-color: var(--branding-forums-light-grey);
+  outline-color: transparent;
   outline-style: solid;
-  outline-width: 1px;
+  outline-width: 2px;
   background-clip: border-box;
-  border: var(--bs-card-border-width) solid var(--bs-card-border-color);
+  border: var(--bs-card-border-width) solid transparent;
   border-radius: var(--bs-card-border-radius);
   box-shadow: var(--bs-card-box-shadow);
 }
@@ -1641,7 +1642,7 @@ html {
 }
 
 .card-header {
-  border-radius: 12px 12px 0 0 !important;
+  border-radius: 25px 25px 0 0 !important;
 }
 
 .card > hr {
@@ -1764,8 +1765,8 @@ html {
 
 .card-community-name-container {
   background-color: rgba(228, 228, 228, 0.075);
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
 }
 
 .card-community-name-text {
@@ -1858,6 +1859,7 @@ html {
   text-decoration: none !important;
   color: inherit !important;
   display: block !important;
+  border-radius: 25px !important;
 }
 
 .card-link:hover,
@@ -2042,22 +2044,22 @@ html {
 .load-more-btn {
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
+  border-radius: 25px !important;
   padding: 0.5rem 1rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
 }
 
 .load-more-btn:hover {
-  border: 1px solid var(--branding-peach) !important;
+  border: 2px solid var(--branding-peach) !important;
   background-color: var(--branding-forums-light-grey) !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
 }
 
 .load-more-btn:active {
   background-color: var(--branding-forums-darker-grey) !important;
-  border: 1px solid var(--branding-forums-dark-grey) !important;
+  border: 2px solid var(--branding-forums-dark-grey) !important;
   scale: 0.95 !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
@@ -2065,22 +2067,22 @@ html {
 .primary-btn {
   background-color: var(--branding-forums-light-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-lighter-grey) !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid var(--branding-forums-lighter-grey) !important;
+  border-radius: 25px !important;
   padding: 0.5rem 1rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
 }
 
 .primary-btn:hover {
-  border: 1px solid var(--branding-peach) !important;
+  border: 2px solid var(--branding-peach) !important;
   background-color: var(--branding-forums-lighter-grey) !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
 }
 
 .primary-btn:active {
   background-color: var(--branding-forums-dark-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
   scale: 0.95 !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
@@ -2153,16 +2155,33 @@ html {
 .input-field {
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
+  border-radius: 20px !important;
   padding: 0.5rem 1rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
 }
 
+.input-field::placeholder {
+  color: var(--branding-light-grey) !important;
+  opacity: 0.6 !important;
+}
+
+.input-field:hover {
+  background-color: var(--branding-forums-light-grey) !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
+  border: 2px solid var(--branding-forums-lighter-grey) !important;
+}
+
+.input-field:focus {
+  border: 2px solid var(--branding-peach) !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
+  background-color: var(--branding-forums-dark-grey) !important;
+}
+
 .reply-card {
-  border-radius: 0.5rem !important;
-  padding: 0.5rem !important;
+  border-radius: 20px !important;
+  padding: 0.75rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
   position: relative;
@@ -2283,10 +2302,11 @@ html {
   gap: 0.5rem !important;
   padding: 0.5rem 1rem !important;
   color: var(--branding-light-grey) !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
   background-color: var(--branding-forums-dark-grey) !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
-  border-radius: 0.5rem !important;
+  border-radius: 25px !important;
 }
 
 .branding-dropdown-toggle:hover {
@@ -2302,14 +2322,15 @@ html {
 .branding-dropdown-menu {
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
+  border-radius: 15px !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
 .branding-dropdown-menu a {
   color: var(--branding-light-grey) !important;
   text-decoration: none !important;
+  border-radius: 2px !important;
 }
 
 .branding-dropdown-menu a:hover {
@@ -2377,8 +2398,8 @@ html {
   flex: 1;
   background-color: var(--branding-forums-darker-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
-  border-radius: 0.5rem 0 0 0.5rem !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
+  border-radius: 25px 0 0 25px !important;
   height: 2.5rem !important;
 }
 
@@ -2389,14 +2410,14 @@ html {
 
 .search-input:focus {
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-peach) !important;
+  border: 2px solid var(--branding-peach) !important;
   box-shadow: none !important;
 }
 
 .input-group-text {
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
 }
 
 .input-group-append {
@@ -2407,7 +2428,7 @@ html {
 .clear-search-btn {
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
   border-left: none !important;
   border-radius: 0 0 0 0 !important;
   height: 2.5rem !important;
@@ -2427,9 +2448,9 @@ html {
   margin-left: 0 !important;
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
   border-left: none !important;
-  border-radius: 0 0.5rem 0.5rem 0 !important;
+  border-radius: 0 25px 25px 0 !important;
   height: 2.5rem !important;
   width: 2.5rem !important;
 }
@@ -2448,6 +2469,7 @@ html {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 0;
+  border-radius: 25px !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   background-color: transparent !important;
   height: 2.5rem !important;
@@ -2508,14 +2530,13 @@ html {
   width: 80%;
   max-width: 700px;
   background-color: var(--branding-forums-darker-grey);
-  border-radius: 10px;
+  border-radius: 25px;
   overflow: scroll;
   overflow-x: hidden;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   scale: 0.95;
   opacity: 0;
   transition: all 0.3s ease;
-  border: 1px solid var(--branding-forums-light-grey);
   overflow-y: auto;
 }
 
@@ -2527,7 +2548,9 @@ html {
 .custom-modal-header {
   display: flex;
   justify-content: flex-end;
+  margin: 0.5rem;
   padding: 0.5rem;
+  border-radius: 20px;
   background-color: var(--branding-forums-dark-grey);
 }
 
@@ -2625,7 +2648,7 @@ html {
   width: 100% !important;
   min-height: 200px !important; /* Set a minimum height */
   transition: border-color 0.3s ease-in-out !important;
-  border-radius: 0.5rem !important;
+  border-radius: 20px !important;
   padding: 0.5rem !important;
   overflow: hidden; /* Hide overflow */
 }
@@ -2683,6 +2706,7 @@ html {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  border-radius: 20px;
 }
 
 .rich-text-editor-toolbar {
@@ -2691,8 +2715,8 @@ html {
   align-items: center;
   gap: 1rem;
   background-color: rgba(42, 43, 46, 0.8);
-  border-radius: 0.5rem;
-  border: 1px solid var(--branding-forums-light-grey);
+  border-radius: 20px;
+  border: 2px solid var(--branding-forums-light-grey);
   padding: 0.5rem;
   margin-bottom: 1rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -2703,8 +2727,8 @@ html {
 .toolbar-btn {
   background-color: transparent !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid transparent !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid transparent !important;
+  border-radius: 12px !important;
   transition: all 0.15s ease-in-out !important;
   width: 5rem !important;
 }
@@ -2714,7 +2738,7 @@ html {
 }
 
 .toolbar-btn.active {
-  border: 1px solid var(--branding-forums-lighter-grey) !important;
+  border: 2px solid var(--branding-forums-lighter-grey) !important;
   background-color: rgba(73, 74, 80, 0.8) !important;
 }
 
@@ -2814,16 +2838,16 @@ html {
   align-items: center;
   flex-direction: row;
   gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 12px;
+  padding: 0.7rem;
+  border-radius: 25px;
   background-color: var(--branding-forums-dark-grey);
-  border: 1px solid var(--branding-forums-light-grey);
+  border: 2px solid transparent;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease-in-out;
 }
 
 .community-member-card:hover {
-  border: 1px solid var(--branding-peach);
+  border: 2px solid var(--branding-peach);
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
 }
 
@@ -2881,22 +2905,22 @@ html {
 .negative-btn {
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
+  border-radius: 25px !important;
   padding: 0.5rem 1rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
 }
 
 .negative-btn:hover {
-  border: 1px solid var(--bs-red) !important;
+  border: 2px solid var(--bs-red) !important;
   background-color: var(--branding-forums-light-grey) !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
 }
 
 .negative-btn:active {
   background-color: var(--branding-forums-dark-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
   scale: 0.95 !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
@@ -2917,15 +2941,15 @@ html {
 .alert-modal-input input {
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
+  border-radius: 20px !important;
   padding: 0.5rem 1rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
 }
 
 .alert-modal-input input:focus {
-  border: 1px solid var(--branding-peach) !important;
+  border: 2px solid var(--branding-peach) !important;
 }
 
 .alert-modal-container {
@@ -2979,22 +3003,22 @@ html {
 .primary-dimmed-btn {
   background-color: var(--branding-forums-dark-grey) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
+  border-radius: 25px !important;
   padding: 0.5rem 1rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
 }
 
 .primary-dimmed-btn:hover {
-  border: 1px solid var(--branding-peach) !important;
+  border: 2px solid var(--branding-peach) !important;
   background-color: var(--branding-forums-light-grey) !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
 }
 
 .primary-dimmed-btn:active {
   background-color: var(--branding-forums-dark-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
   scale: 0.95 !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
@@ -3126,6 +3150,7 @@ html {
   padding: 1rem;
   max-height: 400px; /* Set the desired max-height */
   overflow-y: auto;
+  box-shadow: none !important;
 }
 
 .banned-user-info {
@@ -3149,8 +3174,8 @@ html {
   align-items: center;
   background-color: var(--branding-forums-dark-grey);
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid transparent !important;
+  border-radius: 25px !important;
   padding: 1rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
@@ -3240,8 +3265,8 @@ html {
 .red-btn {
   background-color: var(--bs-red) !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--bs-red) !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid var(--bs-red) !important;
+  border-radius: 25px !important;
   padding: 0.5rem 1rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
@@ -3249,13 +3274,13 @@ html {
 
 .red-btn:hover {
   background-color: var(--bs-red-hover) !important;
-  border: 1px solid var(--bs-red-hover) !important;
+  border: 2px solid var(--bs-red-hover) !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
 }
 
 .red-btn:active {
   background-color: var(--bs-red-active) !important;
-  border: 1px solid var(--bs-red-active) !important;
+  border: 2px solid var(--bs-red-active) !important;
   scale: 0.95 !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
@@ -3324,10 +3349,14 @@ html {
 .community-card-frame {
   --bs-card-height: ;
   background-color: var(--branding-forums-dark-grey);
-  outline-color: var(--branding-forums-light-grey);
+  outline-color: transparent;
   outline-style: solid;
-  outline-width: 1px;
+  outline-width: 2px;
   transition: outline-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.community-card-frame p {
+  transition: color 0.3s ease-in-out !important;
 }
 
 .community-card-frame:hover {

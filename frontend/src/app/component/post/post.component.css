@@ -12374,8 +12374,9 @@ header {
 
 .post-container-card-action-buttons-container {
   padding: 0.25rem 1rem;
+  margin: 0.5rem !important;
   background-color: var(--branding-forums-dark-grey);
-  border-radius: 0 0 12px 12px;
+  border-radius: 20px;
 }
 
 .action-btn {
