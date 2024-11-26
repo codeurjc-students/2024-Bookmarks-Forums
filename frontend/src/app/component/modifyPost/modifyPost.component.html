@@ -283,6 +283,7 @@
                       *ngIf="
                         post?.author?.username === loggedUsername || isAdmin
                       "
+                      id="post-edit-confirm-btn"
                       class="btn primary-btn"
                       title="Confirmar"
                       (click)="confirmEditPost(post?.identifier)"

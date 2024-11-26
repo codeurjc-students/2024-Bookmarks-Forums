@@ -1638,7 +1638,7 @@ html {
     rgba(0, 0, 0, 0.829)
   );
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 0px;
 }
 
 .card-header {
@@ -2126,7 +2126,7 @@ html {
   align-items: center;
   max-height: 200px;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 20px;
   margin: 1rem;
   background-color: var(--branding-forums-darker-grey) !important;
 }
@@ -3096,8 +3096,8 @@ html {
 .community-description-input {
   background-color: transparent !important;
   color: var(--branding-light-grey) !important;
-  border: 1px solid var(--branding-forums-light-grey) !important;
-  border-radius: 0.5rem !important;
+  border: 2px solid var(--branding-forums-light-grey) !important;
+  border-radius: 20px !important;
   outline: none !important;
   transition: all 0.2s ease-in-out !important;
   width: 100% !important;
@@ -3111,7 +3111,7 @@ html {
 }
 
 .community-description-input:focus {
-  border: 1px solid var(--branding-peach) !important;
+  border: 2px solid var(--branding-peach) !important;
   background-color: rgba(255, 255, 255, 0) !important;
   outline: none !important;
 }

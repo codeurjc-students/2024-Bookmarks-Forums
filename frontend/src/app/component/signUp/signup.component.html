@@ -82,6 +82,7 @@
                       title="El alias es un pequeño mote o apodo que se mostrará al lado de tu nombre de usuario en tu perfil"
                       #userAlias
                       name="inputAlias"
+                      id="inputAlias"
                       type="text"
                       class="form-control"
                       placeholder="Alias"
@@ -92,6 +93,7 @@
                     <input
                       #userEmail
                       name="inputEmail"
+                      id="inputEmail"
                       type="email"
                       class="form-control"
                       placeholder="Email"
@@ -160,7 +162,7 @@
                   <div class="form-group">
                     <button
                       type="submit"
-                      id="submit"
+                      id="register-submit"
                       [disabled]="
                         this.usernameNotAvailable ||
                         this.passwordsDontMatch ||

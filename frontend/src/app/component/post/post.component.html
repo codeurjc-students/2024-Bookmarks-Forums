@@ -84,7 +84,8 @@
                 <h1
                   class="display-4 fw-bolder header-main-text landing-hero hero-hyperlink hero-username"
                 >
-                  <p>
+                  <p
+                  id="post-author-username">
                     {{ post?.author?.username }}
                   </p>
                 </h1>
@@ -106,7 +107,9 @@
                 <div
                   class="post-top-info d-flex justify-content-between align-items-center"
                 >
-                  <div class="card-content small text-muted mb-1">
+                  <div
+                    id="post-date"
+                    class="card-content small text-muted mb-1">
                     {{
                       post?.fullCreationDate | date : "dd-MM-yyyy 'a las' HH:mm"
                     }}
@@ -161,6 +164,7 @@
 
                 <button
                   *ngIf="post?.author?.username === loggedUsername || isAdmin"
+                  id="edit-post-btn"
                   class="btn action-btn"
                   title="Editar post"
                   (click)="editPost(post?.identifier)"

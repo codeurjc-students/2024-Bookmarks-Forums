@@ -39,11 +39,12 @@
         <div class="container px-4 px-lg-5 my-5">
           <div class="text-start text-dark">
             <h1 class="display-4 fw-bolder header-welcome-text landing-hero">
-              <p *ngIf="heroNameVisible; else notLogged">
+              <p *ngIf="heroNameVisible; else notLogged"
+              id="landing-greeting">
                 Muy buenas, {{ loggedUsername }}
               </p>
               <ng-template #notLogged>
-                <p>Presentamos Bookmarks Forums</p>
+                <p id="default-greeting">Presentamos Bookmarks Forums</p>
               </ng-template>
             </h1>
 
@@ -132,7 +133,8 @@
                     </a>
                   </div>
 
-                  <div class="card-content small text-muted mb-1">
+                  <div
+                    class="card-content small text-muted mb-1 card-post-date">
                     {{
                       post.fullCreationDate | date : "dd-MM-yyyy 'a las' HH:mm"
                     }}
@@ -140,7 +142,7 @@
                   <h2 class="card-content card-title">{{ post.title }}</h2>
                   <div class="parent-container">
                     <p
-                      class="card-content card-text single-line-card-text"
+                      class="card-content card-text single-line-card-text card-post-content"
                       [innerHTML]="post.content"
                     ></p>
                   </div>
@@ -262,7 +264,7 @@
                     </a>
                   </div>
 
-                  <div class="card-content small text-muted mb-1">
+                  <div class="card-content small text-muted mb-1 card-post-date">
                     {{
                       post.fullCreationDate | date : "dd-MM-yyyy 'a las' HH:mm"
                     }}
@@ -270,7 +272,7 @@
                   <h2 class="card-content card-title">{{ post.title }}</h2>
                   <div class="parent-container">
                     <p
-                      class="card-content card-text single-line-card-text"
+                      class="card-content card-text single-line-card-text card-post-content"
                       [innerHTML]="post.content"
                     ></p>
                   </div>
@@ -346,7 +348,9 @@
                     usuarios! Inicia sesión o crea una cuenta para empezar.
                   </p>
                   <div class="input-group">
-                    <a [routerLink]="['/login']">
+                    <a
+                      id="login-btn"
+                      [routerLink]="['/login']">
                       <button class="btn primary-btn" type="button">
                         <i class="fas fa-sign-in-alt me-1"></i>
                         Iniciar sesión
@@ -406,7 +410,7 @@
             <!-- Side widget-->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
-                <h5 class="card-title mb-0">Usuarios más populares</h5>
+                <h5 class="card-title mb-0">Comunidades más populares</h5>
               </div>
               <div class="card-body">
                 <div class="row">
