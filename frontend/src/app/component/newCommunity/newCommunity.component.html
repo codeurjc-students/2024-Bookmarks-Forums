@@ -240,6 +240,7 @@
                   <!-- If the user is logged in and is a member of the community-->
                     <!-- If the user is an admin of the community -->
                       <button
+                        id="confirm-changes-btn"
                         class="btn primary-btn"
                         (click)="confirmChanges()"
                       >
@@ -295,6 +296,7 @@
           <p class="alert-modal-text">{{ alertModalText }}</p>
           <div class="alert-modal-buttons">
             <button
+              id="confirm-modal-btn"
               class="btn primary-btn"
               title="Confirmar"
               (click)="confirmAction(); closeAlertModal()"

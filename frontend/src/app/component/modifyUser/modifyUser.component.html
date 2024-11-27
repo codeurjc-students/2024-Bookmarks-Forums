@@ -100,6 +100,7 @@
                     <p class="user-info-field-label">Alias:</p>
                     <hr class="post-container-divider" />
                     <input
+                      id="alias-input"
                       type="text"
                       [value]="profileUser?.alias"
                       class="form-control branding-input-field"
@@ -111,6 +112,7 @@
                     <p class="user-info-field-label">Descripción:</p>
                     <hr class="post-container-divider" />
                     <textarea
+                      id="description-input"
                       [value]="profileUser?.description"
                       class="form-control branding-textarea"
                       placeholder="Introduce una descripción"
@@ -156,7 +158,9 @@
               <div class="card-body">
                 <!-- Save, Exit -->
                 <div class="community-actions-container" *ngIf="loggedIn">
-                  <button class="btn primary-btn" (click)="saveChanges()">
+                  <button
+                    id="profile-edit-confirm-btn"
+                    class="btn primary-btn" (click)="saveChanges()">
                     <i class="fas fa-save me-1"></i>
                     Guardar
                   </button>

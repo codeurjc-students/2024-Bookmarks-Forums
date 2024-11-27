@@ -52,8 +52,8 @@ public class PostSampleService {
 
         // REPLIES
 
-        List<String> replyTitles = List.of("Welcome!", "New Releases", "Best Books", "Upcoming Events");
-        List<String> replyContents = List.of("Welcome to Bookmarks Forums! I'm excited to discuss books with everyone.", "I'm looking forward to the new releases in Bookmarks News!", "I can't wait to read the reviews of the best books in Bookmarks Reviews.", "I'm interested in the upcoming events for book readers in Bookmarks Events.");
+        List<String> replyTitles = List.of("Welcome!", "New Releases", "Best Books");
+        List<String> replyContents = List.of("Welcome to Bookmarks Forums! I'm excited to discuss books with everyone.", "I'm looking forward to the new releases in Bookmarks News!", "I can't wait to read the reviews of the best books in Bookmarks Reviews.");
 
         for (int i = 0; i < replyTitles.size(); i++) {
             // +1 comment to the post

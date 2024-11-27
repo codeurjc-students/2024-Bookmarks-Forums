@@ -243,6 +243,7 @@
                     <!-- If the user is an admin of the community -->
                     <ng-container *ngIf="isCommunityAdmin || this.isAdmin">
                       <button
+                        id="confirm-changes-btn"
                         class="btn primary-btn"
                         (click)="confirmChanges()"
                       >
@@ -307,6 +308,7 @@
           <p class="alert-modal-text">{{ alertModalText }}</p>
           <div class="alert-modal-buttons">
             <button
+              id="confirm-modal-btn"
               class="btn primary-btn"
               title="Confirmar"
               (click)="confirmAction(); closeAlertModal()"

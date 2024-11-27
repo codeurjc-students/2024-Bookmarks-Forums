@@ -38,8 +38,8 @@ class PostVisitTest {
     }
 
     @Test
-    void test() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+    void postVisitTest() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getWaitTime()));
 
         // Testing on landing page
 

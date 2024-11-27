@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TestRunner",
+            "request": "launch",
+            "mainClass": "com.example.backend.TestRunner",
+            "projectName": "backend"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-BackendApplication<backend>",
             "request": "launch",
             "cwd": "${workspaceFolder}",

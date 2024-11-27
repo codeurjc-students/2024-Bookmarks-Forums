@@ -36,13 +36,13 @@ class PostEditTest {
     }
 
     @Test
-    void test() {
+    void postEditTest() {
 
         // Login
         LoginAux loginAux = new LoginAux();
         loginAux.login(driver);
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getWaitTime()));
 
 
         // Testing on first post page

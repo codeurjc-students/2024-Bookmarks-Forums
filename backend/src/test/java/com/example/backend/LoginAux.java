@@ -8,6 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 
 import static junit.framework.Assert.assertEquals;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
@@ -20,8 +21,7 @@ class LoginAux {
 
     // This is run by other classes. It expects the backend to be already started and WITH THE SAMPLE DATA
     void login(WebDriver driver) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getWaitTime()));
 
         // Given
         int port = config.getPort();
@@ -29,8 +29,8 @@ class LoginAux {
 
         // When
 
-        String username = "BookReader_14";
-        String password = "pass";
+        String username = config.getUsername();
+        String password = config.getPassword();
 
         // Auto-redirects to login page
 
@@ -51,7 +51,19 @@ class LoginAux {
 
         assertEquals("URL should be the landing page", LOCALHOST + ":" + port + "/", driver.getCurrentUrl());
         assertTrue(landingGreeting.isDisplayed(), "Landing greeting should be displayed");
+        await().atMost(Duration.ofSeconds(2)).until(() -> true); // waits for username text to load
         assertTrue(landingGreeting.getText().contains("Muy buenas, " + username), "Landing greeting should contain alias");
 
+    }
+
+    void logout(WebDriver driver) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getWaitTime()));
+
+        driver.findElement(By.id("navbarDropdown")).click();
+        driver.findElement(By.id("logout-navbar-btn")).click();
+
+        // Check that navbar has login button
+        WebElement loginButton = wait.until(presenceOfElementLocated(By.id("login-nav-btn")));
+        assertTrue(loginButton.isDisplayed(), "Login button should be displayed");
     }
 }

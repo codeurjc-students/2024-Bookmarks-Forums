@@ -38,8 +38,8 @@ class LandingLoginTest {
     }
 
     @Test // needs backend ON with data
-    void test() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+    void landingLoginTest() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getWaitTime()));
 
         // Given
         int port = config.getPort();

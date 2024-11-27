@@ -89,43 +89,23 @@ export class SearchComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // get query from url if not set yet in the search box
-    if (!this.searchTerm || this.searchTerm.trim() === '') {
-      // get query from url
-      this.searchTerm = this.route.snapshot.queryParams['query'] || '';
-    } else {
-      // add query to url
-      this.location.replaceState('/search', '?query=' + this.searchTerm);
-    }
+    this.route.queryParams.subscribe((params) => {
+      if (!this.searchTerm) {
+        this.searchTerm = params['query'] || '';
+      }
+    });
     this.checkIfLoggedIn();
   }
 
   startSearch() {
-      this.searching = true;
-      this.search();
+    this.searching = true;
+    this.search();
   }
 
   clearSearch() {
     this.searchTerm = '';
-    this.posts = [];
-    this.postsPage = 0;
-    this.noMorePosts = false;
-    this.loadingMorePosts = false;
-
-    this.communities = [];
-    this.communitiesPage = 0;
-    this.noMoreCommunities = false;
-    this.loadingMoreCommunities = false;
-
-    this.users = [];
-    this.usersPage = 0;
-    this.noMoreUsers = false;
-    this.loadingMoreUsers = false;
-
     this.location.replaceState('/search', '');
-    
     this.searching = false;
-
     this.search();
   }
 
@@ -485,33 +465,27 @@ export class SearchComponent implements OnInit {
   }
 
   search() {
-
-    if(this.searchTerm.trim() === '') {
+    if (this.searchTerm.trim() === '') {
       this.searchTitle = 'Aquí tienes todo Bookmarks Forums';
     } else {
       this.searchTitle = 'Resultados de la búsqueda para: "' + this.searchTerm + '"';
     }
 
-
-    // get query from url if not set yet in the search box
-    if (!this.searchTerm || this.searchTerm.trim() === '') {
-      // get query from url
-      this.searchTerm = this.route.snapshot.queryParams['query'] || '';
-    } else {
-      // add query to url
+    // Add query to URL if searchTerm is not empty
+    if (this.searchTerm.trim() !== '') {
       this.location.replaceState('/search', '?query=' + this.searchTerm);
+    } else {
+      this.location.replaceState('/search', '');
     }
 
     this.posts = [];
     this.postsPage = 0;
     this.noMorePosts = false;
     this.loadingMorePosts = false;
-
     this.communities = [];
     this.communitiesPage = 0;
     this.noMoreCommunities = false;
     this.loadingMoreCommunities = false;
-
     this.users = [];
     this.usersPage = 0;
     this.noMoreUsers = false;

@@ -69,7 +69,9 @@
               <h1
                 class="display-4 fw-bolder header-main-text landing-hero hero-community-name"
               >
-                <p>
+                <p
+                  id="community-name-text"
+                >
                   {{ community?.name }}
                 </p>
               </h1>
@@ -111,7 +113,9 @@
             </div>
             <!-- Community description -->
             <div *ngIf="showDescription" class="community-description">
-              <p>{{ community?.description }}</p>
+              <p
+                id="community-description-text"
+              >{{ community?.description }}</p>
             </div>
           </div>
         </div>
@@ -375,6 +379,7 @@
                     <!-- If the user is logged in and is a member of the community-->
                     <ng-container *ngIf="isMember || this.isAdmin">
                       <a
+                        id="community-new-post-btn"
                         class="btn primary-btn"
                         [routerLink]="[
                           '/community',
@@ -397,6 +402,7 @@
                       <!-- If the user is an admin of the community -->
                       <ng-container *ngIf="isCommunityAdmin || this.isAdmin">
                         <a
+                          id="edit-community-btn"
                           class="btn primary-dimmed-btn"
                           [routerLink]="[
                             '/community',
@@ -408,6 +414,7 @@
                           Editar comunidad
                         </a>
                         <button
+                          id="delete-community-btn"
                           class="btn negative-btn"
                           (click)="deleteCommunity()"
                         >
@@ -779,6 +786,7 @@
           <p class="alert-modal-text">{{ alertModalText }}</p>
           <div class="alert-modal-buttons">
             <button
+              id="confirm-modal-btn"
               class="btn primary-btn"
               title="Confirmar"
               (click)="confirmAction(); closeAlertModal()"

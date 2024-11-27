@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LanguageServerSettings">
+    <option name="workspaceFolders">
+      <list>
+        <WorkspaceFolder>
+          <option name="name" value="2024-Bookmarks-Forums" />
+          <option name="uri" value="file://$PROJECT_DIR$/" />
+        </WorkspaceFolder>
+      </list>
+    </option>
+  </component>
+</project>

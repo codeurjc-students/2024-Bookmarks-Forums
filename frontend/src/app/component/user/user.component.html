@@ -85,13 +85,17 @@
                 <h1
                   class="display-4 fw-bolder header-main-text landing-hero hero-username"
                 >
-                  <p [ngClass]="{ 'red-text': this.isProfileOfAdmin }">
+                  <p
+                    id="hero-username-text"
+                    [ngClass]="{ 'red-text': this.isProfileOfAdmin }">
                     {{ profileUser?.username }}
                   </p>
                 </h1>
                 <!-- User alias -->
                 <h1 class="display-4 fw-bolder landing-hero alias-text">
-                  <p>({{ profileUser?.alias }})</p>
+                  <p
+                    id="alias-text"
+                  >({{ profileUser?.alias }})</p>
                 </h1>
               </div>
             </div>
@@ -453,6 +457,7 @@
                         "
                       >
                         <a
+                          id="edit-profile-btn"
                           class="btn primary-dimmed-btn"
                           [routerLink]="['edit']"
                         >
@@ -467,6 +472,7 @@
                       >
                         <button
                           class="btn red-btn"
+                          id="delete-account-btn"
                           (click)="deleteUser()"
                           title="Eliminar usuario"
                         >
@@ -495,6 +501,7 @@
                 <div class="user-description-container">
                   <p
                     class="card-content card-text wrap-text"
+                    id="description-text"
                     [innerHTML]="profileUser?.description"
                   ></p>
                 </div>

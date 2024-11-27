@@ -8,7 +8,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Duration;
 
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 
-class UserSignupTest {
+class UserCreationDeletionTest {
 
     TestConfig config = TestConfig.getInstance();
 
@@ -38,8 +37,8 @@ class UserSignupTest {
     }
 
     @Test
-    void test() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+    void userCreationDeletionTest() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getWaitTime()));
 
         // Given
         int port = config.getPort();
@@ -79,7 +78,7 @@ class UserSignupTest {
             submitButton2.click();
         }
 
-        // Then (logout)
+        // Then (check logged in)
 
         WebElement landingGreeting = wait.until(presenceOfElementLocated(By.id("landing-greeting")));
 
@@ -88,12 +87,19 @@ class UserSignupTest {
         assertTrue(landingGreeting.getText().contains("Muy buenas, " + username), "Landing greeting should contain alias");
 
         driver.findElement(By.id("navbarDropdown")).click();
-        driver.findElement(By.id("logout-navbar-btn")).click();
+        driver.findElement(By.id("my-profile-dropdown-btn")).click();
 
-        WebElement defaultGreeting = wait.until(presenceOfElementLocated(By.id("default-greeting")));
+        WebElement deleteAccountButton = wait.until(presenceOfElementLocated(By.id("delete-account-btn")));
+        deleteAccountButton.click();
 
-        assertEquals("URL should be the landing page", LOCALHOST + ":" + port + "/", driver.getCurrentUrl());
-        assertTrue(defaultGreeting.isDisplayed(), "Landing greeting should be displayed");
+        WebElement confirmButton = wait.until(presenceOfElementLocated(By.xpath("//button[@title='Confirmar']")));
+        confirmButton.click();
+
+        // Go to profile page (check that it redirects to the no user found error page)
+        driver.get(LOCALHOST + ":" + port + "/profile/" + username);
+
+        WebElement errorTitle = wait.until(presenceOfElementLocated(By.className("error-title")));
+        assertEquals("Usuario no encontrado: 404", errorTitle.getText());
 
     }
 }

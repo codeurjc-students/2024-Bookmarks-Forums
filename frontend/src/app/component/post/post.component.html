@@ -154,6 +154,7 @@
                   <p class="red-text">Estás baneado de esta comunidad. No puedes votar.</p>
                 </div>
                 <button
+                  id="delete-post-btn"
                   *ngIf="post?.author?.username === loggedUsername || isAdmin"
                   class="btn action-btn"
                   title="Eliminar post"
@@ -397,10 +398,10 @@
                         <i class="fas fa-trash-alt"></i>
                       </button>
                     </div>
-                    <h4 class="card-content card-title wrap-text">
+                    <h4 class="reply-card-title card-content card-title wrap-text">
                       {{ reply?.title }}
                     </h4>
-                    <p class="card-content card-text wrap-text">
+                    <p class="reply-card-content card-content card-text wrap-text">
                       {{ reply?.content }}
                     </p>
                     <!-- Reply action buttons row (like count and like button) -->
@@ -439,6 +440,7 @@
                     </button>
                     <ng-template #noMoreRepliesText>
                       <p
+                        id="no-more-replies-text"
                         class="card-content card-text wrap-text center-text text-muted"
                       >
                         No hay más comentarios
@@ -467,6 +469,7 @@
                       [(ngModel)]="replyContent"
                     ></textarea>
                     <button
+                      id="post-comment-btn"
                       class="btn primary-btn"
                       (click)="submitReply(post?.identifier)"
                     >
@@ -544,6 +547,7 @@
           <p class="alert-modal-text">{{ alertModalText }}</p>
           <div class="alert-modal-buttons">
             <button
+              id="confirm-btn"
               class="btn primary-btn"
               title="Confirmar"
               (click)="confirmAction(); closeAlertModal()"

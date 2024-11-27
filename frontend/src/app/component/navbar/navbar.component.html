@@ -56,6 +56,7 @@
         <!-- Search page option -->
         <li class="bm-nav-item" style="cursor: pointer">
           <a
+            id="explore-nav-btn"
             class="bm-nav-link"
             [routerLink]="['/search']"
             routerLinkActive="underline-active"
@@ -80,6 +81,7 @@
         </li>
         <li class="bm-nav-item">
           <a
+            id="login-nav-btn"
             class="bm-nav-link"
             [routerLink]="['/login']"
             *ngIf="!loggedIn"
@@ -117,7 +119,9 @@
               style="cursor: pointer"
             >
               <li [routerLink]="['profile', username]">
-                <a class="dropdown-item">Mi perfil</a>
+                <a
+                  id="my-profile-dropdown-btn"
+                  class="dropdown-item">Mi perfil</a>
               </li>
               <li>
                 <hr class="dropdown-divider" />
