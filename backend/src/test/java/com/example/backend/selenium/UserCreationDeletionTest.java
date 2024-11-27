@@ -1,4 +1,4 @@
-package com.example.backend;
+package com.example.backend.selenium;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,16 +8,15 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Duration;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 
-class LandingLoginTest {
+class UserCreationDeletionTest {
 
     TestConfig config = TestConfig.getInstance();
 
@@ -37,21 +36,34 @@ class LandingLoginTest {
         }
     }
 
-    @Test // needs backend ON with data
-    void landingLoginTest() {
+    @Test
+    void userCreationDeletionTest() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getWaitTime()));
 
         // Given
         int port = config.getPort();
-        driver.get(LOCALHOST + ":" + port + "/");
+        driver.get(LOCALHOST + ":" + port + "/signup");
 
         // When
 
-        String username = "BookReader_14";
-        String password = "pass";
+        String username = "testingUser";
+        String password = "Abcd!1234";
+        String email = "testingEmail@address.com";
+        String alias = "testingAlias";
 
-        WebElement loginButton = wait.until(presenceOfElementLocated(By.id("login-btn")));
-        loginButton.click();
+        WebElement usernameField = wait.until(presenceOfElementLocated(By.id("inputUsername")));
+
+        usernameField.sendKeys(username);
+        driver.findElement(By.id("inputPassword")).sendKeys(password);
+        driver.findElement(By.id("inputConfirmPassword")).sendKeys(password);
+        driver.findElement(By.id("inputEmail")).sendKeys(email);
+        driver.findElement(By.id("inputAlias")).sendKeys(alias);
+
+        //wait until submit is clickable
+
+        // Espera a que el botón de envío sea clicable
+        WebElement submitButton = wait.until(elementToBeClickable(By.id("register-submit")));
+        submitButton.click();
 
         // Auto-redirects to login page
 
@@ -66,13 +78,28 @@ class LandingLoginTest {
             submitButton2.click();
         }
 
-        // Then (logout)
+        // Then (check logged in)
 
         WebElement landingGreeting = wait.until(presenceOfElementLocated(By.id("landing-greeting")));
 
-        assertEquals("URL should be the landing page", LOCALHOST + ":" + port + "/", driver.getCurrentUrl());
+        assertEquals(LOCALHOST + ":" + port + "/", driver.getCurrentUrl(), "URL should be the landing page");
         assertTrue(landingGreeting.isDisplayed(), "Landing greeting should be displayed");
         assertTrue(landingGreeting.getText().contains("Muy buenas, " + username), "Landing greeting should contain alias");
+
+        driver.findElement(By.id("navbarDropdown")).click();
+        driver.findElement(By.id("my-profile-dropdown-btn")).click();
+
+        WebElement deleteAccountButton = wait.until(presenceOfElementLocated(By.id("delete-account-btn")));
+        deleteAccountButton.click();
+
+        WebElement confirmButton = wait.until(presenceOfElementLocated(By.xpath("//button[@title='Confirmar']")));
+        confirmButton.click();
+
+        // Go to profile page (check that it redirects to the no user found error page)
+        driver.get(LOCALHOST + ":" + port + "/profile/" + username);
+
+        WebElement errorTitle = wait.until(presenceOfElementLocated(By.className("error-title")));
+        assertEquals("Usuario no encontrado: 404", errorTitle.getText());
 
     }
 }

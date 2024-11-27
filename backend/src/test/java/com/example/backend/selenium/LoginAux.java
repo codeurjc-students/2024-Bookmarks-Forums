@@ -1,4 +1,4 @@
-package com.example.backend;
+package com.example.backend.selenium;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -7,8 +7,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-import static junit.framework.Assert.assertEquals;
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
@@ -49,7 +49,7 @@ class LoginAux {
 
         WebElement landingGreeting = wait.until(presenceOfElementLocated(By.id("landing-greeting")));
 
-        assertEquals("URL should be the landing page", LOCALHOST + ":" + port + "/", driver.getCurrentUrl());
+        assertEquals(LOCALHOST + ":" + port + "/", driver.getCurrentUrl(), "URL should be the landing page");
         assertTrue(landingGreeting.isDisplayed(), "Landing greeting should be displayed");
         await().atMost(Duration.ofSeconds(2)).until(() -> true); // waits for username text to load
         assertTrue(landingGreeting.getText().contains("Muy buenas, " + username), "Landing greeting should contain alias");

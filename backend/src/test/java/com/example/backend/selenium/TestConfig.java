@@ -1,4 +1,4 @@
-package com.example.backend;
+package com.example.backend.selenium;
 
 import lombok.Getter;
 import lombok.Setter;
