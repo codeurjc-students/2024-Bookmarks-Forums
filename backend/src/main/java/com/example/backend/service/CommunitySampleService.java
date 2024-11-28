@@ -30,10 +30,14 @@ public class CommunitySampleService {
         List<String> communityNames = List.of("Bookmarks Forums", "Bookmarks News", "Bookmarks Reviews", "Bookmarks Events");
         List<String> descriptions = List.of("A forum for book readers", "News about books", "Reviews of books", "Events for book readers");
 
-        for (int i = 0; i < communityNames.size(); i++) {
+        for (int i = 0; i < communityNames.size()-1; i++) {
             Community community = new Community(communityNames.get(i), descriptions.get(i), null, userRepository.findByUsername("AdminReader"));
             communities.add(community);
         }
+
+        // FanBook_785 is admin of the last community
+        Community lastCommunity = new Community(communityNames.getLast(), descriptions.getLast(), null, userRepository.findByUsername("FanBook_785"));
+        communities.add(lastCommunity);
 
         communityRepository.saveAll(communities);
 

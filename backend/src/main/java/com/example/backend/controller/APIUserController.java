@@ -343,7 +343,7 @@ public class APIUserController {
 
         // Create user
         List<String> roles = List.of("USER"); // Default role
-        User user = new User(username, alias, "Hey there! I am new, what's up?", "", email,
+        User user = new User(username, alias, "Soy nuevo, nuevísimo!", "", email,
                 passwordEncoder.encode(password), roles);
         userService.saveUser(user);
 
