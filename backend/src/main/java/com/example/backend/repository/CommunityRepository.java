@@ -21,6 +21,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
         Page<Community> findByAdminUsername(String username, Pageable pageable);
 
+        @Query("SELECT c FROM Community c WHERE c.description LIKE %:description%")
         Page<Community> findByDescription(String description, Pageable pageable);
 
         @Operation(summary = "Search communities by name or description. Search Engine's default behaviour")

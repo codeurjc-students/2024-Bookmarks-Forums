@@ -48,15 +48,19 @@ public class CommunitySampleService {
             community.addMember(user);
         }
 
-        // FanBook_785 is a member of Bookmarks Forums and Bookmarks News
+        // FanBook_785 is a member of Bookmarks News
         user = userRepository.findByUsername("FanBook_785");
-        for (int i = 0; i < 2; i++) {
+        for (int i = 1; i < 2; i++) {
             communities.get(i).addMember(user);
         }
 
         // YourReader is a member of bookmarks forums
         user = userRepository.findByUsername("YourReader");
         communities.get(0).addMember(user);
+
+        // AdminReader joins last community
+        user = userRepository.findByUsername("AdminReader");
+        lastCommunity.addMember(user);
 
         communityRepository.saveAll(communities);
     }

@@ -1,8 +1,8 @@
 package com.example.backend.rest;
 
 import io.restassured.RestAssured;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.io.File;
@@ -11,10 +11,11 @@ import java.util.Map;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RESTUserTest {
 
     @LocalServerPort
-    private int port = 8443;
+    private int port;
 
     @BeforeEach
     public void setup() {
@@ -57,6 +58,7 @@ class RESTUserTest {
     }
 
     @Test
+    @Order(51)
     void testGetUser() {
         String username = "AdminReader";
 
