@@ -373,7 +373,8 @@ public class APICommunityController {
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)
     })
     @PutMapping("/communities/{id}/users/{username}")
     @JsonView(CommunityUsersInfo.class)
@@ -393,6 +394,11 @@ public class APICommunityController {
         // is action valid?
         if (action == null || (!action.equals("join") && !action.equals("leave"))) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // is the user banned from the community?
+        if (communityService.isUserBannedFromCommunity(username, community.getIdentifier())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         switch (action) {
@@ -872,18 +878,20 @@ public class APICommunityController {
 
         String banUntilFormatted = banUntil.toString();
 
-        switch (banInfo) {
-            case "reason":
-                return new ResponseEntity<>(banReason, HttpStatus.OK);
-            case "duration":
-                return new ResponseEntity<>(banUntilFormatted, HttpStatus.OK);
-            case "status": // true = banned, false = not banned
-                return new ResponseEntity<>(true, HttpStatus.OK);
-            default:
-                // return a Ban
-                return new ResponseEntity<>(communityService.getBanById(id), HttpStatus.OK);
-
+        // if no banInfo is provided, banInfo=default
+        if (banInfo == null) {
+            banInfo = "default";
         }
+
+        return switch (banInfo) {
+            case "reason" -> new ResponseEntity<>(banReason, HttpStatus.OK);
+            case "duration" -> new ResponseEntity<>(banUntilFormatted, HttpStatus.OK);
+            case "status" -> // true = banned, false = not banned
+                    new ResponseEntity<>(true, HttpStatus.OK);
+            default ->
+                // return a Ban
+                    new ResponseEntity<>(communityService.getBanById(id), HttpStatus.OK);
+        };
 
     }
 
