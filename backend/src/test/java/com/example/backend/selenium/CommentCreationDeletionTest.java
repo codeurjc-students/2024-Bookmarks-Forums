@@ -77,7 +77,7 @@ class CommentCreationDeletionTest {
         wait.until(driver -> commentsListContainer.findElements(By.className("reply-card")).size() == 2);
         
 
-        WebElement commentCard = commentsListContainer.findElements(By.className("reply-card")).getLast();
+        WebElement commentCard = commentsListContainer.findElements(By.className("reply-card")).get(commentsListContainer.findElements(By.className("reply-card")).size() - 1);
 
         // Compare card title and content
         WebElement commentTitle = commentCard.findElement(By.className("reply-card-title"));

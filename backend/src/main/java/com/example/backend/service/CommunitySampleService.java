@@ -41,7 +41,7 @@ public class CommunitySampleService {
         }
 
         // FanBook_785 is admin of the last community
-        Community lastCommunity = new Community(communityNames.getLast(), descriptions.getLast(), null, userRepository.findByUsername("FanBook_785"));
+        Community lastCommunity = new Community(communityNames.get(communityNames.size() -1), descriptions.get(descriptions.size() -1), null, userRepository.findByUsername("FanBook_785"));
         communities.add(lastCommunity);
 
         communityRepository.saveAll(communities);
@@ -70,7 +70,7 @@ public class CommunitySampleService {
         // "BadDude" is banned from the first community and second community
         user = userRepository.findByUsername("ZBadDude");
         LocalDateTime now = LocalDateTime.now();
-        communities.getFirst().banUser(user, now.plusDays(7), "because you are a bad dude");
+        communities.get(0).banUser(user, now.plusDays(7), "because you are a bad dude");
         communities.get(1).banUser(user, now.plusDays(14), "because you are a bad dude");
 
         communityRepository.saveAll(communities);

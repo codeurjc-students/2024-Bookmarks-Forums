@@ -1,7 +1,5 @@
-LABEL authors="izanr"
-
 # Frontend
-FROM node:20.18.0 as frontend
+FROM node:20.18.0 AS frontend
 
 WORKDIR /frontend
 
@@ -18,11 +16,11 @@ RUN ng build --configuration production
 COPY /frontend/dist/frontend/browser /frontend/dist/frontend/browser
 
 # Maven (frontend to backend)
-FROM maven:3.9.9-openjdk-23 as build
+FROM maven:3.8.6-openjdk-18 AS build
 
 WORKDIR /app
 
-ENV RUNNING_IN_DOCKER = true
+ENV RUNNING_IN_DOCKER=true
 
 COPY backend/pom.xml /app/
 
@@ -31,13 +29,15 @@ COPY backend/src/ /app/src
 # Copy production files from Angular to backend-public
 COPY --from=frontend /frontend/dist/frontend/browser /app/src/main/resources/static
 
-RUN mvn clean install -DskipTests
+RUN mvn clean install -DskipTests -X
 
 # Java
-FROM amazoncorretto:17
+FROM amazoncorretto:18
 
 WORKDIR /app
 
-COPY --from=build /app/target/backend-0.0.1-SNAPSHOT.jar /app
+COPY --from=build /app/target/backend-0.0.1-SNAPSHOT.jar /backend-0.0.1-SNAPSHOT.jar
+
+RUN chmod +x /backend-0.0.1-SNAPSHOT.jar
 
 

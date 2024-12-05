@@ -57,7 +57,7 @@ class PostVisitTest {
         List<WebElement> postsList = postsListColumn.findElements(By.className("post-card"));
 
         // Get first card title and content
-        WebElement firstPost = postsList.getFirst();
+        WebElement firstPost = postsList.get(0);
         String firstPostTitle = firstPost.findElement(By.className("card-title")).getText();
         String firstPostContent = firstPost.findElement(By.className("card-post-content")).getText();
         String firstPostAuthor = firstPost.findElement(By.className("card-user-username")).getText();

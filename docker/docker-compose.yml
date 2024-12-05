@@ -1,17 +1,14 @@
 # In project root:
 # docker pull etheko/bookmarks-forums
 # cd docker
-# docker-compose -p bookmarks up --build
-
-version: "3"
+# docker-compose -p bookmarks-forums up --build
 services:
   bookmarks-forums-app:
     container_name: bookmarks-forums-app
     image: etheko/bookmarks-forums
     ports:
-      - "8443:8443"
-    command:
-      - java -jar /app/backend-0.0.1-SNAPSHOT.jar
+      - "443:8443"
+    command: ["java", "-jar", "/backend-0.0.1-SNAPSHOT.jar"]
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://bookmarks-forums-DB:3306/BFDB
       - SPRING_DATASOURCE_USERNAME=root
@@ -30,7 +27,12 @@ services:
       - MYSQL_DATABASE=BFDB
       - MYSQL_ROOT_PASSWORD=password
     volumes:
-      - /var/lib/mysql
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
 volumes:
-  mysql:
+  mysql_data:

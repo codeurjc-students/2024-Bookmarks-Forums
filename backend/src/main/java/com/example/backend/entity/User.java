@@ -186,7 +186,7 @@ public class User {
 
         if (onDocker != null && onDocker.equals("true")) {
             try (InputStream imgStream = getClass()
-                    .getResourceAsStream(imgPath.replace("backend/src/main/resources/static", ""))) {
+                    .getResourceAsStream(imgPath.replace("backend/src/main/resources/static", "/static"))) {
                 if (imgStream == null) {
                     throw new IOException("Image not found");
                 }

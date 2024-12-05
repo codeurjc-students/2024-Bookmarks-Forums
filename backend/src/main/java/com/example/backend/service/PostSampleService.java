@@ -66,7 +66,7 @@ public class PostSampleService {
         }
 
         // Banned user posts reply on post 1
-        Post postWithId1 = posts.getFirst();
+        Post postWithId1 = posts.get(0);
         Reply bannedUserReply = new Reply(bannedUserReplyTitle, bannedUserReplyContent, users.get(4), postWithId1);
         replyRepository.save(bannedUserReply);
         
