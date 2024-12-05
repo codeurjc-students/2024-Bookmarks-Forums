@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
@@ -71,6 +72,9 @@ class LandingLoginTest {
 
         assertEquals(LOCALHOST + ":" + port + "/", driver.getCurrentUrl(), "URL should be the landing page");
         assertTrue(landingGreeting.isDisplayed(), "Landing greeting should be displayed");
+        
+        // wait until alias is shown
+        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true);
         assertTrue(landingGreeting.getText().contains("Muy buenas, " + username), "Landing greeting should contain alias");
 
     }

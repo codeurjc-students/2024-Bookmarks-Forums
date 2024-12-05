@@ -73,6 +73,9 @@ class CommentCreationDeletionTest {
 
         // Wait for reply-card
         wait.until(presenceOfElementLocated(By.className("reply-card")));
+        
+        wait.until(driver -> commentsListContainer.findElements(By.className("reply-card")).size() == 2);
+        
 
         WebElement commentCard = commentsListContainer.findElements(By.className("reply-card")).getLast();
 

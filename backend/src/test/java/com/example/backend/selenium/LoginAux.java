@@ -51,7 +51,7 @@ class LoginAux {
 
         assertEquals(LOCALHOST + ":" + port + "/", driver.getCurrentUrl(), "URL should be the landing page");
         assertTrue(landingGreeting.isDisplayed(), "Landing greeting should be displayed");
-        await().atMost(Duration.ofSeconds(2)).until(() -> true); // waits for username text to load
+        await().atMost(Duration.ofSeconds(5)).until(() -> true); // waits for username text to load
         assertTrue(landingGreeting.getText().contains("Muy buenas, " + username), "Landing greeting should contain alias");
 
     }

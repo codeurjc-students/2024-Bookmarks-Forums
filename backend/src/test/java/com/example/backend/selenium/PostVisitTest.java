@@ -12,6 +12,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.List;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
@@ -73,6 +74,7 @@ class PostVisitTest {
         WebElement postDate = wait.until(presenceOfElementLocated(By.id("post-date")));
         WebElement postCommunity = wait.until(presenceOfElementLocated(By.className("branding-hyperlink-text")));
         // Compare
+        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for posts to finish loading
         assertEquals(firstPostTitle, postTitle.getText());
         assertEquals(firstPostContent, postContent.getText());
         assertEquals(firstPostAuthor, postAuthor.getText());

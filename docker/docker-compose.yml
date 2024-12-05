@@ -1,0 +1,36 @@
+# In project root:
+# docker pull etheko/bookmarks-forums
+# cd docker
+# docker-compose -p bookmarks up --build
+
+version: "3"
+services:
+  bookmarks-forums-app:
+    container_name: bookmarks-forums-app
+    image: etheko/bookmarks-forums
+    ports:
+      - "8443:8443"
+    command:
+      - java -jar /app/backend-0.0.1-SNAPSHOT.jar
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://bookmarks-forums-DB:3306/BFDB
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+      - RUNNING_IN_DOCKER=true
+    depends_on:
+      bookmarks-forums-DB:
+        condition: service_healthy
+
+  bookmarks-forums-DB:
+    container_name: bookmarks-forums-DB
+    image: mysql:8.3.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=BFDB
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - /var/lib/mysql
+
+volumes:
+  mysql:
