@@ -92,10 +92,10 @@ export class PostComponent implements OnInit {
     this.checkIfLoggedIn();
   }
 
-  loadUserData(user: User) {
-    this.user = user;
-    this.loggedUsername = user.username;
-    this.isAdmin = user.roles.includes('ADMIN');
+  loadUserData(user: User | undefined) {
+    if (!user) {
+      return;
+    }
     this.loadUserPostVotes();
     this.loadLikedReplies();
   }
@@ -390,6 +390,7 @@ export class PostComponent implements OnInit {
       next: (post) => {
         this.post = post;
         this.postReplies = post.comments;
+        this.loadUserData(this.user); // load the user data
         this.loadReplies();
         this.loadCommunity();
         this.loadPostVotes();
@@ -464,7 +465,9 @@ export class PostComponent implements OnInit {
             // get the logged user
             next: (user) => {
               this.userLoaded = true;
-              this.loadUserData(user); // load the user data
+              this.user = user;
+              this.loggedUsername = user.username;
+              this.isAdmin = user.roles.includes('ADMIN');
               this.loadPost();
             },
             error: (r) => {

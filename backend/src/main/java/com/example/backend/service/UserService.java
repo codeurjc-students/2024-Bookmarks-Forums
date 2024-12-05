@@ -1,13 +1,7 @@
 package com.example.backend.service;
 
-import com.example.backend.entity.Community;
-import com.example.backend.entity.Post;
-import com.example.backend.entity.Reply;
-import com.example.backend.entity.User;
-import com.example.backend.repository.CommunityRepository;
-import com.example.backend.repository.PostRepository;
-import com.example.backend.repository.ReplyRepository;
-import com.example.backend.repository.UserRepository;
+import com.example.backend.entity.*;
+import com.example.backend.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,14 +17,16 @@ public class UserService {
     private final CommunityRepository communityRepository;
     private final ReplyRepository replyRepository;
     private final PostRepository postRepository;
+    private final BanRepository banRepository;
 
     public UserService(UserRepository userRepository, CommunityRepository communityRepository,
-            ReplyRepository replyRepository, PostRepository postRepository) {
+                       ReplyRepository replyRepository, PostRepository postRepository, BanRepository banRepository) {
 
         this.userRepository = userRepository;
         this.communityRepository = communityRepository;
         this.replyRepository = replyRepository;
         this.postRepository = postRepository;
+        this.banRepository = banRepository;
     }
 
     public User getUserByUsername(String username) {
@@ -187,6 +183,12 @@ public class UserService {
         for (Post post : user.getDownvotedPosts()) {
             post.getDownvotedBy().remove(user);
             postRepository.save(post);
+        }
+
+        // Remove user bans
+        List<Ban> userBans = communityRepository.getBansByUser(user.getUsername());
+        if (userBans != null && !userBans.isEmpty()) {
+            banRepository.deleteAll(userBans);
         }
 
         // Save the user

@@ -1,5 +1,7 @@
 package com.example.backend.service;
 
+import com.example.backend.entity.Ban;
+import com.example.backend.repository.BanRepository;
 import com.example.backend.repository.CommunityRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.DependsOn;
@@ -8,6 +10,7 @@ import com.example.backend.entity.Community;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +21,12 @@ public class CommunitySampleService {
     private final CommunityRepository communityRepository;
 
     private final UserRepository userRepository;
+    private final BanRepository banRepository;
 
-    public CommunitySampleService(CommunityRepository communityRepository, UserRepository userRepository) {
+    public CommunitySampleService(CommunityRepository communityRepository, UserRepository userRepository, BanRepository banRepository) {
         this.communityRepository = communityRepository;
         this.userRepository = userRepository;
+        this.banRepository = banRepository;
     }
 
     @PostConstruct
@@ -61,6 +66,12 @@ public class CommunitySampleService {
         // AdminReader joins last community
         user = userRepository.findByUsername("AdminReader");
         lastCommunity.addMember(user);
+
+        // "BadDude" is banned from the first community and second community
+        user = userRepository.findByUsername("ZBadDude");
+        LocalDateTime now = LocalDateTime.now();
+        communities.getFirst().banUser(user, now.plusDays(7), "because you are a bad dude");
+        communities.get(1).banUser(user, now.plusDays(14), "because you are a bad dude");
 
         communityRepository.saveAll(communities);
     }

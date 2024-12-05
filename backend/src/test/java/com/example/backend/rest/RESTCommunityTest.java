@@ -907,7 +907,7 @@ class RESTCommunityTest {
 
         // Not logged in
         given()
-                .pathParam("id", 1)
+                .pathParam("id", 2)
                 .when()
                 .get("/bans/{id}")
                 .then()
@@ -1157,7 +1157,7 @@ class RESTCommunityTest {
         // No banned users
         given()
                 .cookie("AuthToken", authCookieAdmin)
-                .pathParam("id", 1)
+                .pathParam("id", 4)
                 .queryParam("page", 0)
                 .queryParam("size", 10)
                 .when()
@@ -1225,7 +1225,7 @@ class RESTCommunityTest {
         // Check for a non-existent community
         given()
                 .cookie("AuthToken", authCookieAdmin)
-                .pathParam("id", 9999) // Assume this ID does not exist
+                .pathParam("id", 9999)
                 .pathParam("username", "someUser")
                 .when()
                 .get("/communities/{id}/users/{username}")
@@ -1236,7 +1236,7 @@ class RESTCommunityTest {
         given()
                 .cookie("AuthToken", authCookieAdmin)
                 .pathParam("id", 1)
-                .pathParam("username", "AdminReader") // Assume AdminReader is a member
+                .pathParam("username", "AdminReader")
                 .when()
                 .get("/communities/{id}/users/{username}")
                 .then()
@@ -1247,7 +1247,7 @@ class RESTCommunityTest {
         given()
                 .cookie("AuthToken", authCookieAdmin)
                 .pathParam("id", 4)
-                .pathParam("username", "NonMemberUser") // Assume this user is not a member
+                .pathParam("username", "NonMemberUser")
                 .when()
                 .get("/communities/{id}/users/{username}")
                 .then()

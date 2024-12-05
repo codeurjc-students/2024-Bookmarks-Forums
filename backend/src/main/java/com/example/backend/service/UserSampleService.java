@@ -31,12 +31,12 @@ public class UserSampleService {
         List<String> adminRoles = List.of("USER", "ADMIN");
 
         List<User> users = new ArrayList<>();
-        List<String> usernames = List.of("BookReader_14", "FanBook_785", "YourReader", "AdminReader");
-        List<String> emails = List.of("bookreader14@gmail.com", "fanBook@gmail.com", "reader@gmail.com", "adminReader@gmail.com");
-        List<String> aliases = List.of("BookReader", "FanB", "YourReader", "adminR");
-        List<String> passwords = List.of(passwordEncoder.encode("pass"), passwordEncoder.encode("pass"), passwordEncoder.encode("pass"), passwordEncoder.encode("adminpass"));
-        List<List<String>> roles = List.of(userRoles, userRoles, userRoles, adminRoles);
-        List<String> descriptions = List.of("I'm a reader fan that loves fantasy books", "I love books", "I'm a reader", "I'm a Bookmarks Forums admin");
+        List<String> usernames = List.of("BookReader_14", "FanBook_785", "YourReader", "AdminReader", "ZBadDude");
+        List<String> emails = List.of("bookreader14@gmail.com", "fanBook@gmail.com", "reader@gmail.com", "adminReader@gmail.com", "badReallyBadDude@gmail.com");
+        List<String> aliases = List.of("BookReader", "FanB", "YourReader", "adminR", "bDude");
+        List<String> passwords = List.of(passwordEncoder.encode("pass"), passwordEncoder.encode("pass"), passwordEncoder.encode("pass"), passwordEncoder.encode("adminpass"), passwordEncoder.encode("pass"));
+        List<List<String>> roles = List.of(userRoles, userRoles, userRoles, adminRoles, userRoles);
+        List<String> descriptions = List.of("I'm a reader fan that loves fantasy books", "I love books", "I'm a reader", "I'm a Bookmarks Forums admin", "I'm a bad dude");
 
         for (int i = 0; i < usernames.size(); i++) {
             User user = new User(usernames.get(i), aliases.get(i), descriptions.get(i), null, emails.get(i), passwords.get(i), roles.get(i));

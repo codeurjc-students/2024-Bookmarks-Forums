@@ -52,8 +52,11 @@ public class PostSampleService {
 
         // REPLIES
 
-        List<String> replyTitles = List.of("Welcome!", "New Releases", "Best Books");
-        List<String> replyContents = List.of("Welcome to Bookmarks Forums! I'm excited to discuss books with everyone.", "I'm looking forward to the new releases in Bookmarks News!", "I can't wait to read the reviews of the best books in Bookmarks Reviews.");
+        List<String> replyTitles = List.of("Welcome!", "New Releases", "Best Books", "Lol dude");
+        List<String> replyContents = List.of("Welcome to Bookmarks Forums! I'm excited to discuss books with everyone.", "I'm looking forward to the new releases in Bookmarks News!", "I can't wait to read the reviews of the best books in Bookmarks Reviews.", "I love this omg!!!!");
+
+        String bannedUserReplyTitle = "I'm a bad dude";
+        String bannedUserReplyContent = "This is trash, dude";
 
         for (int i = 0; i < replyTitles.size(); i++) {
             // +1 comment to the post
@@ -61,6 +64,12 @@ public class PostSampleService {
             Reply reply = new Reply(replyTitles.get(i), replyContents.get(i), users.get(i), posts.get(i));
             replyRepository.save(reply);
         }
+
+        // Banned user posts reply on post 1
+        Post postWithId1 = posts.getFirst();
+        Reply bannedUserReply = new Reply(bannedUserReplyTitle, bannedUserReplyContent, users.get(4), postWithId1);
+        replyRepository.save(bannedUserReply);
+        
 
         // Everybody upvotes the second post
         Post post = posts.get(1);

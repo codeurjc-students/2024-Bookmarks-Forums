@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.*;
 class RESTUserTest {
 
     @LocalServerPort
-    private int port;
+    private int port ;
 
     @BeforeEach
     public void setup() {
