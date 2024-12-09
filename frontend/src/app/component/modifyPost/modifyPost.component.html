@@ -281,7 +281,7 @@
                     <!-- Confirmar -->
                     <button
                       *ngIf="
-                        post?.author?.username === loggedUsername || isAdmin
+                        post?.author?.username === loggedUsername || isAdmin || isCommunityAdmin
                       "
                       id="post-edit-confirm-btn"
                       class="btn primary-btn"
@@ -307,7 +307,7 @@
                     <!-- Eliminar -->
                     <button
                       *ngIf="
-                        post?.author?.username === loggedUsername || isAdmin
+                        post?.author?.username === loggedUsername || isAdmin || isCommunityAdmin
                       "
                       class="btn primary-btn"
                       title="Eliminar post"

@@ -155,7 +155,7 @@
                 </div>
                 <button
                   id="delete-post-btn"
-                  *ngIf="post?.author?.username === loggedUsername || isAdmin"
+                  *ngIf="post?.author?.username === loggedUsername || isAdmin || isCommunityAdmin"
                   class="btn action-btn"
                   title="Eliminar post"
                   (click)="deletePost(post?.identifier)"
@@ -164,7 +164,7 @@
                 </button>
 
                 <button
-                  *ngIf="post?.author?.username === loggedUsername || isAdmin"
+                  *ngIf="post?.author?.username === loggedUsername || isAdmin || isCommunityAdmin"
                   id="edit-post-btn"
                   class="btn action-btn"
                   title="Editar post"

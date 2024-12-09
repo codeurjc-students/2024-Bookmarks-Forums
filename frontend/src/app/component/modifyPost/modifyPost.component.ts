@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
-import { LoginService } from '../../services/session.service';
-import { PostService } from '../../services/post.service';
-import { UserService } from '../../services/user.service';
-import { CommunityService } from '../../services/community.service';
-import { User } from '../../models/user.model';
-import { Post } from '../../models/post.model';
-import { Community } from '../../models/community.model';
-import { Chart, registerables } from 'chart.js';
-import { DatePipe } from '@angular/common';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {ActivatedRoute} from '@angular/router';
+import {LoginService} from '../../services/session.service';
+import {PostService} from '../../services/post.service';
+import {UserService} from '../../services/user.service';
+import {CommunityService} from '../../services/community.service';
+import {User} from '../../models/user.model';
+import {Post} from '../../models/post.model';
+import {Community} from '../../models/community.model';
+import {Chart, registerables} from 'chart.js';
+import {DatePipe} from '@angular/common';
+import {Router} from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -24,11 +24,13 @@ export class ModifyPostComponent implements OnInit {
   showModal: boolean = false;
   showAlertModal: boolean = false;
   alertModalText: string = '';
-  confirmAction: () => void = () => {};
+  confirmAction: () => void = () => {
+  };
   showCancelButton: boolean = true;
 
   post: Post | undefined;
   community: Community | undefined;
+  isCommunityAdmin: boolean = false;
   postTitle: string = '';
   postContent: string = '';
   selectedImageURL: string | ArrayBuffer | null = null;
@@ -56,7 +58,8 @@ export class ModifyPostComponent implements OnInit {
     public communityService: CommunityService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     // Check if user is logged in
@@ -90,6 +93,22 @@ export class ModifyPostComponent implements OnInit {
         .subscribe({
           next: (community) => {
             this.community = community;
+            this.isCommunityAdmin = community.admin.username === this.loggedUsername;
+            if (this.post) {
+              if (
+                this.post.author.username === this.loggedUsername &&
+                (this.isAdmin || community.admin.username === this.loggedUsername)
+              ) {
+                this.router.navigate(['/error'], {
+                  queryParams: {
+                    title: 'Error cargando el post',
+                    description:
+                      'No tienes permiso para editar este post. Solo el autor o un administrador de la comunidad pueden editar un post.',
+                    code: 403,
+                  },
+                });
+              }
+            }
           },
           error: (r) => {
             this.router.navigate(['/error'], {
@@ -109,20 +128,6 @@ export class ModifyPostComponent implements OnInit {
     this.postService.getPostById(postID).subscribe({
       next: (post) => {
         this.post = post;
-        if (
-          post.author.username !== this.loggedUsername &&
-          (!this.isAdmin ||
-            post.community.admin.username !== this.loggedUsername)
-        ) {
-          this.router.navigate(['/error'], {
-            queryParams: {
-              title: 'Error cargando el post',
-              description:
-                'No tienes permiso para editar este post. Solo el autor o un administrador de la comunidad pueden editar un post.',
-              code: 403,
-            },
-          });
-        }
         this.postTitle = post.title;
         this.postContent = post.content; // Set the postContent property
         this.loadCommunity();
@@ -402,15 +407,15 @@ export class ModifyPostComponent implements OnInit {
     if (this.postTitle.length > this.titleMaxLength) {
       alert(
         'Title is too long. Maximum length is ' +
-          this.titleMaxLength +
-          ' characters.'
+        this.titleMaxLength +
+        ' characters.'
       );
       return;
     } else if (this.postContent.length > this.contentMaxLength) {
       alert(
         'Content is too long. Maximum length is ' +
-          this.contentMaxLength +
-          ' characters.'
+        this.contentMaxLength +
+        ' characters.'
       );
       return;
     }

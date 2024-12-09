@@ -58,6 +58,7 @@ export class PostComponent implements OnInit {
   loggedIn: boolean = false;
   isAdmin: boolean = false;
 
+  isCommunityAdmin: boolean = false;
   isModerator: boolean = false;
 
   public chart: any;
@@ -295,6 +296,12 @@ export class PostComponent implements OnInit {
     }
   }
 
+  checkCommunityAdmin(){
+    if(this.community && this.user){
+      this.isCommunityAdmin = this.community.admin.username === this.loggedUsername;
+    }
+  }
+
   checkModerator() {
     if (this.user && this.community) {
       this.communityService
@@ -325,6 +332,7 @@ export class PostComponent implements OnInit {
             this.community = community;
             this.loadUserBanStatus();
             this.checkModerator();
+            this.checkCommunityAdmin();
           },
           error: (r) => {
             this.router.navigate(['/error'], {
