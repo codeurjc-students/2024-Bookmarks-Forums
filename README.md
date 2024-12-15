@@ -257,7 +257,7 @@ The documentation for the REST API has been generated using Swagger and the Open
 
 The YAML file can be found in the following link: [api-docs-yaml](backend/api-docs/api-docs.yaml).
 
-However, a more visual and interactive version can be found in the following link: [Swagger UI]([backend/api-docs/api-docs.html](https://raw.githack.com/codeurjc-students/2024-Bookmarks-Forums/refs/heads/main/backend/api-docs/api-docs.html))
+However, a more visual and interactive version can be found in the following link: [HTML-api-docs-version](https://raw.githack.com/codeurjc-students/2024-Bookmarks-Forums/refs/heads/main/backend/api-docs/api-docs.html).
 
 # 10. Docker instructions for building the application's image
 
