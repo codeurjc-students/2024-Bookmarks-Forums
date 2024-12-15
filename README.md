@@ -25,9 +25,10 @@ Table of contents
 6. [Wireframe](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#6-wireframe)
 7. [Screenshots](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#7-screenshots)
 8. [Current navigation map](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#8-current-navigation-map)
-9. [Docker instructions for building the application's image](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#9-docker-instructions-for-building-the-applications-image)
-10. [Docker instructions for running the application's container](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#10-docker-instructions-for-running-the-applications-container)
-11. [Demonstrative video](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#11-demonstrative-video)
+9. [REST API Documentation](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#9-rest-api-documentation)
+10. [Docker instructions for building the application's image](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#10-docker-instructions-for-building-the-applications-image)
+11. [Docker instructions for running the application's container](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#11-docker-instructions-for-running-the-applications-container)
+12. [Demonstrative video](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#12-demonstrative-video)
 
 ## 1. About this Web Application
 
@@ -250,7 +251,13 @@ In this map, the chat and administrator zone are not shown as they will be imple
 
 ![Navigation Map](<Readme images/Nav Diagram.png>)
 
-# 9. Docker instructions for building the application's image
+# 9. REST API Documentation
+
+The documentation for the REST API has been generated using Swagger and the OpenAPI specification.
+The YAML file can be found in the following link: [api-docs-yaml](backend/api-docs/api-docs.yaml)
+However, a more visual and interactive version can be found in the following link: [Swagger UI](backend/api-docs/api-docs.html)
+
+# 10. Docker instructions for building the application's image
 
 ⚠️ **In order to build the application's Docker image, you need to have Docker, Node.js and Angular CLI installed on your machine.**
 
@@ -289,7 +296,7 @@ This script will do the following:
 - Push the Docker image to DockerHub.
 - Set up the Docker container with the application's image.
 
-# 10. Docker instructions for running the application's container
+# 11. Docker instructions for running the application's container
 
 ⚠️ **In order to run the application's Docker container, you need to have Docker installed on your machine.**
 
@@ -323,9 +330,8 @@ docker-compose up
 https://localhost:443
 ```
 
-# 11. Demonstrative video
+# 12. Demonstrative video
 
 Here is a video showcasing the application's main functionalities (spanish):
 
 [![Demonstrative Video](https://img.youtube.com/vi/Z09aqRIdNzs/0.jpg)](https://youtu.be/Z09aqRIdNzs)
-
