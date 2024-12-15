@@ -92,9 +92,9 @@ public class APIPostController {
     @Operation(summary = "Search posts")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "204", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found", content = @Content),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/posts")
@@ -121,11 +121,11 @@ public class APIPostController {
     @Operation(summary = "Get posts of a community using its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the posts", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = PostInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class))
 
             }),
-            @ApiResponse(responseCode = "204", description = "No posts found"),
-            @ApiResponse(responseCode = "404", description = "Community not found"),
+            @ApiResponse(responseCode = "204", description = "No posts found", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Community not found", content = @Content),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/communities/{communityID}/posts")
@@ -166,9 +166,9 @@ public class APIPostController {
     @Operation(summary = "Get posts by username")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "204", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found", content = @Content),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/users/{username}/posts")
@@ -199,8 +199,8 @@ public class APIPostController {
             @ApiResponse(responseCode = "201", description = "Post created", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
     })
     @JsonView(PostInfo.class)
     @PostMapping("/communities/{communityID}/posts")
@@ -270,8 +270,8 @@ public class APIPostController {
     @Operation(summary = "Delete post image")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Post image deleted"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Post not found"),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Post not found", content = @Content),
     })
     @DeleteMapping("/posts/{postId}/pictures")
     public ResponseEntity<String> deletePostImage(HttpServletRequest request, @PathVariable Long postId) {
@@ -315,10 +315,10 @@ public class APIPostController {
     @Operation(summary = "Returns whether the user has upvoted or downvoted a post")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User has upvoted or downvoted the post", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Post not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Post not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
     })
     @GetMapping("/posts/{postId}/votes")
     public ResponseEntity<Boolean> hasUserVotedPost(@PathVariable Long postId, @RequestParam String username,
@@ -348,10 +348,10 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Post edited", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Post not found"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Post not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
     })
     @JsonView(PostInfo.class)
     @PutMapping("/posts/{postId}")
@@ -449,9 +449,9 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Post image updated", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Post not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Post not found", content = @Content),
     })
     @JsonView(PostInfo.class)
     @PutMapping("/posts/{postId}/pictures")
@@ -522,8 +522,8 @@ public class APIPostController {
     @Operation(summary = "Delete a post")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Post deleted"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Post not found"),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Post not found", content = @Content),
     })
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<String> deletePost(HttpServletRequest request, @PathVariable Long postId) {
@@ -568,7 +568,7 @@ public class APIPostController {
                     @Content(mediaType = "image/jpeg"),
                     @Content(mediaType = "image/png"),
             }),
-            @ApiResponse(responseCode = "404", description = "Post image not found"),
+            @ApiResponse(responseCode = "404", description = "Post image not found", content = @Content),
     })
     @GetMapping("/posts/{postId}/pictures")
     public ResponseEntity<Object> getPostImage(@PathVariable Long postId) {
@@ -597,9 +597,9 @@ public class APIPostController {
     @Operation(summary = "Get replies of a post")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Replies found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Reply.class)),
             }),
-            @ApiResponse(responseCode = "204", description = "Replies not found"),
+            @ApiResponse(responseCode = "204", description = "Replies not found", content = @Content),
     })
     @JsonView(ReplyInfo.class)
     @GetMapping("/posts/{postId}/replies/all")
@@ -620,7 +620,7 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Reply found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Reply.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Reply not found"),
+            @ApiResponse(responseCode = "404", description = "Reply not found", content = @Content),
     })
     @JsonView(ReplyInfo.class)
     @GetMapping("/replies/{replyId}")
@@ -642,9 +642,9 @@ public class APIPostController {
     @Operation(summary = "Search replies")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Replies found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Reply.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Replies not found"),
+            @ApiResponse(responseCode = "404", description = "Replies not found", content = @Content),
     })
     @JsonView(ReplyInfo.class)
     @GetMapping("/replies")
@@ -684,9 +684,9 @@ public class APIPostController {
     @Operation(summary = "Search replies by post")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Replies found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Reply.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Replies not found"),
+            @ApiResponse(responseCode = "404", description = "Replies not found", content = @Content),
     })
     @JsonView(ReplyInfo.class)
     @GetMapping("/posts/{postId}/replies")
@@ -721,10 +721,10 @@ public class APIPostController {
             @ApiResponse(responseCode = "201", description = "Reply created", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Reply.class)),
             }),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "413", description = "Payload too large"),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+            @ApiResponse(responseCode = "413", description = "Payload too large", content = @Content),
     })
     @JsonView(ReplyInfo.class)
     @PostMapping("/posts/{postId}/replies")
@@ -783,8 +783,8 @@ public class APIPostController {
             @ApiResponse(responseCode = "200", description = "Reply liked", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Reply.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Reply not found"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Reply not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
     })
     @JsonView(ReplyInfo.class)
     @PutMapping("/replies/{replyId}")
@@ -830,10 +830,10 @@ public class APIPostController {
     @Operation(summary = "Returns whether the user has liked a reply")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User has liked the reply", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Reply not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Reply not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
     })
     @GetMapping("/replies/{replyId}/votes")
     public ResponseEntity<Boolean> hasUserLikedReply(@PathVariable Long replyId, @RequestParam String username) {
@@ -853,8 +853,8 @@ public class APIPostController {
     @Operation(summary = "Delete a reply")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Reply deleted"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Reply not found"),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Reply not found", content = @Content),
     })
     @DeleteMapping("/replies/{replyId}")
     public ResponseEntity<String> deleteReply(HttpServletRequest request, @PathVariable Long replyId) {
@@ -902,9 +902,9 @@ public class APIPostController {
     @Operation(summary = "Get the most liked posts of the most followed users the user follows")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "204", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found", content = @Content),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/users/me/following/posts/most-liked")
@@ -928,9 +928,9 @@ public class APIPostController {
     @Operation(summary = "Get the most liked posts of the user's communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "204", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found", content = @Content),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/users/me/communities/posts/most-liked")
@@ -954,9 +954,9 @@ public class APIPostController {
     @Operation(summary = "Get the most recent posts of the user's communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "204", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found", content = @Content),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/users/me/communities/posts/most-recent")
@@ -979,9 +979,9 @@ public class APIPostController {
     @Operation(summary = "Get the most liked posts of the most followed (popular) communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "204", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found", content = @Content),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/communities/most-popular/posts/most-liked")
@@ -999,9 +999,9 @@ public class APIPostController {
     @Operation(summary = "Get the most liked posts of the most followed users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "204", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found", content = @Content),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/users/posts/most-liked")
@@ -1019,9 +1019,9 @@ public class APIPostController {
     @Operation(summary = "Get the most recent posts of the most followed communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Post.class)),
             }),
-            @ApiResponse(responseCode = "204", description = "Posts not found"),
+            @ApiResponse(responseCode = "204", description = "Posts not found", content = @Content),
     })
     @JsonView(PostInfo.class)
     @GetMapping("/communities/most-popular/posts/most-recent")

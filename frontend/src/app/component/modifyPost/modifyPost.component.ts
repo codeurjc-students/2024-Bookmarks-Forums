@@ -96,8 +96,9 @@ export class ModifyPostComponent implements OnInit {
             this.isCommunityAdmin = community.admin.username === this.loggedUsername;
             if (this.post) {
               if (
-                this.post.author.username === this.loggedUsername &&
-                (this.isAdmin || community.admin.username === this.loggedUsername)
+                this.post.author.username !== this.loggedUsername &&
+                !this.isAdmin &&
+                community.admin.username !== this.loggedUsername
               ) {
                 this.router.navigate(['/error'], {
                   queryParams: {

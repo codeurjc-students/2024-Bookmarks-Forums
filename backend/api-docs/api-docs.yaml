@@ -1,0 +1,2846 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: https://localhost:8443
+  description: Generated server url
+paths:
+  /api/v1/users/{username}:
+    get:
+      tags:
+      - api-user-controller
+      summary: Get user by username or email
+      operationId: getUser
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Users found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+        "404":
+          description: Users not found
+    put:
+      tags:
+      - api-user-controller
+      summary: Update user data
+      operationId: updateUser
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: action
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: otherUsername
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "400":
+          description: Bad Request
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+    delete:
+      tags:
+      - api-user-controller
+      summary: Delete user
+      operationId: deleteUser
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: User not found
+        "200":
+          description: User deleted
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/users/{username}/pictures:
+    get:
+      tags:
+      - api-user-controller
+      summary: Get user's profile picture
+      operationId: getProfilePicture
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "404":
+          description: Profile picture not found
+        "500":
+          description: Internal Server Error
+        "200":
+          description: Profile picture found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    put:
+      tags:
+      - api-user-controller
+      summary: Change user's profile picture
+      operationId: changeProfilePicture
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - file
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "200":
+          description: Profile picture changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+  /api/v1/replies/{replyId}:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get reply by ID
+      operationId: getReplyById
+      parameters:
+      - name: replyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Reply not found
+        "200":
+          description: Reply found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reply_ReplyInfo"
+    put:
+      tags:
+      - api-post-controller
+      summary: Modify a reply (like)
+      operationId: likeReply
+      parameters:
+      - name: replyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: action
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "404":
+          description: Reply not found
+        "401":
+          description: Unauthorized
+        "200":
+          description: Reply liked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reply_ReplyInfo"
+    delete:
+      tags:
+      - api-post-controller
+      summary: Delete a reply
+      operationId: deleteReply
+      parameters:
+      - name: replyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Reply deleted
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Reply not found
+        "403":
+          description: Forbidden
+  /api/v1/posts/{postId}:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get post by ID
+      operationId: getPostById
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Post found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "404":
+          description: Post not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+    put:
+      tags:
+      - api-post-controller
+      summary: Edit a post (or upvote/downvote)
+      operationId: editPost
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: action
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostDTO_PostInfo"
+      responses:
+        "200":
+          description: Post edited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "404":
+          description: Post not found
+        "400":
+          description: Invalid input
+        "403":
+          description: Forbidden
+        "401":
+          description: Unauthorized
+    delete:
+      tags:
+      - api-post-controller
+      summary: Delete a post
+      operationId: deletePost
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Post deleted
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Post not found
+        "403":
+          description: Forbidden
+  /api/v1/posts/{postId}/pictures:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get post image
+      operationId: getPostImage
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Post image found
+          content:
+            image/jpeg: {}
+            image/png: {}
+        "404":
+          description: Post image not found
+    put:
+      tags:
+      - api-post-controller
+      summary: Update post image
+      operationId: updatePostImage
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: action
+        in: query
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Post image updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "404":
+          description: Post not found
+        "400":
+          description: Invalid input
+        "403":
+          description: Forbidden
+    delete:
+      tags:
+      - api-post-controller
+      summary: Delete post image
+      operationId: deletePostImage
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Post not found
+        "403":
+          description: Forbidden
+        "204":
+          description: Post image deleted
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/communities/{id}:
+    get:
+      tags:
+      - api-community-controller
+      summary: Get a community by ID
+      operationId: getCommunityById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Community not found
+        "200":
+          description: Found the community
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityBasicInfo"
+    put:
+      tags:
+      - api-community-controller
+      summary: Update a community
+      operationId: updateCommunity
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "404":
+          description: Community not found
+        "422":
+          description: Unprocessable Entity
+        "200":
+          description: Updated the community
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityBasicInfo"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+    delete:
+      tags:
+      - api-community-controller
+      summary: Delete a community
+      operationId: deleteCommunity
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Community not found
+        "200":
+          description: Deleted the community
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community"
+        "401":
+          description: Unauthorized
+  /api/v1/communities/{id}/users/{username}:
+    get:
+      tags:
+      - api-community-controller
+      summary: Check if a user is a member of a community
+      operationId: isUserMember
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "200":
+          description: User is a member of the community
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community"
+        "404":
+          description: User is not a member of the community
+        "401":
+          description: Unauthorized
+    put:
+      tags:
+      - api-community-controller
+      summary: "Add, remove or ban a user from a community"
+      operationId: manageCommunityUsers
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: action
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: duration
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: reason
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "404":
+          description: Entity not found
+        "200":
+          description: Action succesfully performed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityUsersInfo"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+  /api/v1/communities/{id}/pictures:
+    get:
+      tags:
+      - api-community-controller
+      summary: Get the banner of a community
+      operationId: getCommunityBanner
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Entity not found
+        "200":
+          description: Found the banner
+          content:
+            image/jpeg:
+              schema:
+                $ref: "#/components/schemas/Community"
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+    put:
+      tags:
+      - api-community-controller
+      summary: Upload a banner to a community
+      operationId: uploadCommunityBanner
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: action
+        in: query
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "404":
+          description: Entity not found
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "200":
+          description: Uploaded the banner to the community
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityBasicInfo"
+        "401":
+          description: Unauthorized
+  /api/v1/communities/{id}/moderators/{username}:
+    get:
+      tags:
+      - api-community-controller
+      summary: Check if a user is a moderator of a community
+      operationId: isUserModeratorOfCommunity
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "200":
+          description: Found the moderator
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityUsersInfo"
+        "404":
+          description: Entity not found
+        "401":
+          description: Unauthorized
+    put:
+      tags:
+      - api-community-controller
+      summary: Add or remove a moderator from a community
+      operationId: manageModerators
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: action
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "404":
+          description: Entity not found
+        "200":
+          description: Action succesfully performed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityUsersInfo"
+        "401":
+          description: Unauthorized
+  /api/v1/users:
+    get:
+      tags:
+      - api-user-controller
+      summary: "Search users by username, email, alias or description. Search Engine's\
+        \ default behaviour"
+      operationId: searchUsers
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: orderByCreationDate
+        in: query
+        required: true
+        schema:
+          type: boolean
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Users found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+        "400":
+          description: Bad Request
+        "404":
+          description: User not found
+    post:
+      tags:
+      - api-user-controller
+      summary: Register a new user
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequestDTO_UserBasicView"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+        "400":
+          description: Bad Request
+        "409":
+          description: Conflict
+  /api/v1/refresh:
+    post:
+      tags:
+      - api-session-controller
+      summary: Refresh token
+      operationId: refreshToken
+      parameters:
+      - name: refreshToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid token
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/posts/{postId}/replies:
+    get:
+      tags:
+      - api-post-controller
+      summary: Search replies by post
+      operationId: searchRepliesByPost
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: criteria
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "404":
+          description: Replies not found
+        "200":
+          description: Replies found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reply_ReplyInfo"
+    post:
+      tags:
+      - api-post-controller
+      summary: Create a reply
+      operationId: createReply
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "201":
+          description: Reply created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reply_ReplyInfo"
+        "413":
+          description: Payload too large
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+  /api/v1/logout:
+    post:
+      tags:
+      - api-session-controller
+      summary: Logout
+      operationId: logout
+      responses:
+        "200":
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/login:
+    post:
+      tags:
+      - api-session-controller
+      summary: Login
+      operationId: login
+      parameters:
+      - name: accessToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      - name: refreshToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/communities:
+    get:
+      tags:
+      - api-community-controller
+      summary: |
+        Get communities by specified criteria and sort:
+        Default: search by name and description. Sortings: creationDate, members, lastPostDate, alphabetical (default)
+        General: get all communities (no query). Sortings: creationDate, lastPostDate, members, alphabetical (default)
+        Admin: get communities by admin username. Sortings: NONE
+        Name: search by name. Sortings: creationDate, lastPostDate, members, alphabetical (default)
+        Description: search by description. Sortings: creationDate, lastPostDate, members, alphabetical (default)
+      operationId: getCommunitiesByName
+      parameters:
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: by
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "400":
+          description: Missing parameter
+        "200":
+          description: Found communities
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityBasicInfo"
+    post:
+      tags:
+      - api-community-controller
+      summary: Create a community
+      operationId: createCommunity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "201":
+          description: Created the community
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityBasicInfo"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "409":
+          description: Conflict
+  /api/v1/communities/{communityID}/posts:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get posts of a community using its ID
+      operationId: getCommunityPosts
+      parameters:
+      - name: communityID
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: count
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+          default: lastModifiedDate
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "404":
+          description: Community not found
+        "200":
+          description: Found the posts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "204":
+          description: No posts found
+    post:
+      tags:
+      - api-post-controller
+      summary: Create a post
+      operationId: createPost
+      parameters:
+      - name: communityID
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostDTO_PostInfo"
+      responses:
+        "400":
+          description: Invalid input
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "401":
+          description: Unauthorized
+  /api/v1/bans:
+    post:
+      tags:
+      - api-community-controller
+      summary: Ban a user from a community
+      operationId: banUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "404":
+          description: Entity not found
+        "201":
+          description: Banned the user from the community
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ban_BasicInfo"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+  /api/v1/users/{username}/taken:
+    get:
+      tags:
+      - api-user-controller
+      summary: Check if username is taken
+      operationId: isUsernameTaken
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Username is available
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /api/v1/users/{username}/posts:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get posts by username
+      operationId: getPostsByUsername
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: order
+        in: query
+        required: false
+        schema:
+          type: string
+          default: creationDate
+      responses:
+        "200":
+          description: Posts found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "204":
+          description: Posts not found
+  /api/v1/users/{username}/posts/count:
+    get:
+      tags:
+      - api-user-controller
+      summary: Get the number of posts a user has made
+      operationId: getUserPostsCount
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Posts found
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
+        "404":
+          description: User not found
+  /api/v1/users/{username}/following:
+    get:
+      tags:
+      - api-user-controller
+      summary: Get user's following list (pageable)
+      operationId: getUserFollowing
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "404":
+          description: User not found
+        "200":
+          description: Following found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+  /api/v1/users/{username}/followers:
+    get:
+      tags:
+      - api-user-controller
+      summary: Get user's followers list (pageable)
+      operationId: getUserFollowers
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Followers found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+        "404":
+          description: User not found
+  /api/v1/users/{username}/communities:
+    get:
+      tags:
+      - api-user-controller
+      summary: "Get user's communities list (pageable). If admin=true, returns the\
+        \ communities the user is an admin of"
+      operationId: getUserCommunities
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: admin
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "400":
+          description: Bad Request
+        "200":
+          description: Communities found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunitiesBasicView"
+        "404":
+          description: User not found
+  /api/v1/users/{username}/communities/count:
+    get:
+      tags:
+      - api-user-controller
+      summary: "Get the number of communities a user is a member of. If admin=true,\
+        \ returns the number of communities the user is an admin of"
+      operationId: getUserCommunitiesCount
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: admin
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: Communities found
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
+        "400":
+          description: Bad Request
+        "404":
+          description: User not found
+  /api/v1/users/{follower}/following/{following}:
+    get:
+      tags:
+      - api-user-controller
+      summary: Check if user is following another user
+      operationId: isUserFollowing
+      parameters:
+      - name: follower
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: following
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User is following
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "404":
+          description: User not found
+  /api/v1/users/posts/most-liked:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get the most liked posts of the most followed users
+      operationId: getMostLikedPostsOfMostFollowedUsers
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Posts found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "204":
+          description: Posts not found
+  /api/v1/users/most-popular:
+    get:
+      tags:
+      - api-user-controller
+      summary: Get users with the most liked posts
+      operationId: getMostPopularUsers
+      parameters:
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Users found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+        "404":
+          description: Users not found
+  /api/v1/users/me:
+    get:
+      tags:
+      - api-user-controller
+      summary: Get current user
+      operationId: getCurrentUser
+      responses:
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+  /api/v1/users/me/following/posts/most-liked:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get the most liked posts of the most followed users the user follows
+      operationId: getMostLikedPostsOfMostFollowedUsers_1
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Posts found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "204":
+          description: Posts not found
+  /api/v1/users/me/communities/posts/most-recent:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get the most recent posts of the user's communities
+      operationId: getMostRecentPostsOfUserCommunities
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Posts found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "204":
+          description: Posts not found
+  /api/v1/users/me/communities/posts/most-liked:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get the most liked posts of the user's communities
+      operationId: getMostLikedPostsOfUserCommunities
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Posts found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "204":
+          description: Posts not found
+  /api/v1/test:
+    get:
+      tags:
+      - api-session-controller
+      summary: Test operation
+      operationId: test
+      responses:
+        "200":
+          description: Test operation successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/replies:
+    get:
+      tags:
+      - api-post-controller
+      summary: Search replies
+      operationId: searchReplies
+      parameters:
+      - name: criteria
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "404":
+          description: Replies not found
+        "200":
+          description: Replies found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reply_ReplyInfo"
+  /api/v1/replies/{replyId}/votes:
+    get:
+      tags:
+      - api-post-controller
+      summary: Returns whether the user has liked a reply
+      operationId: hasUserLikedReply
+      parameters:
+      - name: replyId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "404":
+          description: Reply not found
+        "400":
+          description: Invalid input
+        "200":
+          description: User has liked the reply
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /api/v1/posts:
+    get:
+      tags:
+      - api-post-controller
+      summary: Search posts
+      operationId: searchPosts
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: order
+        in: query
+        required: false
+        schema:
+          type: string
+          default: creationDate
+      responses:
+        "200":
+          description: Posts found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "204":
+          description: Posts not found
+  /api/v1/posts/{postId}/votes:
+    get:
+      tags:
+      - api-post-controller
+      summary: Returns whether the user has upvoted or downvoted a post
+      operationId: hasUserVotedPost
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: type
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User has upvoted or downvoted the post
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "404":
+          description: Post not found
+        "400":
+          description: Invalid input
+  /api/v1/posts/{postId}/replies/all:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get replies of a post
+      operationId: getRepliesOfPost
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: order
+        in: query
+        required: false
+        schema:
+          type: string
+          default: creationDate
+      responses:
+        "200":
+          description: Replies found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reply_ReplyInfo"
+        "204":
+          description: Replies not found
+  /api/v1/communities/{id}/users:
+    get:
+      tags:
+      - api-community-controller
+      summary: Get members of a community (pageable)
+      operationId: getMembers
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: count
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "404":
+          description: Community not found
+        "204":
+          description: No content
+        "200":
+          description: Found members
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityUsersInfo"
+        "400":
+          description: Missing parameter
+  /api/v1/communities/{id}/moderators:
+    get:
+      tags:
+      - api-community-controller
+      summary: Get moderators of a community (pageable)
+      operationId: getModerators
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          description: Community not found
+        "400":
+          description: Missing parameter
+        "200":
+          description: Found moderators
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityUsersInfo"
+  /api/v1/communities/{id}/admins:
+    get:
+      tags:
+      - api-community-controller
+      summary: Get admin of a community
+      operationId: getAdmin
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Community not found
+        "200":
+          description: Found the admin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityUsersInfo"
+  /api/v1/communities/most-popular:
+    get:
+      tags:
+      - api-community-controller
+      summary: Get a list of community names and their respective member count
+      operationId: getMostPopularCommunities
+      parameters:
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "404":
+          description: Entity not found
+        "401":
+          description: Unauthorized
+        "200":
+          description: Found the community names and member counts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityBasicInfo"
+  /api/v1/communities/most-popular/posts/most-recent:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get the most recent posts of the most followed communities
+      operationId: getMostRecentPostsOfMostFollowedCommunities
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Posts found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "204":
+          description: Posts not found
+  /api/v1/communities/most-popular/posts/most-liked:
+    get:
+      tags:
+      - api-post-controller
+      summary: Get the most liked posts of the most followed (popular) communities
+      operationId: getMostLikedPostsOfAllCommunities
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Posts found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "204":
+          description: Posts not found
+  /api/v1/bans/{id}:
+    get:
+      tags:
+      - api-community-controller
+      summary: Get ban info of a user in a community
+      operationId: getBanInfo
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: banInfo
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "404":
+          description: Entity not found
+        "200":
+          description: Found the ban info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityBanInfo"
+        "401":
+          description: Unauthorized
+    delete:
+      tags:
+      - api-community-controller
+      summary: Unban a user from a community
+      operationId: unbanUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "404":
+          description: Entity not found
+        "401":
+          description: Unauthorized
+        "200":
+          description: Unbanned the user from the community
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community"
+  /api/v1/bans/users/{username}/communities/{id}:
+    get:
+      tags:
+      - api-community-controller
+      summary: Check if a user is banned from a community
+      operationId: isUserBanned
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "422":
+          description: Unprocessable Entity
+        "200":
+          description: User is banned from the community
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityBanInfo"
+        "404":
+          description: User is not banned from the community
+        "401":
+          description: Unauthorized
+  /api/v1/bans/communities/{id}:
+    get:
+      tags:
+      - api-community-controller
+      summary: Get all banned users in a community
+      operationId: getBannedUsers
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "404":
+          description: Entity not found
+        "204":
+          description: No content
+        "401":
+          description: Unauthorized
+        "200":
+          description: Found the banned users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community_CommunityBanInfo"
+components:
+  schemas:
+    LocalTime_UserBasicView:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        nano:
+          type: integer
+          format: int32
+    Post_UserBasicView:
+      type: object
+    Reply_UserBasicView:
+      type: object
+    User_UserBasicView:
+      type: object
+      properties:
+        username:
+          type: string
+        alias:
+          type: string
+        email:
+          type: string
+        description:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        pfpString:
+          type: string
+        followers:
+          type: integer
+          format: int32
+        following:
+          type: integer
+          format: int32
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_UserBasicView"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_UserBasicView"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_UserBasicView"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_UserBasicView"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_UserBasicView"
+        creationDate:
+          type: string
+          format: date
+        creationTime:
+          $ref: "#/components/schemas/LocalTime_UserBasicView"
+        fullCreationDate:
+          type: string
+          format: date-time
+    LocalTime_ReplyInfo:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        nano:
+          type: integer
+          format: int32
+    Post_ReplyInfo:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+    Reply_ReplyInfo:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+        post:
+          $ref: "#/components/schemas/Post_ReplyInfo"
+        title:
+          type: string
+        content:
+          type: string
+        likes:
+          type: integer
+          format: int32
+        author:
+          $ref: "#/components/schemas/User_ReplyInfo"
+        creationDate:
+          type: string
+          format: date
+        creationTime:
+          $ref: "#/components/schemas/LocalTime_ReplyInfo"
+        fullCreationDate:
+          type: string
+          format: date-time
+    User_ReplyInfo:
+      type: object
+      properties:
+        username:
+          type: string
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_ReplyInfo"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_ReplyInfo"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_ReplyInfo"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_ReplyInfo"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_ReplyInfo"
+    PostDTO_PostInfo:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        image:
+          type: string
+          format: binary
+    Community_PostInfo:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+        name:
+          type: string
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_PostInfo"
+    Post_PostInfo:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+        author:
+          $ref: "#/components/schemas/User_PostInfo"
+        title:
+          type: string
+        content:
+          type: string
+        hasImage:
+          type: boolean
+        community:
+          $ref: "#/components/schemas/Community_PostInfo"
+        upvotes:
+          type: integer
+          format: int32
+        downvotes:
+          type: integer
+          format: int32
+        comments:
+          type: integer
+          format: int32
+        fullCreationDate:
+          type: string
+          format: date-time
+        fullLastReplyDate:
+          type: string
+          format: date-time
+        fullLastEditDate:
+          type: string
+          format: date-time
+    Reply_PostInfo:
+      type: object
+    User_PostInfo:
+      type: object
+      properties:
+        username:
+          type: string
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_PostInfo"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_PostInfo"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_PostInfo"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_PostInfo"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_PostInfo"
+    Community_CommunityBasicInfo:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        admin:
+          $ref: "#/components/schemas/User_CommunityBasicInfo"
+        hasBanner:
+          type: boolean
+        bannerString:
+          type: string
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunityBasicInfo"
+        creationDate:
+          type: string
+          format: date
+        creationTime:
+          $ref: "#/components/schemas/LocalTime_CommunityBasicInfo"
+        fullCreationDate:
+          type: string
+          format: date-time
+        lastPostDate:
+          type: string
+          format: date
+        lastPostTime:
+          $ref: "#/components/schemas/LocalTime_CommunityBasicInfo"
+        fullLastPostDate:
+          type: string
+          format: date-time
+    LocalTime_CommunityBasicInfo:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        nano:
+          type: integer
+          format: int32
+    Post_CommunityBasicInfo:
+      type: object
+    Reply_CommunityBasicInfo:
+      type: object
+    User_CommunityBasicInfo:
+      type: object
+      properties:
+        username:
+          type: string
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunityBasicInfo"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunityBasicInfo"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_CommunityBasicInfo"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunityBasicInfo"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_CommunityBasicInfo"
+    Ban_CommunityUsersInfo:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User_CommunityUsersInfo"
+    Community_CommunityUsersInfo:
+      type: object
+      properties:
+        moderators:
+          type: array
+          items:
+            $ref: "#/components/schemas/User_CommunityUsersInfo"
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/User_CommunityUsersInfo"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunityUsersInfo"
+        bannedUsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ban_CommunityUsersInfo"
+    LocalTime_CommunityUsersInfo:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        nano:
+          type: integer
+          format: int32
+    Post_CommunityUsersInfo:
+      type: object
+    Reply_CommunityUsersInfo:
+      type: object
+    User_CommunityUsersInfo:
+      type: object
+      properties:
+        username:
+          type: string
+        alias:
+          type: string
+        email:
+          type: string
+        description:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        pfpString:
+          type: string
+        followers:
+          type: integer
+          format: int32
+        following:
+          type: integer
+          format: int32
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunityUsersInfo"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunityUsersInfo"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_CommunityUsersInfo"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunityUsersInfo"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_CommunityUsersInfo"
+        creationDate:
+          type: string
+          format: date
+        creationTime:
+          $ref: "#/components/schemas/LocalTime_CommunityUsersInfo"
+        fullCreationDate:
+          type: string
+          format: date-time
+    SignupRequestDTO_UserBasicView:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        alias:
+          type: string
+        password:
+          type: string
+    AuthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - SUCCESS
+          - FAILURE
+        message:
+          type: string
+        error:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Ban_BasicInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user:
+          $ref: "#/components/schemas/User_BasicInfo"
+        community:
+          $ref: "#/components/schemas/Community_BasicInfo"
+        banReason:
+          type: string
+        banUntil:
+          type: string
+          format: date-time
+    Community_BasicInfo:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+        name:
+          type: string
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_BasicInfo"
+    Post_BasicInfo:
+      type: object
+    Reply_BasicInfo:
+      type: object
+    User_BasicInfo:
+      type: object
+      properties:
+        username:
+          type: string
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_BasicInfo"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_BasicInfo"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_BasicInfo"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_BasicInfo"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_BasicInfo"
+    Ban:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user:
+          $ref: "#/components/schemas/User"
+        community:
+          $ref: "#/components/schemas/Community"
+        banReason:
+          type: string
+        banUntil:
+          type: string
+          format: date-time
+    Community:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        admin:
+          $ref: "#/components/schemas/User"
+        moderators:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        hasBanner:
+          type: boolean
+        bannerString:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        creationDate:
+          type: string
+          format: date
+        creationTime:
+          $ref: "#/components/schemas/LocalTime"
+        fullCreationDate:
+          type: string
+          format: date-time
+        lastPostDate:
+          type: string
+          format: date
+        lastPostTime:
+          $ref: "#/components/schemas/LocalTime"
+        fullLastPostDate:
+          type: string
+          format: date-time
+        bannedUsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ban"
+    LocalTime:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        nano:
+          type: integer
+          format: int32
+    Post:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+        author:
+          $ref: "#/components/schemas/User"
+        title:
+          type: string
+        content:
+          type: string
+        hasImage:
+          type: boolean
+        community:
+          $ref: "#/components/schemas/Community"
+        upvotes:
+          type: integer
+          format: int32
+        upvotedBy:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        downvotes:
+          type: integer
+          format: int32
+        downvotedBy:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        comments:
+          type: integer
+          format: int32
+        creationDate:
+          type: string
+          format: date
+        creationTime:
+          $ref: "#/components/schemas/LocalTime"
+        fullCreationDate:
+          type: string
+          format: date-time
+        lastReplyDate:
+          type: string
+          format: date
+        lastReplyTime:
+          $ref: "#/components/schemas/LocalTime"
+        fullLastReplyDate:
+          type: string
+          format: date-time
+        isEdited:
+          type: boolean
+        lastEditDate:
+          type: string
+          format: date
+        lastEditTime:
+          $ref: "#/components/schemas/LocalTime"
+        fullLastEditDate:
+          type: string
+          format: date-time
+        replyList:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply"
+        edited:
+          type: boolean
+    Reply:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+        post:
+          $ref: "#/components/schemas/Post"
+        title:
+          type: string
+        content:
+          type: string
+        likes:
+          type: integer
+          format: int32
+        likedBy:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        author:
+          $ref: "#/components/schemas/User"
+        creationDate:
+          type: string
+          format: date
+        creationTime:
+          $ref: "#/components/schemas/LocalTime"
+        fullCreationDate:
+          type: string
+          format: date-time
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        alias:
+          type: string
+        email:
+          type: string
+        description:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        pfpString:
+          type: string
+        followers:
+          type: integer
+          format: int32
+        following:
+          type: integer
+          format: int32
+        followersList:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        followingList:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply"
+        communities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Community"
+        creationDate:
+          type: string
+          format: date
+        creationTime:
+          $ref: "#/components/schemas/LocalTime"
+        fullCreationDate:
+          type: string
+          format: date-time
+    Community_CommunitiesBasicView:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        admin:
+          $ref: "#/components/schemas/User_CommunitiesBasicView"
+        hasBanner:
+          type: boolean
+        bannerString:
+          type: string
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunitiesBasicView"
+        creationDate:
+          type: string
+          format: date
+        creationTime:
+          $ref: "#/components/schemas/LocalTime_CommunitiesBasicView"
+        fullCreationDate:
+          type: string
+          format: date-time
+        lastPostDate:
+          type: string
+          format: date
+        lastPostTime:
+          $ref: "#/components/schemas/LocalTime_CommunitiesBasicView"
+        fullLastPostDate:
+          type: string
+          format: date-time
+    LocalTime_CommunitiesBasicView:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        nano:
+          type: integer
+          format: int32
+    Post_CommunitiesBasicView:
+      type: object
+    Reply_CommunitiesBasicView:
+      type: object
+    User_CommunitiesBasicView:
+      type: object
+      properties:
+        username:
+          type: string
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunitiesBasicView"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunitiesBasicView"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_CommunitiesBasicView"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunitiesBasicView"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_CommunitiesBasicView"
+    Community_CommunityBanInfo:
+      type: object
+      properties:
+        identifier:
+          type: integer
+          format: int64
+        name:
+          type: string
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_CommunityBanInfo"
+    Post_CommunityBanInfo:
+      type: object

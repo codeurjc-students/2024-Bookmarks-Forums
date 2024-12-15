@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.backend.service.CommunityService;
-import com.example.backend.service.PostService;
 import com.example.backend.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -67,7 +66,7 @@ public class APICommunityController {
     @Operation(summary = "Get a community by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the community", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBasicInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Community not found", content = @Content)
@@ -85,15 +84,17 @@ public class APICommunityController {
     // Get communities (order: creationDate, members, lastPostDate) (by: name,
     // description, admin, default, general) DEFAULT = by name and description | SECURITY: CHECKED
     @JsonView(CommunityBasicInfo.class)
-    @Operation(summary = "Get communities by specified criteria and sort:\n"
-            + "Default: search by name and description. Sortings: creationDate, members, lastPostDate, alphabetical (default)\n"
-            + "General: get all communities (no query). Sortings: creationDate, lastPostDate, members, alphabetical (default)\n"
-            + "Admin: get communities by admin username. Sortings: NONE\n"
-            + "Name: search by name. Sortings: creationDate, lastPostDate, members, alphabetical (default)\n"
-            + "Description: search by description. Sortings: creationDate, lastPostDate, members, alphabetical (default)\n")
+    @Operation(summary = """
+            Get communities by specified criteria and sort:
+            Default: search by name and description. Sortings: creationDate, members, lastPostDate, alphabetical (default)
+            General: get all communities (no query). Sortings: creationDate, lastPostDate, members, alphabetical (default)
+            Admin: get communities by admin username. Sortings: NONE
+            Name: search by name. Sortings: creationDate, lastPostDate, members, alphabetical (default)
+            Description: search by description. Sortings: creationDate, lastPostDate, members, alphabetical (default)
+            """)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found communities", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBasicInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "204", description = "No content", content = @Content),
@@ -134,7 +135,7 @@ public class APICommunityController {
     @Operation(summary = "Get members of a community (pageable)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found members", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
             }),
             @ApiResponse(responseCode = "404", description = "Community not found", content = @Content),
             @ApiResponse(responseCode = "400", description = "Missing parameter", content = @Content),
@@ -179,7 +180,7 @@ public class APICommunityController {
     @Operation(summary = "Get moderators of a community (pageable)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found moderators", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Community not found", content = @Content),
@@ -202,7 +203,7 @@ public class APICommunityController {
     @Operation(summary = "Get admin of a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the admin", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Community not found", content = @Content)
@@ -368,7 +369,7 @@ public class APICommunityController {
     @Operation(summary = "Add, remove or ban a user from a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Action succesfully performed", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
@@ -592,7 +593,7 @@ public class APICommunityController {
     @Operation(summary = "Check if a user is a moderator of a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the moderator", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
@@ -653,7 +654,7 @@ public class APICommunityController {
     @Operation(summary = "Add or remove a moderator from a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Action succesfully performed", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityUsersInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
@@ -822,7 +823,7 @@ public class APICommunityController {
     @Operation(summary = "Get ban info of a user in a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the ban info", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBanInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
@@ -899,7 +900,7 @@ public class APICommunityController {
     @Operation(summary = "Check if a user is banned from a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User is banned from the community", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBanInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "User is not banned from the community", content = @Content),
@@ -942,7 +943,7 @@ public class APICommunityController {
     @Operation(summary = "Get all banned users in a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the banned users", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBanInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),
@@ -985,7 +986,7 @@ public class APICommunityController {
     @Operation(summary = "Get a list of community names and their respective member count")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the community names and member counts", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunityBasicInfo.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class))
 
             }),
             @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content),

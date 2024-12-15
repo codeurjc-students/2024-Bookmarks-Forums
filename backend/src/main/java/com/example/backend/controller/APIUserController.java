@@ -71,10 +71,10 @@ public class APIUserController {
     @Operation(summary = "Get current user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserBasicView.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
     })
     @GetMapping("/users/me")
     public ResponseEntity<User> getCurrentUser(HttpServletRequest request) {
@@ -95,9 +95,9 @@ public class APIUserController {
     @Operation(summary = "Get user by username or email")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserBasicView.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Users not found"),
+            @ApiResponse(responseCode = "404", description = "Users not found", content = @Content),
     })
     @GetMapping("/users/{username}")
     public ResponseEntity<User> getUser(@PathVariable String username) {
@@ -137,9 +137,9 @@ public class APIUserController {
     @Operation(summary = "Get user's followers list (pageable)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Followers found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserBasicView.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
     })
     @GetMapping("/users/{username}/followers")
     public ResponseEntity<List<User>> getUserFollowers(@PathVariable String username,
@@ -162,7 +162,7 @@ public class APIUserController {
             @ApiResponse(responseCode = "200", description = "User is not following", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = boolean.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
     })
     @GetMapping("/users/{follower}/following/{following}")
     public ResponseEntity<Boolean> isUserFollowing(@PathVariable String follower, @PathVariable String following) {
@@ -182,9 +182,9 @@ public class APIUserController {
     @Operation(summary = "Get user's following list (pageable)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Following found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserBasicView.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
     })
     @GetMapping("/users/{username}/following")
     public ResponseEntity<List<User>> getUserFollowing(
@@ -204,10 +204,10 @@ public class APIUserController {
     @Operation(summary = "Search users by username, email, alias or description. Search Engine's default behaviour")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserBasicView.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
     })
     @GetMapping("/users")
     public ResponseEntity<List<User>> searchUsers(
@@ -226,10 +226,10 @@ public class APIUserController {
     @Operation(summary = "Get user's communities list (pageable). If admin=true, returns the communities the user is an admin of")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Communities found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = CommunitiesBasicView.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Community.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
     })
     @GetMapping("/users/{username}/communities")
     public ResponseEntity<List<Community>> getUserCommunities(
@@ -253,8 +253,8 @@ public class APIUserController {
             @ApiResponse(responseCode = "200", description = "Communities found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
     })
     @GetMapping("/users/{username}/communities/count")
     public ResponseEntity<Integer> getUserCommunitiesCount(
@@ -286,7 +286,7 @@ public class APIUserController {
             @ApiResponse(responseCode = "200", description = "Posts found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
     })
     @GetMapping("/users/{username}/posts/count")
     public ResponseEntity<Integer> getUserPostsCount(@PathVariable String username) {
@@ -304,8 +304,8 @@ public class APIUserController {
             @ApiResponse(responseCode = "201", description = "User registered", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
             }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "409", description = "Conflict"),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Conflict", content = @Content),
     })
     @JsonView(UserBasicView.class)
     @ResponseStatus(HttpStatus.CREATED)
@@ -465,9 +465,9 @@ public class APIUserController {
     @Operation(summary = "Delete user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User deleted"),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
     })
     @DeleteMapping("/users/{username}")
     public ResponseEntity<String> deleteUser(HttpServletRequest request, @PathVariable String username) {
@@ -526,10 +526,10 @@ public class APIUserController {
             @ApiResponse(responseCode = "200", description = "Profile picture changed", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
             }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content),
     })
     @JsonView(UserBasicView.class)
     @PutMapping("/users/{username}/pictures")
@@ -587,8 +587,8 @@ public class APIUserController {
             @ApiResponse(responseCode = "200", description = "Profile picture found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Profile picture not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+            @ApiResponse(responseCode = "404", description = "Profile picture not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content),
     })
     @GetMapping("/users/{username}/pictures")
     public ResponseEntity<Object> getProfilePicture(@PathVariable String username) {
@@ -638,9 +638,9 @@ public class APIUserController {
     @Operation(summary = "Get users with the most liked posts")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserBasicView.class)),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
             }),
-            @ApiResponse(responseCode = "404", description = "Users not found"),
+            @ApiResponse(responseCode = "404", description = "Users not found", content = @Content),
     })
     @GetMapping("/users/most-popular")
     public ResponseEntity<List<Object[]>> getMostPopularUsers(@RequestParam(defaultValue = "10") int size) {

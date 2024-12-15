@@ -1,0 +1,3603 @@
+{
+	"info": {
+		"_postman_id": "07af1339-cc33-4cb0-aa56-6f35f96fc618",
+		"name": "Bookmarks Forums",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32947073"
+	},
+	"item": [
+		{
+			"name": "Session",
+			"item": [
+				{
+					"name": "Test Request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/test",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"test"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"BookReader_14\",\n    \"password\": \"pass\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/login",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Admin Login New Password",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"AdminReader\",\n    \"password\": \"Hola1234!\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/login",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "JSON",
+							"header": [
+								{
+									"key": "Set-Cookie",
+									"value": "AuthToken=yI9zDcX9gFoXVHaW14iwO2OR2i3o93814vyCgQCvnmQ7IdMyis0UgsveEfdrg/FkoM8KccLLyq4/Kt9r80cSspIP446WU6s6ZzJPIrS238nTkY/76PddyiXR8359jrwDMqiJNOAODEQsFwP9G96zRhjoQzvKbNfcpknSEWzFhMIZSrnbEdb9NANqw88eF+FxmmIxe4DPNhSaR5BfGTHlAcMyRC6Ye3WBxzIl+ihxTTBy2hAz8pBt/NI45iNPmbBLmPS/Pu/HZHuRZFsGQ0bMhVW/fvNE6gjqBPorveOW8saMKyAONYmIv7JvaO1iE04P; Path=/; HttpOnly",
+									"type": "text"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "RefreshToken=yI9zDcX9gFoXVHaW14iwO2OR2i3o93814vyCgQCvnmQ7IdMyis0UgsveEfdrg/FkoM8KccLLyq4/Kt9r80cSspIP446WU6s6ZzJPIrS238nTkY/76PddyiXR8359jrwDMqiJNOAODEQsFwP9G96zRhjoQzvKbNfcpknSEWzFhMIZSrnbEdb9NANqw88eF+FxmmIxe4DPNhSaR5BfGTHlAcMyRC6Ye3WBxzIl+ihxTTBKdEz6BszLMdKZdIBUtf9pa1kACLrWpvXiN5j8E+w0hPz8pgC7Y9NDe7VSQc2FjcrG3QjNzpE3jAYhB5g1PrK5; Path=/; HttpOnly",
+									"type": "text"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"type": "text"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate",
+									"type": "text"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache",
+									"type": "text"
+								},
+								{
+									"key": "Expires",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000 ; includeSubDomains",
+									"type": "text"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY",
+									"type": "text"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"type": "text"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 08 Oct 2024 15:41:27 GMT",
+									"type": "text"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60",
+									"type": "text"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"message\": \"Auth successful. Tokens are created in cookie.\",\n    \"error\": null\n}"
+						},
+						{
+							"name": "Admin Login Old Password",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"AdminReader\",\n    \"password\": \"adminpass\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/login",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "JSON",
+							"header": [
+								{
+									"key": "Set-Cookie",
+									"value": "AuthToken=yI9zDcX9gFoXVHaW14iwO2OR2i3o93814vyCgQCvnmQ7IdMyis0UgsveEfdrg/FkoM8KccLLyq4/Kt9r80cSspIP446WU6s6ZzJPIrS238nTkY/76PddyiXR8359jrwDMqiJNOAODEQsFwP9G96zRhjoQzvKbNfcpknSEWzFhMIZSrnbEdb9NANqw88eF+FxmmIxe4DPNhSaR5BfGTHlAcMyRC6Ye3WBxzIl+ihxTTBy2hAz8pBt/NI45iNPmbBLmPS/Pu/HZHuRZFsGQ0bMhVW/fvNE6gjqBPorveOW8saMKyAONYmIv7JvaO1iE04P; Path=/; HttpOnly",
+									"type": "text"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "RefreshToken=yI9zDcX9gFoXVHaW14iwO2OR2i3o93814vyCgQCvnmQ7IdMyis0UgsveEfdrg/FkoM8KccLLyq4/Kt9r80cSspIP446WU6s6ZzJPIrS238nTkY/76PddyiXR8359jrwDMqiJNOAODEQsFwP9G96zRhjoQzvKbNfcpknSEWzFhMIZSrnbEdb9NANqw88eF+FxmmIxe4DPNhSaR5BfGTHlAcMyRC6Ye3WBxzIl+ihxTTBKdEz6BszLMdKZdIBUtf9pa1kACLrWpvXiN5j8E+w0hPz8pgC7Y9NDe7VSQc2FjcrG3QjNzpE3jAYhB5g1PrK5; Path=/; HttpOnly",
+									"type": "text"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"type": "text"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate",
+									"type": "text"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache",
+									"type": "text"
+								},
+								{
+									"key": "Expires",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000 ; includeSubDomains",
+									"type": "text"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY",
+									"type": "text"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"type": "text"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 08 Oct 2024 15:41:27 GMT",
+									"type": "text"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60",
+									"type": "text"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"message\": \"Auth successful. Tokens are created in cookie.\",\n    \"error\": null\n}"
+						},
+						{
+							"name": "Login BookReader_14 User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"BookReader_14\",\n    \"password\": \"pass\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/login",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "JSON",
+							"header": [
+								{
+									"key": "Set-Cookie",
+									"value": "AuthToken=yI9zDcX9gFoXVHaW14iwO2OR2i3o93814vyCgQCvnmRpIrb7WTWpjvJfOtRXjLjttttRURsKV+whTSfOLFPELnH2lIEH16jEq2xSAnUBfDNQdsmV25MKQn01exOMDCgTGzHqNW4Cu4ZYEAxRtrXp+dZY44i+4bbh8AOJr90MGbhddH6Dd4MWE2FTQfED0iTTXW2NBwYA5NdTxUJ6MZwfXwPAFcjtNWQCq3mqnIrQjObf5wE3+MTHn2enkis2H3AnqtfBKoZZk3eDlx7JNVZZAg==; Path=/; HttpOnly",
+									"type": "text"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "RefreshToken=yI9zDcX9gFoXVHaW14iwO2OR2i3o93814vyCgQCvnmRpIrb7WTWpjvJfOtRXjLjttttRURsKV+whTSfOLFPELnH2lIEH16jEq2xSAnUBfDNQdsmV25MKQn01exOMDCgTGzHqNW4Cu4ZYEAxRtrXp+dZY44i+4bbh8AOJr90MGbhddH6Dd4MWE2FTQfED0iTTngCblQe8tYfYGA/oFVjgBlQj29ap2hddQ/Ghvau3M22utFsu/kZevgt0c0qLnvvb3KR3hme2R/MhR5hEEPYSDQ==; Path=/; HttpOnly",
+									"type": "text"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"type": "text"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate",
+									"type": "text"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache",
+									"type": "text"
+								},
+								{
+									"key": "Expires",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000 ; includeSubDomains",
+									"type": "text"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY",
+									"type": "text"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"type": "text"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 08 Oct 2024 17:24:44 GMT",
+									"type": "text"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60",
+									"type": "text"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"message\": \"Auth successful. Tokens are created in cookie.\",\n    \"error\": null\n}"
+						},
+						{
+							"name": "Login FanBook_785 User Copy",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"FanBook_785\",\n    \"password\": \"pass\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/login",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "JSON",
+							"header": [
+								{
+									"key": "Set-Cookie",
+									"value": "AuthToken=yI9zDcX9gFoXVHaW14iwO2OR2i3o93814vyCgQCvnmRpIrb7WTWpjvJfOtRXjLjttttRURsKV+whTSfOLFPELnH2lIEH16jEq2xSAnUBfDNQdsmV25MKQn01exOMDCgTGzHqNW4Cu4ZYEAxRtrXp+dZY44i+4bbh8AOJr90MGbhddH6Dd4MWE2FTQfED0iTTXW2NBwYA5NdTxUJ6MZwfXwPAFcjtNWQCq3mqnIrQjObf5wE3+MTHn2enkis2H3AnqtfBKoZZk3eDlx7JNVZZAg==; Path=/; HttpOnly",
+									"type": "text"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "RefreshToken=yI9zDcX9gFoXVHaW14iwO2OR2i3o93814vyCgQCvnmRpIrb7WTWpjvJfOtRXjLjttttRURsKV+whTSfOLFPELnH2lIEH16jEq2xSAnUBfDNQdsmV25MKQn01exOMDCgTGzHqNW4Cu4ZYEAxRtrXp+dZY44i+4bbh8AOJr90MGbhddH6Dd4MWE2FTQfED0iTTngCblQe8tYfYGA/oFVjgBlQj29ap2hddQ/Ghvau3M22utFsu/kZevgt0c0qLnvvb3KR3hme2R/MhR5hEEPYSDQ==; Path=/; HttpOnly",
+									"type": "text"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"type": "text"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate",
+									"type": "text"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache",
+									"type": "text"
+								},
+								{
+									"key": "Expires",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000 ; includeSubDomains",
+									"type": "text"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY",
+									"type": "text"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"type": "text"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 08 Oct 2024 17:24:44 GMT",
+									"type": "text"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60",
+									"type": "text"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"message\": \"Auth successful. Tokens are created in cookie.\",\n    \"error\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"FanBook_785\",\n    \"password\": \"pass\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/logout",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/auth/refresh",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/me",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Chart: Get Most Popular Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/most-popular?size=2",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"most-popular"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "NewUser",
+									"type": "text"
+								},
+								{
+									"key": "alias",
+									"value": "NewAlias",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "newEmail@email.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/YourReader",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"YourReader"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Is Username Taken",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/AdminReader/taken",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"AdminReader",
+								"taken"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Followers List of an User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/YourReader/followers?page=0&size=10",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"YourReader",
+								"followers"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Is User Following Another User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/YourReader/following/BookReader_14",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"YourReader",
+								"following",
+								"BookReader_14"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Following List of an User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/YourReader/following?page=0&size=10",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"YourReader",
+								"following"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Engine: Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users?query=admin&orderByCreationDate=true&page=0&size=10",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "admin"
+								},
+								{
+									"key": "orderByCreationDate",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Communities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/YourReader/communities?admin=false&page=0&size=10",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"YourReader",
+								"communities"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "false"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Communities Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/AdminReader/communities/count?admin=false",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"AdminReader",
+								"communities",
+								"count"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Posts Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/AdminReader/posts/count",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"AdminReader",
+								"posts",
+								"count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get/Search User Posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/BookReader_14/posts?query=Book&page=0&size=10&order=lastModifiedDate",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"BookReader_14",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Book"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "order",
+									"value": "lastModifiedDate"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"alias\": \"The Admin!\",\r\n    \"description\": \"The one and only, the Bookmarks Forums Admin!\",\r\n    \"email\": \"izanrbhd@gmail.com\",\r\n    \"password\": \"Hola1234!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/BookReader_14?action=edit",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"BookReader_14"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "edit"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update Multiple Data",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"alias\": \"The Admin!\",\r\n    \"description\": \"The one and only, the Bookmarks Forums Admin!\",\r\n    \"email\": \"izanrbhd@gmail.com\",\r\n    \"password\": \"Hola1234!\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/users/AdminReader?action=edit",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"AdminReader"
+									],
+									"query": [
+										{
+											"key": "action",
+											"value": "edit"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "JSON",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"type": "text"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate",
+									"type": "text"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache",
+									"type": "text"
+								},
+								{
+									"key": "Expires",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000 ; includeSubDomains",
+									"type": "text"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY",
+									"type": "text"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"type": "text"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 08 Oct 2024 15:34:03 GMT",
+									"type": "text"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60",
+									"type": "text"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"username\": \"AdminReader\",\n    \"alias\": \"The Admin!\",\n    \"email\": \"izanrbhd@gmail.com\",\n    \"description\": \"The one and only, the Bookmarks Forums Admin!\",\n    \"roles\": [\n        \"USER\",\n        \"ADMIN\"\n    ],\n    \"pfpString\": \"/assets/defaultProfilePicture.png\",\n    \"followers\": 1,\n    \"following\": 2,\n    \"creationDate\": \"2024-10-08\",\n    \"creationTime\": \"17:33:46.782\",\n    \"fullCreationDate\": \"2024-10-08T17:33:46.782315\"\n}"
+						},
+						{
+							"name": "Update Email",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"izanrbhd@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/users/AdminReader?action=edit",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"AdminReader"
+									],
+									"query": [
+										{
+											"key": "action",
+											"value": "edit"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "JSON",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"type": "text"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate",
+									"type": "text"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache",
+									"type": "text"
+								},
+								{
+									"key": "Expires",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000 ; includeSubDomains",
+									"type": "text"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY",
+									"type": "text"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"type": "text"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 08 Oct 2024 15:34:03 GMT",
+									"type": "text"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60",
+									"type": "text"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"username\": \"AdminReader\",\n    \"alias\": \"The Admin!\",\n    \"email\": \"izanrbhd@gmail.com\",\n    \"description\": \"The one and only, the Bookmarks Forums Admin!\",\n    \"roles\": [\n        \"USER\",\n        \"ADMIN\"\n    ],\n    \"pfpString\": \"/assets/defaultProfilePicture.png\",\n    \"followers\": 1,\n    \"following\": 2,\n    \"creationDate\": \"2024-10-08\",\n    \"creationTime\": \"17:33:46.782\",\n    \"fullCreationDate\": \"2024-10-08T17:33:46.782315\"\n}"
+						},
+						{
+							"name": "Update Password",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"Abcd!1234\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/users/AdminReader?action=edit",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"AdminReader"
+									],
+									"query": [
+										{
+											"key": "action",
+											"value": "edit"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "JSON",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"type": "text"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate",
+									"type": "text"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache",
+									"type": "text"
+								},
+								{
+									"key": "Expires",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000 ; includeSubDomains",
+									"type": "text"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY",
+									"type": "text"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"type": "text"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 08 Oct 2024 15:34:03 GMT",
+									"type": "text"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60",
+									"type": "text"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"username\": \"AdminReader\",\n    \"alias\": \"The Admin!\",\n    \"email\": \"izanrbhd@gmail.com\",\n    \"description\": \"The one and only, the Bookmarks Forums Admin!\",\n    \"roles\": [\n        \"USER\",\n        \"ADMIN\"\n    ],\n    \"pfpString\": \"/assets/defaultProfilePicture.png\",\n    \"followers\": 1,\n    \"following\": 2,\n    \"creationDate\": \"2024-10-08\",\n    \"creationTime\": \"17:33:46.782\",\n    \"fullCreationDate\": \"2024-10-08T17:33:46.782315\"\n}"
+						},
+						{
+							"name": "Follow User",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"etheko\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/users/BookReader_14?action=follow&otherUsername=Fanbook_785",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"BookReader_14"
+									],
+									"query": [
+										{
+											"key": "action",
+											"value": "follow"
+										},
+										{
+											"key": "otherUsername",
+											"value": "Fanbook_785"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Unfollow User",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"etheko\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/users/BookReader_14?action=unfollow&otherUsername=FanBook_785",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"BookReader_14"
+									],
+									"query": [
+										{
+											"key": "action",
+											"value": "unfollow"
+										},
+										{
+											"key": "otherUsername",
+											"value": "FanBook_785"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/BookReader_14",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"BookReader_14"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set PFP",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1efa3b0a-5078-4600-9baa-ee61e250d1c2"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/AdminReader/pictures",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"AdminReader",
+								"pictures"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get PFP",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/AdminReader/pictures",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"AdminReader",
+								"pictures"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Community",
+			"item": [
+				{
+					"name": "Algo",
+					"item": [
+						{
+							"name": "Get Most popular Communities and Members Count",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/communities/most-popular?size=3",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"communities",
+										"most-popular"
+									],
+									"query": [
+										{
+											"key": "size",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/4",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Communities by Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities?query=Bookmarks&page=0&size=10&sort=alphabetical&by=name",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Bookmarks"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "alphabetical"
+								},
+								{
+									"key": "by",
+									"value": "name"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Communities by Description",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities?query=readers&page=0&size=10&sort=default&by=description",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "readers"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "default"
+								},
+								{
+									"key": "by",
+									"value": "description"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Communities by Admin",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities?query=AdminReader&page=0&size=10&by=admin",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "AdminReader"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "by",
+									"value": "admin"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Communities QUERYLESS",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities?page=0&size=10&sort=creationDate&by=general",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "aa",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "creationDate"
+								},
+								{
+									"key": "by",
+									"value": "general"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Communities by Name/Description (DEFAULT)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities?query=reader&page=0&size=10&sort=alphabetical&by=default",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "reader"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "alphabetical"
+								},
+								{
+									"key": "by",
+									"value": "default"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Members In Community",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/2/users?query=book&page=0&size=10&count=false",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"2",
+								"users"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "book"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "count",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Is User Member",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/2/users/BookReader_14",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"2",
+								"users",
+								"BookReader_14"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Members",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/4/users?page=0&size=10&count=false",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"4",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "count",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Members Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/4/users?count=true",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"4",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "count",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Moderators",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/2/moderators?page=0&size=10",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"2",
+								"moderators"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Admin",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/4/admins",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"4",
+								"admins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify Community",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"New Community Name\",\r\n    \"description\": \"New Community Description! Wow!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/Bookmarks_Events",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"Bookmarks_Events"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Change Name/Description",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"La mejor comunidad de todas\",\r\n    \"description\": \"Esta es probablemente una de las mejores comunidades de Bookmarks Forums, donde podrás encontrar de todo, absolutamente. Así que ya sabes, únete y pruébalo tú mismo!!!\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/communities/2",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"communities",
+										"2"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Change Admin",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"admin\": \"FanBook_785\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/communities/2",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"communities",
+										"2"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Delete Community",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/4",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Community",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Furry Readers\",\r\n    \"description\": \"Are you a furry? Do you like to read? No more questions, join us then!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Join Community",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/1/users/FanBook_785?action=join",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"1",
+								"users",
+								"FanBook_785"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "join"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Leave Community",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/1/users/FanBook_785?action=leave",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"1",
+								"users",
+								"FanBook_785"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "leave"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ban User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"communityID\": 1,\r\n    \"username\": \"BookReader_14\",\r\n    \"duration\": \"week\",\r\n    \"reason\": \"Too cute for this community\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/bans",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"bans"
+							],
+							"query": [
+								{
+									"key": "communityID",
+									"value": "5",
+									"disabled": true
+								},
+								{
+									"key": "username",
+									"value": "FanBook_785",
+									"disabled": true
+								},
+								{
+									"key": "duration",
+									"value": "week",
+									"disabled": true
+								},
+								{
+									"key": "reason",
+									"value": "Too cute for the community!",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unban User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/bans/1",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"bans",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ban Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/bans/1?banInfo=duration",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"bans",
+								"1"
+							],
+							"query": [
+								{
+									"key": "banInfo",
+									"value": "reason",
+									"disabled": true
+								},
+								{
+									"key": "banInfo",
+									"value": "duration"
+								},
+								{
+									"key": "banInfo",
+									"value": "raw",
+									"disabled": true
+								},
+								{
+									"key": "banInfo",
+									"value": "status",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Is User Banned",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/bans/users/BookReader_14/communities/1",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"bans",
+								"users",
+								"BookReader_14",
+								"communities",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Banned Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/bans/communities/1?page=0&size=10",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"bans",
+								"communities",
+								"1"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add mod",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/2/moderators/BookReader_14?action=add",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"2",
+								"moderators",
+								"BookReader_14"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "add"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Is Mod?",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/2/moderators/BookReader_14",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"2",
+								"moderators",
+								"BookReader_14"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove mod",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/2/moderators/BookReader_14?action=remove",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"2",
+								"moderators",
+								"BookReader_14"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "remove"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Banner",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1ef9eb9d-c1db-4ed0-8318-0280f4989d1f"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/4/pictures",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"4",
+								"pictures"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Banner",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/4/pictures?action=delete",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"4",
+								"pictures"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "delete"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Banner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/4/pictures",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"4",
+								"pictures"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "Algo",
+					"item": [
+						{
+							"name": "User Recom.: Most Liked Posts by following users",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/users/me/following/posts/most-liked?page=0&size=1",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"me",
+										"following",
+										"posts",
+										"most-liked"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User Recom.: Most Liked Posts by following communities",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/users/me/communities/posts/most-liked?page=0&size=1",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"me",
+										"communities",
+										"posts",
+										"most-liked"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User Recom.: Most Recent Posts of User Communities",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/users/me/communities/posts/most-recent?page=0&size=1",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"me",
+										"communities",
+										"posts",
+										"most-recent"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "General Recom.: Most Liked Posts of all Users",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/users/posts/most-liked?page=0&size=10",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"posts",
+										"most-liked"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "General Recom.: Most Liked Posts of most followed Communities",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/communities/most-popular/posts/most-liked?page=0&size=1",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"communities",
+										"most-popular",
+										"posts",
+										"most-liked"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "General Recom.: Most Recent Posts of most followed Communities",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/communities/most-popular/posts/most-recent?page=0&size=1",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"communities",
+										"most-popular",
+										"posts",
+										"most-recent"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get Post by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/1",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Posts of a Community",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/2/posts?page=0&size=2&sort=likes",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"2",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "count",
+									"value": "true",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "2"
+								},
+								{
+									"key": "sort",
+									"value": "likes"
+								},
+								{
+									"key": "query",
+									"value": "welcome",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Posts Globally",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts?page=0&size=10&order=creationDate&query=Bookmarks",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "order",
+									"value": "creationDate"
+								},
+								{
+									"key": "query",
+									"value": "Bookmarks"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Posts Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/1/posts?count=true&page=0&size=10&sort=creationDate",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"1",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "count",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "creationDate"
+								},
+								{
+									"key": "query",
+									"value": "welcome",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Post",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Holaaa",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "buenasssss",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "postman-cloud:///1ef9eb9d-c1db-4ed0-8318-0280f4989d1f"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/communities/2/posts",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"communities",
+								"2",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Post Image",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/5/pictures",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"5",
+								"pictures"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Post",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "I modified my post!!2",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "postman-cloud:///1ef8b494-4005-4280-8724-d187278fee7e",
+									"disabled": true
+								},
+								{
+									"key": "content",
+									"value": "I like it more now...",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/1?action=edit",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"1"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "edit"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upvote Post",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "I modified my post!!",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "postman-cloud:///1ef8b494-4005-4280-8724-d187278fee7e"
+								},
+								{
+									"key": "content",
+									"value": "I like it more now...",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/2?action=upvote",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"2"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "upvote"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Downvote Post",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "I modified my post!!",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "postman-cloud:///1ef8b494-4005-4280-8724-d187278fee7e"
+								},
+								{
+									"key": "content",
+									"value": "I like it more now...",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/2?action=downvote",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"2"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "downvote"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Post Image",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "postman-cloud:///1efa3b0a-5078-4600-9baa-ee61e250d1c2"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/2/pictures",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"2",
+								"pictures"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Post",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/2",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get replies of a post",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/3/replies/all?order=creationDate&page=0&size=2",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"3",
+								"replies",
+								"all"
+							],
+							"query": [
+								{
+									"key": "order",
+									"value": "creationDate"
+								},
+								{
+									"key": "order",
+									"value": "rating",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get reply by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/replies/3",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"replies",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Replies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/replies?query=bad&criteria=title&page=0&size=10",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"replies"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "bad"
+								},
+								{
+									"key": "criteria",
+									"value": "title"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Replies of a Post",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/1/replies?query=bad&criteria=title&page=0&size=10",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"1",
+								"replies"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "bad"
+								},
+								{
+									"key": "criteria",
+									"value": "title"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create reply",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"New Replyyyyy!!!!\",\r\n    \"content\": \"This is new reply! Like it?\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/1/replies",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"1",
+								"replies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like/Dislike reply",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"New Replyyyyy!!!!\",\r\n    \"content\": \"This is new reply! Like it?\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/replies/1?action=like",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"replies",
+								"1"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "like"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Reply",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"New Replyyyyy!!!!\",\r\n    \"content\": \"This is new reply! Like it?\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/replies/1",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"replies",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Has user Voted Post",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/posts/1/votes?username=AdminReader&type=downvote",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"1",
+								"votes"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "AdminReader"
+								},
+								{
+									"key": "type",
+									"value": "downvote"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Has User Liked Reply",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/replies/3/votes?username=BookReader_14",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"replies",
+								"3",
+								"votes"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "BookReader_14"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Runners (testing)",
+			"item": [
+				{
+					"name": "Create Community and logout",
+					"item": [
+						{
+							"name": "Logout Copy",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"FanBook_785\",\n    \"password\": \"pass\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/logout",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login Copy",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"BookReader_14\",\n    \"password\": \"pass\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/login",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Community Copy",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Furry Readers\",\r\n    \"description\": \"Are you a furry? Do you like to read? No more questions, join us then!\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/communities",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"communities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Logout Copy",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"FanBook_785\",\n    \"password\": \"pass\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/logout",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Join Community",
+					"item": [
+						{
+							"name": "Login Copy",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"FanBook_785\",\n    \"password\": \"pass\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/login",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Join Community Copy",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/communities/5/users/FanBook_785?action=join",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"communities",
+										"5",
+										"users",
+										"FanBook_785"
+									],
+									"query": [
+										{
+											"key": "action",
+											"value": "join"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Logout Copy 2",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"FanBook_785\",\n    \"password\": \"pass\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/logout",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "BookReader_14 -> FanBook",
+					"item": [
+						{
+							"name": "Login Copy 2",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"BookReader_14\",\n    \"password\": \"pass\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/login",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Ban User Copy",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/communities/5/users/FanBook_785?action=ban&duration=week&reason=Too cute for the community!",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"communities",
+										"5",
+										"users",
+										"FanBook_785"
+									],
+									"query": [
+										{
+											"key": "action",
+											"value": "ban"
+										},
+										{
+											"key": "duration",
+											"value": "week"
+										},
+										{
+											"key": "reason",
+											"value": "Too cute for the community!"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Logout Copy",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"FanBook_785\",\n    \"password\": \"pass\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{LOCALHOST}}/api/v1/logout",
+									"host": [
+										"{{LOCALHOST}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "LOCALHOST",
+			"value": "https://localhost:8443",
+			"type": "string"
+		}
+	]
+}

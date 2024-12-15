@@ -29,7 +29,10 @@ COPY backend/src/ /app/src
 # Copy production files from Angular to backend-public
 COPY --from=frontend /frontend/dist/frontend/browser /app/src/main/resources/static
 
-RUN mvn clean install -DskipTests -X
+# Copy api-docs
+COPY backend/api-docs/ /app/api-docs
+
+RUN mvn clean install -DskipTests -X -P docker
 
 # Java
 FROM amazoncorretto:18
