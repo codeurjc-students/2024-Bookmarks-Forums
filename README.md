@@ -254,10 +254,8 @@ In this map, the chat and administrator zone are not shown as they will be imple
 # 9. REST API Documentation
 
 The documentation for the REST API has been generated using Swagger and the OpenAPI specification.
-
-The YAML file can be found in the following link: [api-docs-yaml](backend/api-docs/api-docs.yaml).
-
-However, a more visual and interactive version can be found in the following link: [HTML-api-docs-version](https://raw.githack.com/codeurjc-students/2024-Bookmarks-Forums/refs/heads/main/backend/api-docs/api-docs.html).
+The YAML file can be found in the following link: [api-docs-yaml](backend/api-docs/api-docs.yaml)
+However, a more visual and interactive version can be found in the following link: [Swagger UI](backend/api-docs/api-docs.html)
 
 # 10. Docker instructions for building the application's image
 
@@ -285,9 +283,21 @@ cd 2024-Bookmarks-Forums/docker
 
 4. Run the following automated script to build the Docker image:
 
+On Linux:
+
 ```bash
 ./create_image.sh
 ```
+
+[create_image.sh](https://github.com/codeurjc-students/2024-Bookmarks-Forums/blob/main/docker/create_image.sh)
+
+On Windows:
+
+```bash
+create_image.bat
+```
+
+[create_image.bat](https://github.com/codeurjc-students/2024-Bookmarks-Forums/blob/main/docker/create_image.bat)
 
 This script will do the following:
 
@@ -297,6 +307,7 @@ This script will do the following:
 - Build the Docker image with the backend's JAR file and the Dockerfile.
 - Push the Docker image to DockerHub.
 - Set up the Docker container with the application's image.
+
 
 # 11. Docker instructions for running the application's container
 
@@ -317,6 +328,18 @@ cd 2024-Bookmarks-Forums/docker
 ```
 
 3. Run one of these docker-compose commands to start the application's container:
+
+On Linux:
+
+```bash
+sudo docker compose -p bookmarks-forums up --build
+```
+
+```bash
+sudo docker compose up
+```
+
+On Windows:
 
 ```bash
 docker-compose -p bookmarks-forums up --build

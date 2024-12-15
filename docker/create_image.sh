@@ -1,12 +1,12 @@
 # Remove specific files in backend static folder
-rm -f backend/src/main/resources/static/index.html
-rm -f backend/src/main/resources/static/main-*.js
-rm -f backend/src/main/resources/static/polyfills-*.js
-rm -f backend/src/main/resources/static/scripts-*.js
-rm -f backend/src/main/resources/static/styles-*.js
+rm -f ../backend/src/main/resources/static/index.html
+rm -f ../backend/src/main/resources/static/main-*.js
+rm -f ../backend/src/main/resources/static/polyfills-*.js
+rm -f ../backend/src/main/resources/static/scripts-*.js
+rm -f ../backend/src/main/resources/static/styles-*.js
 
 # Go to frontend direcroty
-cd frontend
+cd ../frontend
 
 # Install Angular CLI
 npm install -g @angular/cli
@@ -30,10 +30,10 @@ cd ../backend
 cd ../docker
 
 # Docker container build
-docker build -t etheko/bookmarks-forums -f Dockerfile ../
+sudo docker build -t etheko/bookmarks-forums -f Dockerfile ../
 
 # Image push to DockerHub
-docker push etheko/bookmarks-forums
+sudo docker push etheko/bookmarks-forums
 
 # Set up
-docker-compose -p bookmarks-forums up --build
+sudo docker compose -p bookmarks-forums up --build
