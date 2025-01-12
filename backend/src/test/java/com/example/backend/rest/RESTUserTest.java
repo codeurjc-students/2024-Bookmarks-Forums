@@ -254,7 +254,7 @@ class RESTUserTest {
                 .then()
                 .statusCode(200)
                 .body("size()", greaterThanOrEqualTo(0))
-                .body("name", hasItem("Bookmarks Reviews")); // Checking if "Bookmarks Reviews" is in the response
+                .body("name", hasItem("Bookmarks Events")); // Checking if "Bookmarks Events" is in the response
 
         // Case 2: Existing user as admin
         given()
@@ -437,7 +437,7 @@ class RESTUserTest {
         String authCookie =
                 given()
                         .contentType("application/json")
-                        .body("{\"username\": \"YourReader\", \"password\": \"pass\"}")
+                        .body("{\"username\": \"bDude\", \"password\": \"pass\"}")
                         .when()
                         .post("/login")
                         .then()
@@ -446,7 +446,7 @@ class RESTUserTest {
                         .extract()
                         .cookie("AuthToken");
 
-        String username = "YourReader";
+        String username = "bDude";
 
         // User trying to modify another user
         given()
@@ -500,7 +500,6 @@ class RESTUserTest {
                 .statusCode(200)
                 .body("alias", equalTo(newAlias));
 
-        // Assuming "AnotherUser" exists for follow/unfollow actions
         String otherUsername = "AdminReader";
 
         // Case 4: Follow a user
