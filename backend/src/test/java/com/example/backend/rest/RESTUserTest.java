@@ -437,7 +437,7 @@ class RESTUserTest {
         String authCookie =
                 given()
                         .contentType("application/json")
-                        .body("{\"username\": \"bDude\", \"password\": \"pass\"}")
+                        .body("{\"username\": \"YourReader\", \"password\": \"pass\"}")
                         .when()
                         .post("/login")
                         .then()
@@ -446,7 +446,7 @@ class RESTUserTest {
                         .extract()
                         .cookie("AuthToken");
 
-        String username = "bDude";
+        String username = "YourReader";
 
         // User trying to modify another user
         given()
