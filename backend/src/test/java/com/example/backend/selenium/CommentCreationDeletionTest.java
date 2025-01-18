@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -24,7 +25,11 @@ class CommentCreationDeletionTest {
 
     @BeforeEach
     public void setupTest() {
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        driver = new ChromeDriver(options);
     }
 
     @AfterEach
@@ -43,7 +48,6 @@ class CommentCreationDeletionTest {
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getWaitTime()));
 
-
         // Testing on post ID: 1
 
         // Given
@@ -52,7 +56,6 @@ class CommentCreationDeletionTest {
 
         String postTitle = "testing comment title";
         String postContent = "testing comment content";
-
 
         // When
 
@@ -73,11 +76,11 @@ class CommentCreationDeletionTest {
 
         // Wait for reply-card
         wait.until(presenceOfElementLocated(By.className("reply-card")));
-        
-        wait.until(driver -> commentsListContainer.findElements(By.className("reply-card")).size() == 2);
-        
 
-        WebElement commentCard = commentsListContainer.findElements(By.className("reply-card")).get(commentsListContainer.findElements(By.className("reply-card")).size() - 1);
+        wait.until(driver -> commentsListContainer.findElements(By.className("reply-card")).size() == 2);
+
+        WebElement commentCard = commentsListContainer.findElements(By.className("reply-card"))
+                .get(commentsListContainer.findElements(By.className("reply-card")).size() - 1);
 
         // Compare card title and content
         WebElement commentTitle = commentCard.findElement(By.className("reply-card-title"));
@@ -89,7 +92,8 @@ class CommentCreationDeletionTest {
         WebElement deleteButton = commentCard.findElement(By.className("delete-reply-btn"));
         deleteButton.click();
 
-        // Check that there is no reply-card element anymore (no more comments text is displayed)
+        // Check that there is no reply-card element anymore (no more comments text is
+        // displayed)
         wait.until(presenceOfElementLocated(By.id("no-more-replies-text")));
 
         // Logout

@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -27,7 +28,11 @@ class PostCreationDeletionTest {
 
     @BeforeEach
     public void setupTest() {
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        driver = new ChromeDriver(options);
     }
 
     @AfterEach
@@ -73,7 +78,8 @@ class PostCreationDeletionTest {
         postContent.sendKeys(newContent);
         submitButton.click();
 
-        // save current date and format as a string with this formatting: "DD-MM-YYYY a las hh:mm"
+        // save current date and format as a string with this formatting: "DD-MM-YYYY a
+        // las hh:mm"
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy 'a las' HH:mm");
         String saveDate = LocalDateTime.now().format(formatter);
 
@@ -99,10 +105,10 @@ class PostCreationDeletionTest {
         assertEquals(community, postCommunity.getText());
 
         // Post deletion
-        
+
         // Given
         String postId = driver.getCurrentUrl().substring(driver.getCurrentUrl().lastIndexOf("/") + 1);
-        
+
         // When
 
         WebElement deletePostButton = wait.until(presenceOfElementLocated(By.id("delete-post-btn")));
@@ -111,7 +117,8 @@ class PostCreationDeletionTest {
         WebElement deletePostConfirmButton = wait.until(presenceOfElementLocated(By.id("confirm-btn")));
         deletePostConfirmButton.click();
 
-        // Then (go to post page and check that it redirects to the corresponding error page)
+        // Then (go to post page and check that it redirects to the corresponding error
+        // page)
         driver.get(LOCALHOST + ":" + config.getPort() + "/post/" + postId);
         WebElement errorText = wait.until(presenceOfElementLocated(By.className("error-text")));
         assertEquals("No se ha encontrado el post.", errorText.getText());

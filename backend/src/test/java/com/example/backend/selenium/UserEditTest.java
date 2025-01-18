@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -25,7 +26,11 @@ class UserEditTest {
 
     @BeforeEach
     public void setupTest() {
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        driver = new ChromeDriver(options);
     }
 
     @AfterEach
@@ -44,7 +49,6 @@ class UserEditTest {
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getWaitTime()));
 
-
         // Testing on first post page
 
         String newAlias = "newTestingAlias";
@@ -53,7 +57,6 @@ class UserEditTest {
         // Given
         int port = config.getPort();
         driver.get(LOCALHOST + ":" + port + "/profile/" + config.getUsername());
-
 
         // When
 

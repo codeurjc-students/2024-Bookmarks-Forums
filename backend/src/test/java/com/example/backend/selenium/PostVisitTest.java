@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -28,7 +29,11 @@ class PostVisitTest {
 
     @BeforeEach
     public void setupTest() {
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        driver = new ChromeDriver(options);
     }
 
     @AfterEach
@@ -65,7 +70,7 @@ class PostVisitTest {
         String firstPostCommunity = firstPost.findElement(By.className("card-community-name-text")).getText();
         firstPost.click();
 
-        //Then
+        // Then
 
         // Redirects to post page
         WebElement postTitle = wait.until(presenceOfElementLocated(By.className("card-title")));
@@ -80,8 +85,6 @@ class PostVisitTest {
         assertEquals(firstPostAuthor, postAuthor.getText());
         assertEquals(firstPostDate, postDate.getText());
         assertEquals(firstPostCommunity, postCommunity.getText());
-
-
 
     }
 }

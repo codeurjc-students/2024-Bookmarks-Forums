@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.Keys;
@@ -30,7 +31,11 @@ class SearchTest {
 
     @BeforeEach
     public void setupTest() {
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        driver = new ChromeDriver(options);
     }
 
     @AfterEach
@@ -69,7 +74,6 @@ class SearchTest {
         assertEquals("Aquí tienes todo Bookmarks Forums", searchPageTitle.getText());
 
         WebElement searchInput = wait.until(presenceOfElementLocated(By.id("searchTerm")));
-
 
         // Search for post
         String searchTerm = "welcome";
@@ -184,8 +188,7 @@ class SearchTest {
         await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true);
         String communityName = community.getText();
 
-        assertEquals(communityName2, communityName);     
-
+        assertEquals(communityName2, communityName);
 
     }
 }

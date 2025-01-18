@@ -25,7 +25,7 @@ public class TestConfig { // Singleton pattern for testing config params.
     private TestConfig() {
         this.localhost = "http://localhost";
         this.port = 4200; // Default port
-        this.waitTime = 10;
+        this.waitTime = 0;
 
         this.username = "BookReader_14";
         this.password = "pass";

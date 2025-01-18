@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -27,7 +28,11 @@ class LandingLoginTest {
 
     @BeforeEach
     public void setupTest() {
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        driver = new ChromeDriver(options);
     }
 
     @AfterEach
@@ -72,10 +77,11 @@ class LandingLoginTest {
 
         assertEquals(LOCALHOST + ":" + port + "/", driver.getCurrentUrl(), "URL should be the landing page");
         assertTrue(landingGreeting.isDisplayed(), "Landing greeting should be displayed");
-        
+
         // wait until alias is shown
         await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true);
-        assertTrue(landingGreeting.getText().contains("Muy buenas, " + username), "Landing greeting should contain alias");
+        assertTrue(landingGreeting.getText().contains("Muy buenas, " + username),
+                "Landing greeting should contain alias");
 
     }
 }

@@ -23,11 +23,32 @@ jobs:
           distribution: "adopt"
           java-version: "18"
 
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: "131"
+          install-dependencies: true
+          install-chromedriver: true
+
+
       - name: Set up Docker (database container setup)
         run: sudo docker run -d --name bookmarks-forums-DB-GitHub-actions-selenium -p 3306:3306 -e MYSQL_DATABASE=BFDB -e MYSQL_ROOT_PASSWORD=password mysql:8.3.0
 
       - name: Install Dockerize
         run: curl -sSL https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz | sudo tar -C /usr/local/bin -xzv
+
+      - name: Wait for MySQL to start
+        run: dockerize -wait tcp://localhost:3306 -timeout 1m
+
+      - name: Set environment variables
+        run: |
+          echo "GMAIL_USERNAME=${{ secrets.GMAIL_USERNAME }}" >> $GITHUB_ENV
+          echo "GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Create env.properties file
+        run: |
+          echo "GMAIL_USERNAME=${{ secrets.GMAIL_USERNAME }}" > backend/src/main/resources/env.properties
+          echo "GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}" >> backend/src/main/resources/env.properties
 
       - name: Convert line endings to Unix format
         run: sed -i 's/\r$//' backend/mvnw
@@ -39,10 +60,9 @@ jobs:
         run: backend/mvnw -B package --file backend/pom.xml -DskipTests
 
       - name: Run application
-        run: backend/mvnw spring-boot:run --file backend/pom.xml &
-
-      - name: Wait for application to start
-        run: sleep 30
+        run: |
+          nohup backend/mvnw spring-boot:run --file backend/pom.xml &
+          sleep 10
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -61,23 +81,11 @@ jobs:
         run: npm install
         working-directory: frontend
 
-      - name: Check backend is up
-        run: curl -k https://localhost:8443/actuator/health
-
-      - name: Run Angular application (and accept google's terms and conditions)
-        run: ng serve --host=127.0.0.1 --port=4200 &
-        working-directory: frontend
-
-      - name: Wait for Angular application to start
+      - name: Run Angular application
         run: |
-          for i in {1..60}; do
-            if curl --output /dev/null --silent --head --fail http://127.0.0.1:4200; then
-              echo "Angular application is up"
-              break
-            fi
-            echo "Waiting for Angular application..."
-            sleep 5
-          done
+          nohup ng serve --host=127.0.0.1 --port=4200 &
+          sleep 30
+        working-directory: frontend
 
       - name: Run Selenium tests
         run: backend/mvnw test -P selenium-tests --file backend/pom.xml

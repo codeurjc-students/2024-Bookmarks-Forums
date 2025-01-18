@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -26,7 +27,11 @@ class CommunityFullTest {
 
     @BeforeEach
     public void setupTest() {
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        driver = new ChromeDriver(options);
     }
 
     @AfterEach
@@ -58,7 +63,8 @@ class CommunityFullTest {
         WebElement communityCreationButton = wait.until(presenceOfElementLocated(By.id("new-community-btn-link")));
         communityCreationButton.click();
 
-        WebElement showDescriptionButton = wait.until(presenceOfElementLocated(By.className("hyperlink-btn-in-header")));
+        WebElement showDescriptionButton = wait
+                .until(presenceOfElementLocated(By.className("hyperlink-btn-in-header")));
         showDescriptionButton.click();
 
         WebElement communityNameField = wait.until(presenceOfElementLocated(By.id("communityName")));
@@ -74,22 +80,25 @@ class CommunityFullTest {
 
         WebElement confirmButton = wait.until(presenceOfElementLocated(By.id("confirm-modal-btn")));
         wait.until((ExpectedCondition<Boolean>) driver -> confirmButton.isEnabled());
-        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for modal animation to finish
+        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for modal animation to
+                                                                                    // finish
         confirmButton.click();
 
-        // Then (check that the community name and description are displayed on the community page)
+        // Then (check that the community name and description are displayed on the
+        // community page)
         WebElement community = wait.until(presenceOfElementLocated(By.id("community-name-text")));
         wait.until((ExpectedCondition<Boolean>) driver -> !community.getText().isEmpty());
         await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true);
         String communityName = community.getText();
 
-        WebElement showDescriptionButton2 = wait.until(presenceOfElementLocated(By.className("hyperlink-btn-in-header")));
+        WebElement showDescriptionButton2 = wait
+                .until(presenceOfElementLocated(By.className("hyperlink-btn-in-header")));
         showDescriptionButton2.click();
 
         WebElement communityDescription = wait.until(presenceOfElementLocated(By.id("community-description-text")));
         wait.until((ExpectedCondition<Boolean>) driver -> !communityDescription.getText().isEmpty());
         String communityDescriptionText = communityDescription.getText();
-        
+
         assertEquals(newCommunityName, communityName);
         assertEquals(newCommunityDescription, communityDescriptionText);
 
@@ -106,7 +115,8 @@ class CommunityFullTest {
         // When
 
         WebElement communityNameField2 = wait.until(presenceOfElementLocated(By.id("communityName")));
-        WebElement showDescriptionButton3 = wait.until(presenceOfElementLocated(By.className("hyperlink-btn-in-header")));
+        WebElement showDescriptionButton3 = wait
+                .until(presenceOfElementLocated(By.className("hyperlink-btn-in-header")));
         showDescriptionButton3.click();
         WebElement communityDescriptionField2 = wait.until(presenceOfElementLocated(By.id("communityDescription")));
         WebElement submitButton2 = wait.until(presenceOfElementLocated(By.id("confirm-changes-btn")));
@@ -119,7 +129,8 @@ class CommunityFullTest {
 
         WebElement confirmButton2 = wait.until(presenceOfElementLocated(By.id("confirm-modal-btn")));
         wait.until((ExpectedCondition<Boolean>) driver -> confirmButton2.isEnabled());
-        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for modal animation to finish
+        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for modal animation to
+                                                                                    // finish
         confirmButton2.click();
 
         // Then (Check elements changed)
@@ -128,7 +139,8 @@ class CommunityFullTest {
         wait.until((ExpectedCondition<Boolean>) driver -> !community2.getText().isEmpty());
         String communityName2 = community2.getText();
 
-        WebElement showDescriptionButton4 = wait.until(presenceOfElementLocated(By.className("hyperlink-btn-in-header")));
+        WebElement showDescriptionButton4 = wait
+                .until(presenceOfElementLocated(By.className("hyperlink-btn-in-header")));
         showDescriptionButton4.click();
 
         WebElement communityDescription2 = wait.until(presenceOfElementLocated(By.id("community-description-text")));
@@ -149,7 +161,8 @@ class CommunityFullTest {
 
         WebElement confirmButton3 = wait.until(presenceOfElementLocated(By.id("confirm-modal-btn")));
         wait.until((ExpectedCondition<Boolean>) driver -> confirmButton3.isEnabled());
-        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for modal animation to finish
+        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for modal animation to
+                                                                                    // finish
         confirmButton3.click();
 
         // Then (community should no longer display its page)
