@@ -84,6 +84,13 @@ class PostCreationDeletionTest {
         WebElement postDate = wait.until(presenceOfElementLocated(By.id("post-date")));
         WebElement postCommunity = wait.until(presenceOfElementLocated(By.className("branding-hyperlink-text")));
 
+        // Wait 5 seconds for the post to be created
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         // Compare
         assertEquals(newTitle, postTitle2.getText());
         assertEquals(newContent, postContent2.getText());

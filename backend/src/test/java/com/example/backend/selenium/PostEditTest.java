@@ -81,6 +81,14 @@ class PostEditTest {
         // Check on post page
         WebElement postTitle3 = wait.until(presenceOfElementLocated(By.className("card-title")));
         WebElement postContent3 = wait.until(presenceOfElementLocated(By.className("post-content")));
+
+        // Wait 5 seconds for the post to be updated
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         assertEquals(newTitle, postTitle3.getText());
         assertEquals(newContent, postContent3.getText());
 

@@ -58,6 +58,14 @@ class SearchTest {
         // Then
 
         WebElement searchPageTitle = wait.until(presenceOfElementLocated(By.className("page-title")));
+
+        // Wait for 5 seconds
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         assertEquals("Aquí tienes todo Bookmarks Forums", searchPageTitle.getText());
 
         WebElement searchInput = wait.until(presenceOfElementLocated(By.id("searchTerm")));
