@@ -1,0 +1,78 @@
+name: Build and Push Docker Image
+# This will build the Angular project, copy the build to the backend static folder, build the backend with Maven, and push the Docker image to DockerHub
+on:
+  push:
+    branches:
+      - main
+      - ci-cd
+  pull_request:
+    branches:
+      - main
+      - ci-cd
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set environment variables
+        run: |
+          echo "GMAIL_USERNAME=${{ secrets.GMAIL_USERNAME }}" >> $GITHUB_ENV
+          echo "GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Create env.properties file
+        run: |
+          echo "GMAIL_USERNAME=${{ secrets.GMAIL_USERNAME }}" > backend/src/main/resources/env.properties
+          echo "GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}" >> backend/src/main/resources/env.properties
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli
+        working-directory: ./frontend
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ./frontend
+
+      - name: Build Angular project
+        run: ng build --configuration production
+        working-directory: ./frontend
+
+      - name: Copy Angular build to backend static folder
+        run: cp -r frontend/dist/frontend/browser/* backend/src/main/resources/static/
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: "adopt"
+          java-version: "18"
+
+      - name: Convert line endings to Unix format
+        run: sed -i 's/\r$//' backend/mvnw
+
+      - name: Make mvnw executable
+        run: chmod +x backend/mvnw
+
+      - name: Build backend with Maven
+        run: ./mvnw clean package -DskipTests -P local
+        working-directory: ./backend
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/bookmarks-forums -f Dockerfile ../
+        working-directory: ./docker
+
+      - name: Push Docker image to DockerHub
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/bookmarks-forums
+        working-directory: ./docker
