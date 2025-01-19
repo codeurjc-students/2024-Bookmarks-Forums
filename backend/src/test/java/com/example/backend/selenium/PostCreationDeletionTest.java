@@ -114,6 +114,13 @@ class PostCreationDeletionTest {
         WebElement deletePostButton = wait.until(presenceOfElementLocated(By.id("delete-post-btn")));
         deletePostButton.click();
 
+        // Wait for 3 seconds
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement deletePostConfirmButton = wait.until(presenceOfElementLocated(By.id("confirm-btn")));
         deletePostConfirmButton.click();
 

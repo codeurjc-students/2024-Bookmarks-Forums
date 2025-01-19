@@ -98,6 +98,13 @@ class UserCreationDeletionTest {
         WebElement deleteAccountButton = wait.until(presenceOfElementLocated(By.id("delete-account-btn")));
         deleteAccountButton.click();
 
+        // Wait for 3 seconds
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement confirmButton = wait.until(presenceOfElementLocated(By.xpath("//button[@title='Confirmar']")));
         confirmButton.click();
 
