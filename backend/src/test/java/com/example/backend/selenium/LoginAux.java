@@ -47,6 +47,14 @@ class LoginAux {
 
         // Then
 
+        // Waits for 3 seconds to allow the page to load
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement landingGreeting = wait.until(presenceOfElementLocated(By.id("landing-greeting")));
 
         assertEquals(LOCALHOST + ":" + port + "/", driver.getCurrentUrl(), "URL should be the landing page");
