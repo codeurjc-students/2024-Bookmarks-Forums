@@ -127,6 +127,14 @@ class PostCreationDeletionTest {
         // Then (go to post page and check that it redirects to the corresponding error
         // page)
         driver.get(LOCALHOST + ":" + config.getPort() + "/post/" + postId);
+
+        // Wait for 5 seconds
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement errorText = wait.until(presenceOfElementLocated(By.className("error-text")));
         assertEquals("No se ha encontrado el post.", errorText.getText());
 
