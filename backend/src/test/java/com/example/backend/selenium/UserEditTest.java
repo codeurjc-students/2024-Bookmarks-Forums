@@ -63,6 +63,13 @@ class UserEditTest {
         WebElement editProfileButton = wait.until(presenceOfElementLocated(By.id("edit-profile-btn")));
         editProfileButton.click();
 
+        // Wait for 5 seconds
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement aliasField = wait.until(presenceOfElementLocated(By.id("alias-input")));
         WebElement descriptionField = wait.until(presenceOfElementLocated(By.id("description-input")));
         WebElement submitButton = wait.until(presenceOfElementLocated(By.id("profile-edit-confirm-btn")));
@@ -71,6 +78,13 @@ class UserEditTest {
         descriptionField.clear();
         descriptionField.sendKeys(newDescription);
         submitButton.click();
+
+        // Wait for 5 seconds
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // Then (goes to profile page and compares)
         WebElement aliasText = wait.until(presenceOfElementLocated(By.id("alias-text")));

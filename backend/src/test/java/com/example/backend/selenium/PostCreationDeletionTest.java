@@ -114,9 +114,9 @@ class PostCreationDeletionTest {
         WebElement deletePostButton = wait.until(presenceOfElementLocated(By.id("delete-post-btn")));
         deletePostButton.click();
 
-        // Wait for 3 seconds
+        // Wait for 5 seconds
         try {
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
