@@ -8,7 +8,7 @@ services:
     image: etheko/bookmarks-forums
     ports:
       - "443:8443"
-    command: ["java", "-jar", "/backend-0.0.1-SNAPSHOT.jar"]
+    command: ["java", "-jar", "/app/backend-0.0.1-SNAPSHOT.jar"]
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://bookmarks-forums-DB:3306/BFDB
       - SPRING_DATASOURCE_USERNAME=root

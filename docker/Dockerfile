@@ -39,8 +39,8 @@ FROM amazoncorretto:18
 
 WORKDIR /app
 
-COPY --from=build /app/target/backend-0.0.1-SNAPSHOT.jar /backend-0.0.1-SNAPSHOT.jar
+COPY --from=build /app/target/backend-0.0.1-SNAPSHOT.jar /app/backend-0.0.1-SNAPSHOT.jar
 
-RUN chmod +x /backend-0.0.1-SNAPSHOT.jar
+RUN chmod +x /app/backend-0.0.1-SNAPSHOT.jar
 
-
+CMD ["java", "-jar", "/app/backend-0.0.1-SNAPSHOT.jar"]
