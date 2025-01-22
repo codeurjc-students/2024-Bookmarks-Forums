@@ -80,6 +80,7 @@ jobs:
       tag: ${{ github.sha }}
 
   deploy:
+    environment: production
     permissions:
       id-token: write
     needs: publish
