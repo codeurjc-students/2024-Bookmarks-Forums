@@ -1,5 +1,4 @@
-name: Build and Push Docker Image
-# This will build the Angular project, copy the build to the backend static folder, build the backend with Maven, and push the Docker image to DockerHub
+name: Build and Push Docker Image. Deploy to Azure.
 on:
   push:
     branches:
@@ -70,9 +69,45 @@ jobs:
         working-directory: ./backend
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/bookmarks-forums -f Dockerfile ../
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/bookmarks-forums:${{ github.sha }} -f Dockerfile ../
         working-directory: ./docker
 
       - name: Push Docker image to DockerHub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/bookmarks-forums
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/bookmarks-forums:${{ github.sha }}
         working-directory: ./docker
+
+    outputs:
+      tag: ${{ github.sha }}
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure
+        run: |
+          az container create \
+            --resource-group ${{ secrets.AZURE_GROUP }} \
+            --name bookmarks-forums \
+            --image ${{ secrets.DOCKERHUB_USERNAME }}/bookmarks-forums:${{ needs.publish.outputs.tag }} \
+            --dns-name-label bookmarks-forums-app \
+            --registry-login-server index.docker.io \
+            --registry-username ${{ secrets.DOCKERHUB_USERNAME }} \
+            --registry-password ${{ secrets.DOCKERHUB_AZURE_TOKEN }} \
+            --ports 443 \
+            --os-type Linux \
+            --cpu 1 \
+            --memory 1.5 \
+            --environment-variables \
+              SPRING_DATASOURCE_URL="jdbc:mysql://bookmarks-forums-database.mysql.database.azure.com:3306/bookmarks-forums-db?useSSL=true" \
+              SPRING_DATASOURCE_USERNAME="${{ secrets.DATABASE_USERNAME }}" \
+              SPRING_DATASOURCE_PASSWORD="${{ secrets.DATABASE_PASSWORD }}" \
+              RUNNING_IN_DOCKER="true" \
+              SERVER_PORT=443
+
