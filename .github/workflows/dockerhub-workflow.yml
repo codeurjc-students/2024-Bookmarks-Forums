@@ -93,6 +93,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Start MySQL database
+        run: |
+          az mysql flexible-server start \
+            --name bookmarks-forums-database \
+            --resource-group ${{ secrets.AZURE_GROUP }}
+
       - name: Deploy to Azure
         run: |
           az container create \
