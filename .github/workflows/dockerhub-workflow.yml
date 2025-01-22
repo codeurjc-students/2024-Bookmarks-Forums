@@ -80,6 +80,8 @@ jobs:
       tag: ${{ github.sha }}
 
   deploy:
+    permissions:
+      id-token: write
     needs: publish
     runs-on: ubuntu-22.04
     steps:
