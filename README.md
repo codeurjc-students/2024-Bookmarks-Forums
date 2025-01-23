@@ -255,7 +255,7 @@ In this map, the chat and administrator zone are not shown as they will be imple
 
 The documentation for the REST API has been generated using Swagger and the OpenAPI specification.
 The YAML file can be found in the following link: [api-docs-yaml](backend/api-docs/api-docs.yaml)
-However, a more visual and interactive version can be found in the following link: [Swagger UI](backend/api-docs/api-docs.html)
+However, a more visual and interactive version can be found in the following link: [API Docs HTML Version](https://raw.githack.com/codeurjc-students/2024-Bookmarks-Forums/refs/heads/main/backend/api-docs/api-docs.html)
 
 # 10. Docker instructions for building the application's image
 
