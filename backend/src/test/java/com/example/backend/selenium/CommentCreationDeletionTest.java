@@ -90,6 +90,13 @@ class CommentCreationDeletionTest {
 
         // Delete comment
         WebElement deleteButton = commentCard.findElement(By.className("delete-reply-btn"));
+        
+        // Wait 3 seconds
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         deleteButton.click();
 
         // Check that there is no reply-card element anymore (no more comments text is
