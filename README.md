@@ -28,7 +28,8 @@ Table of contents
 9. [REST API Documentation](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#9-rest-api-documentation)
 10. [Docker instructions for building the application's image](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#10-docker-instructions-for-building-the-applications-image)
 11. [Docker instructions for running the application's container](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#11-docker-instructions-for-running-the-applications-container)
-12. [Demonstrative video](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#12-demonstrative-video)
+12. [CI/CD](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#12-cicd)
+13. [Demonstrative video](https://github.com/codeurjc-students/2024-Bookmarks-Forums?tab=readme-ov-file#13-demonstrative-video)
 
 ## 1. About this Web Application
 
@@ -158,8 +159,7 @@ Users will be able to sort posts by date (from most recent to least recent) or l
 Apart from the main functionality and technologies mentioned above, the web application will contain:
 
 - Automatic tests: for unit integration testing.
-- Packaging: as GraalVM native images.
-- Deployment: on a cloud VM.
+- Deployment: CD on Azure (Azure Containers).
 
 ## 6. Wireframe
 
@@ -355,7 +355,26 @@ docker-compose up
 https://localhost:443
 ```
 
-# 12. Demonstrative video
+# 12. CI/CD
+
+The CI/CD pipeline has been set up using GitHub Actions. The pipeline is triggered when a pull request is opened or updated, or when a push is made to the main branch.
+There are three automated workflows in the pipeline:
+
+- **Backend Workflow**: This workflow builds the backend project with Maven and runs the backend (REST API) tests.
+
+- **Frontend Workflow**: This workflow builds the Angular project and runs the frontend tests.
+
+- **Publish and Deploy Workflow**: This workflow builds the Docker image and pushes it to DockerHub. It deploys the application to Azure Containers using the previously pushed Docker image.
+
+🟢 The deployed application can be accessed at the following URL: [Bookmarks Forums](https://bookmarks-forums-app.westeurope.azurecontainer.io/)
+
+🟢 The workflow files can be found in the following link: [Workflows](https://github.com/codeurjc-students/2024-Bookmarks-Forums/tree/main/.github/workflows)
+
+🟢 All generated artifacts and logs can be found in the Actions tab of the repository.
+
+⚠️ **NOTE**: Due to some region restrictions with the MySQL Flexible Server, the application's database is currently hosted in the US, while the Azure Container running the application is hosted in West Europe. This may cause some latency and slowness issues when using and navigating the application.
+
+# 13. Demonstrative video
 
 Here is a video showcasing the application's main functionalities (spanish):
 
