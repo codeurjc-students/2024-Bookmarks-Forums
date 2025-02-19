@@ -2,11 +2,17 @@ package com.example.backend.service;
 
 import com.example.backend.entity.*;
 import com.example.backend.repository.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.sql.Blob;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,7 +26,7 @@ public class UserService {
     private final BanRepository banRepository;
 
     public UserService(UserRepository userRepository, CommunityRepository communityRepository,
-                       ReplyRepository replyRepository, PostRepository postRepository, BanRepository banRepository) {
+            ReplyRepository replyRepository, PostRepository postRepository, BanRepository banRepository) {
 
         this.userRepository = userRepository;
         this.communityRepository = communityRepository;
@@ -210,6 +216,58 @@ public class UserService {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    // ADMIN ONLY: Disable a user account
+    public User disableUser(String username, int duration) {
+        User user = userRepository.findByUsername(username);
+        if (user != null && !user.isDisabled()) {
+            LocalDateTime timeNow = LocalDateTime.now();
+
+            switch (duration) {
+                case 1 -> timeNow = timeNow.plusDays(1);
+                case 7 -> timeNow = timeNow.plusDays(7);
+                case 14 -> timeNow = timeNow.plusDays(14);
+                case 30 -> timeNow = timeNow.plusDays(30);
+                case 180 -> timeNow = timeNow.plusDays(180);
+                case 365 -> timeNow = timeNow.plusDays(365);
+                case -1 -> timeNow = timeNow.plusYears(100); // forever
+                default -> throw new IllegalArgumentException("Invalid duration: " + duration);
+            }
+
+            user.setDisabled(true, timeNow);
+            userRepository.save(user);
+        }
+        return user;
+    }
+
+    // ADMIN ONLY: Enable a user account
+    public User enableUser(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            user.setDisabled(false);
+            userRepository.save(user);
+        }
+        return user;
+    }
+
+    // Account disabled check
+    public boolean isAccountDisabled(String username) {
+        User user = userRepository.findByUsername(username);
+
+        // If user is disabled, check if the disabledUntil time has passed
+        if (user != null && user.isDisabled()) {
+            LocalDateTime now = LocalDateTime.now();
+            // if the disabledUntil time has passed, enable the account
+            if (now.isAfter(user.getDisabledUntil())) {
+                user.setDisabled(false);
+                userRepository.save(user);
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

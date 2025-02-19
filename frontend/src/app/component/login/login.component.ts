@@ -20,14 +20,27 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {}
 
-  logIn(userName:string, userPassword:string){
-    this.loginService.login({username:userName, password:userPassword}).subscribe({
-      next: r => {
-        this.router.navigate(['/'])
+  logIn(userName: string, userPassword: string) {
+    this.loginService.login({ username: userName, password: userPassword }).subscribe({
+      next: (r) => {
+        this.router.navigate(['/']);
       },
-      error: r => {
-        this.errorMessage = "Nombre de usuario o contraseña incorrectos";
-      }
+      error: (r) => {
+        if (r.error?.message) {
+          switch (r.error.message) {
+            case "Account is disabled !":
+              this.errorMessage = "La cuenta está deshabilitada.";
+              break;
+            case "Invalid credentials !":
+              this.errorMessage = "Nombre de usuario o contraseña incorrectos.";
+              break;
+            default:
+              this.errorMessage = "Error desconocido.";
+          }
+        } else {
+          this.errorMessage = "Error desconocido.";
+        }
+      },
     });
   }
 }

@@ -66,6 +66,9 @@ public class User {
     private Blob pfp;
 
     @JsonView(BasicInfo.class)
+    private int banCount = 0; // Accumulative, never decreases
+
+    @JsonView(BasicInfo.class)
     private String pfpString;
 
     @JsonView(BasicInfo.class)
@@ -73,6 +76,12 @@ public class User {
 
     @JsonView(BasicInfo.class)
     private int following = 0;
+
+    @JsonView(BasicInfo.class)
+    private boolean isDisabled = false; // If true, user cannot log in
+
+    @JsonView(BasicInfo.class)
+    private LocalDateTime disabledUntil;
 
     @JsonView(FollowersInfo.class)
     @ManyToMany
@@ -201,6 +210,15 @@ public class User {
             imgBlob = new SerialBlob(Files.readAllBytes(imgFile.toPath()));
         }
         return imgBlob;
+    }
+
+    public void addBanCount() {
+        this.banCount++;
+    }
+
+    public void setDisabled(boolean isDisabled, LocalDateTime duration) {
+        this.isDisabled = isDisabled;
+        this.disabledUntil = duration;
     }
 
     public String toString() {

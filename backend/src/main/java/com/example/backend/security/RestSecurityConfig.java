@@ -12,11 +12,12 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 
 @Configuration
 @EnableWebSecurity
@@ -58,8 +59,7 @@ public class RestSecurityConfig {
         http
                 .securityMatcher("/api/v1/**")
                 .exceptionHandling(handling -> handling
-                        .authenticationEntryPoint(unauthorizedHandlerJwt)
-                );
+                        .authenticationEntryPoint(unauthorizedHandlerJwt));
 
         http
                 .authorizeHttpRequests(authorize -> authorize
@@ -91,8 +91,7 @@ public class RestSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAnyRole("USER")
 
                         // PUBLIC ENDPOINTS ----------------------------
-                        .anyRequest().permitAll()
-                );
+                        .anyRequest().permitAll());
 
         // Disable Form login Authentication
         http.formLogin(formLogin -> formLogin.disable());

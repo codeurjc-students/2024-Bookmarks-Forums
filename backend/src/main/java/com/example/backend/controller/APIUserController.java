@@ -82,6 +82,12 @@ public class APIUserController {
         if (principal == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // Not logged in
         }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         User user = userService.getUserByUsername(principal.getName());
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -378,6 +384,11 @@ public class APIUserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         User user = userService.getUserByUsername(username);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -476,6 +487,11 @@ public class APIUserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         User user = userService.getUserByUsername(username);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -538,6 +554,11 @@ public class APIUserController {
 
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -646,5 +667,98 @@ public class APIUserController {
     public ResponseEntity<List<Object[]>> getMostPopularUsers(@RequestParam(defaultValue = "10") int size) {
         return new ResponseEntity<>(userService.getMostPopularUsersCount(size), HttpStatus.OK);
 
+    }
+
+    // ADMIN ONLY: Disable a user account
+    @JsonView(UserBasicView.class)
+    @Operation(summary = "Disable a user account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User disabled", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content),
+    })
+    @PutMapping("/users/{username}/disable")
+    public ResponseEntity<User> disableUser(HttpServletRequest request, @PathVariable String username, @RequestParam String duration) {
+        
+        // Is user logged in?
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Is user a site admin?
+        String requesterUsername = request.getUserPrincipal().getName();
+        if (!userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // The site admin cannot disable their own account
+        if (userService.getUserByUsername(username).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        switch (duration) {
+            case "day":
+                userService.disableUser(username, 1);
+                break;
+            case "week":
+                userService.disableUser(username, 7);
+                break;
+            case "2weeks":
+                userService.disableUser(username, 14);
+                break;
+            case "month":
+                userService.disableUser(username, 30);
+                break;
+            case "6months":
+                userService.disableUser(username, 180);
+                break;
+            case "year":
+                userService.disableUser(username, 365);
+                break;
+            case "forever":
+                userService.disableUser(username, -1);
+                break;
+            default:
+                return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        return new ResponseEntity<>(userService.getUserByUsername(username), HttpStatus.OK);
+    }
+
+    // ADMIN ONLY: Enable a user account
+    @JsonView(UserBasicView.class)
+    @Operation(summary = "Enable a user account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User enabled", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+    })
+    @PutMapping("/users/{username}/enable")
+    public ResponseEntity<User> enableUser(HttpServletRequest request, @PathVariable String username) {
+        // Is user logged in?
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Is user a site admin?
+        String requesterUsername = request.getUserPrincipal().getName();
+        if (!userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // The site admin cannot execute this on themselves
+        if (userService.getUserByUsername(username).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(userService.enableUser(username), HttpStatus.OK);
     }
 }

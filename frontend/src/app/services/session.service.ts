@@ -49,7 +49,7 @@ export class LoginService {
   login(user: UserLogin) {
     return this.httpClient
       .post(this.baseUrl + 'login', user, { withCredentials: true })
-      .pipe(catchError((error) => this.wrongCredentialsError(error)));
+      .pipe(catchError((error) => throwError(() => error)));
   }
 
   logout(): Observable<any> {
@@ -109,12 +109,6 @@ export class LoginService {
   }
 
   //Error handlers
-
-  private wrongCredentialsError(error: any) {
-    console.log('[!] ERROR: ');
-    console.error(error);
-    return throwError(() => new Error('Wrong credentials!'));
-  }
 
   private handleError(error: any) {
     console.log('[!] ERROR: ');

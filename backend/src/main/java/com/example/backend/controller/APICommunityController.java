@@ -82,7 +82,8 @@ public class APICommunityController {
     }
 
     // Get communities (order: creationDate, members, lastPostDate) (by: name,
-    // description, admin, default, general) DEFAULT = by name and description | SECURITY: CHECKED
+    // description, admin, default, general) DEFAULT = by name and description |
+    // SECURITY: CHECKED
     @JsonView(CommunityBasicInfo.class)
     @Operation(summary = """
             Get communities by specified criteria and sort:
@@ -219,7 +220,8 @@ public class APICommunityController {
         }
     }
 
-    // Update community (format this as the UserController update method) | SECURITY: CHECKED
+    // Update community (format this as the UserController update method) |
+    // SECURITY: CHECKED
     @Operation(summary = "Update a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Updated the community", content = {
@@ -242,6 +244,11 @@ public class APICommunityController {
 
         // is user logged in
         if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -303,6 +310,11 @@ public class APICommunityController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // check that the user performing the request is the admin of the community or a
         // site admin
         String username = request.getUserPrincipal().getName();
@@ -337,6 +349,11 @@ public class APICommunityController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         String username = request.getUserPrincipal().getName();
         User admin = userService.getUserByUsername(username);
         if (admin == null) {
@@ -365,7 +382,8 @@ public class APICommunityController {
     }
 
     // Manage users in community (add, remove, ban, unban)
-    // ban durations: day, week, 2weeks, month, 6months, year, forever | SECURITY: CHECKED
+    // ban durations: day, week, 2weeks, month, 6months, year, forever | SECURITY:
+    // CHECKED
     @Operation(summary = "Add, remove or ban a user from a community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Action succesfully performed", content = {
@@ -389,6 +407,11 @@ public class APICommunityController {
 
         // check that the user performing the request is logged in
         if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -416,6 +439,11 @@ public class APICommunityController {
     private ResponseEntity<Community> addUserToCommunity(HttpServletRequest request, Community community,
             String username) {
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // check that the user performing the request is the user being added or a site
         // admin
         String requesterUsername = request.getUserPrincipal().getName();
@@ -441,6 +469,12 @@ public class APICommunityController {
 
     private ResponseEntity<Community> removeUserFromCommunity(HttpServletRequest request, Community community,
             String username) {
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // check that the user performing the request is the user being removed, a
         // community admin, moderator or a site admin
         String requesterUsername = request.getUserPrincipal().getName();
@@ -509,6 +543,11 @@ public class APICommunityController {
 
         // is user logged in
         if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -632,6 +671,12 @@ public class APICommunityController {
     })
     @DeleteMapping("/bans/{id}")
     public ResponseEntity<String> unbanUser(HttpServletRequest request, @PathVariable Long id) {
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         Ban ban = communityService.getBanById(id);
         if (ban == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -669,6 +714,11 @@ public class APICommunityController {
 
         // is user logged in
         if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -734,15 +784,15 @@ public class APICommunityController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // does community exist?
         Community community = communityService.getCommunityById(id);
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        // is user logged in
-        if (principal == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         // is user the admin of the community? or a site admin?
@@ -840,6 +890,11 @@ public class APICommunityController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // does ban exist?
         if (communityService.getBanById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -888,10 +943,10 @@ public class APICommunityController {
             case "reason" -> new ResponseEntity<>(banReason, HttpStatus.OK);
             case "duration" -> new ResponseEntity<>(banUntilFormatted, HttpStatus.OK);
             case "status" -> // true = banned, false = not banned
-                    new ResponseEntity<>(true, HttpStatus.OK);
+                new ResponseEntity<>(true, HttpStatus.OK);
             default ->
                 // return a Ban
-                    new ResponseEntity<>(communityService.getBanById(id), HttpStatus.OK);
+                new ResponseEntity<>(communityService.getBanById(id), HttpStatus.OK);
         };
 
     }
@@ -913,6 +968,11 @@ public class APICommunityController {
             @PathVariable Long id) {
         // is user logged in
         if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -959,6 +1019,11 @@ public class APICommunityController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // does community exist?
         if (communityService.getCommunityById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -982,7 +1047,8 @@ public class APICommunityController {
         }
     }
 
-    // Gets a list of community names and their respective member count | SECURITY: CHECKED
+    // Gets a list of community names and their respective member count | SECURITY:
+    // CHECKED
     @Operation(summary = "Get a list of community names and their respective member count")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the community names and member counts", content = {
@@ -1016,6 +1082,11 @@ public class APICommunityController {
             @PathVariable String username) {
         // is user logged in
         if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 

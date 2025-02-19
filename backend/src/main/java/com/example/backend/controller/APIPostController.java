@@ -213,6 +213,11 @@ public class APIPostController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // does the community exist?
         if (communityService.getCommunityById(communityID) == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -279,6 +284,11 @@ public class APIPostController {
         // is user logged in?
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -361,6 +371,11 @@ public class APIPostController {
         // is user logged in?
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -464,6 +479,11 @@ public class APIPostController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // is the post found?
         Post post = postService.getPostById(postId);
         if (post == null) {
@@ -531,6 +551,11 @@ public class APIPostController {
         // is user logged in?
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -737,6 +762,11 @@ public class APIPostController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // is the post found?
         Post post = postService.getPostById(postId);
         if (post == null) {
@@ -794,6 +824,11 @@ public class APIPostController {
         // is user logged in?
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -862,6 +897,11 @@ public class APIPostController {
         // is user logged in?
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // is the user's account disabled?
+        if (userService.isAccountDisabled(request.getUserPrincipal().getName())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 

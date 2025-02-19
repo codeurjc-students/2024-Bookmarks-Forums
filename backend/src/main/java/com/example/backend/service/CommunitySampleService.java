@@ -70,8 +70,12 @@ public class CommunitySampleService {
         // "BadDude" is banned from the first community and second community
         user = userRepository.findByUsername("ZBadDude");
         LocalDateTime now = LocalDateTime.now();
+        user.addBanCount();
         communities.get(0).banUser(user, now.plusDays(7), "because you are a bad dude");
+        user.addBanCount();
         communities.get(1).banUser(user, now.plusDays(14), "because you are a bad dude");
+
+        userRepository.save(user);
 
         communityRepository.saveAll(communities);
     }

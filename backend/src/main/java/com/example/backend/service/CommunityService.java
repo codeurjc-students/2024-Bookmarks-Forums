@@ -206,6 +206,11 @@ public class CommunityService {
             }
             
             community.banUser(user, timeNow, reason);
+
+            // +1 ban count
+            user.addBanCount();
+            userRepository.save(user);
+
             // remove user from community
             community.removeMember(user);
             communityRepository.save(community);

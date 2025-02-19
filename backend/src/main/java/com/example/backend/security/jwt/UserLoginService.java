@@ -1,6 +1,9 @@
 package com.example.backend.security.jwt;
 
+import com.example.backend.entity.User;
 import com.example.backend.security.RepositoryUserDetailService;
+import com.example.backend.service.UserService;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 public class UserLoginService {
@@ -30,6 +35,9 @@ public class UserLoginService {
 	@Autowired
 	private JwtCookieManager cookieUtil;
 
+	@Autowired
+	private UserService userService;
+
 	public ResponseEntity<AuthResponse> login(LoginRequest loginRequest, String encryptedAccessToken, String 
 			encryptedRefreshToken) {
 
@@ -45,12 +53,20 @@ public class UserLoginService {
 		String username = loginRequest.getUsername();
 		UserDetails user = userDetailsService.loadUserByUsername(username);
 
+		// check if user account is disabled
+		if (userService.isAccountDisabled(username)) {
+			AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
+					"Account is disabled !");
+			return ResponseEntity.status(400).body(loginResponse);
+		}
+
 		Boolean accessTokenValid = jwtTokenProvider.validateToken(accessToken);
 		Boolean refreshTokenValid = jwtTokenProvider.validateToken(refreshToken);
 
 		HttpHeaders responseHeaders = new HttpHeaders();
 		Token newAccessToken;
 		Token newRefreshToken;
+
 		if (!accessTokenValid && !refreshTokenValid) {
 			newAccessToken = jwtTokenProvider.generateToken(user);
 			newRefreshToken = jwtTokenProvider.generateRefreshToken(user);
