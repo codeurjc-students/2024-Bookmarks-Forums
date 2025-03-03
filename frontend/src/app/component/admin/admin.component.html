@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <title>Bookmarks Forums - Post</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/8f3c0a721b.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Chart.js script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.js"></script>
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- ----------------------------------------------------------------- -->
+  </head>
+  <body>
+    <div class="main-body-container">
+      <!-- Page hero ---------------------------------------------------- -->
+      <header class="bg-branding-white py-1 page-hero">
+        <div class="container px-4 px-lg-5 my-5">
+          <div class="text-start text-dark">
+            <div class="post-author-container">
+              <div class="user-hero-username-alias">
+                <!-- User username -->
+                <h1
+                  class="display-4 fw-bolder header-main-text landing-hero hero-username"
+                >
+                  <p>Panel de Administración</p>
+                </h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <!-- ----------------------------------------------------------------- -->
+
+      <!-- Page content-->
+      <div class="container">
+        <div class="row justify-content-between">
+          <!-- Users Column -->
+          <div class="col-lg-7">
+            <!-- User search bar -->
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Gestión de usuarios</h5>
+              </div>
+              <div class="card-body">
+                <div class="post-search-container">
+                  <div
+                    class="search-bar-button-group wide-search-bar-button-group"
+                  >
+                    <input
+                      type="text"
+                      class="form-control search-input"
+                      placeholder="Buscar usuarios..."
+                      [(ngModel)]="searchTerm"
+                      (keydown.enter)="searchUsers()"
+                    />
+                    <button
+                      class="btn clear-search-btn"
+                      (click)="clearSearch()"
+                      title="Limpiar búsqueda"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                    <button
+                      title="Buscar usuarios"
+                      class="btn search-btn"
+                      (click)="searchUsers()"
+                    >
+                      <i class="fas fa-search"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr class="post-container-divider" />
+
+            <!-- Users list -->
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">
+                  Usuarios ordenados por número de baneos
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="community-members-container">
+                  <div class="admin-user-card" *ngFor="let user of users">
+                    <div class="admin-user-info">
+                      <img
+                        [src]="
+                          user.pfpString || 'assets/img/default-profile.png'
+                        "
+                        alt="Profile"
+                        class="community-member-profile-picture"
+                      />
+                      <div class="admin-user-details">
+                        <a
+                          [routerLink]="['/profile', user.username]"
+                          class="admin-user-username"
+                        >
+                          {{ user.username }}
+                          <span class="admin-user-ban-count">
+                            <i class="fas fa-gavel"></i>
+                            {{ user.banCount }} sanciones
+                          </span>
+                        </a>
+                        <p class="admin-user-status" *ngIf="user.isDisabled">
+                          <i class="fas fa-ban me-1"></i>
+                          Cuenta deshabilitada hasta
+                          {{ formatDisabledUntil(user.disabledUntil) }}
+                        </p>
+                        <p class="admin-user-status" *ngIf="!user.isDisabled">
+                          <i class="fas fa-check-circle me-1"></i>
+                          Cuenta activa
+                        </p>
+                      </div>
+                    </div>
+                    <div class="admin-user-actions">
+                      <button
+                        *ngIf="!user.isDisabled"
+                        type="button"
+                        class="btn negative-btn"
+                        (click)="disableUser(user.username)"
+                        title="Deshabilitar cuenta"
+                      >
+                        Deshabilitar
+                      </button>
+                      <button
+                        *ngIf="user.isDisabled"
+                        type="button"
+                        class="btn primary-btn"
+                        (click)="enableUser(user.username)"
+                        title="Habilitar cuenta"
+                      >
+                        Habilitar
+                      </button>
+                    </div>
+                  </div>
+                  <!-- Load more users button -->
+                  <div class="load-more-replies-container">
+                    <button
+                      class="btn primary-btn"
+                      (click)="loadMoreUsers()"
+                      *ngIf="!noMoreUsers; else noMoreUsersText"
+                    >
+                      <span id="load-more-label">Cargar más usuarios</span>
+                    </button>
+                    <ng-template #noMoreUsersText>
+                      <p class="text-muted">No hay más usuarios para mostrar</p>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Info + Actions column -->
+          <div class="col-lg-4">
+            <!-- Bans Chart -->
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Usuarios con más baneos</h5>
+              </div>
+              <div class="card-body">
+                <canvas id="mostBannedUsersChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Dislikes Chart -->
+            <div class="card dark-card mb-4">
+              <div class="post-container-card-top">
+                <h5 class="card-title mb-0">Usuarios con más dislikes</h5>
+              </div>
+              <div class="card-body">
+                <canvas id="mostDislikedUsersChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Alert Modal -->
+    <div class="alert-modal-overlay" *ngIf="alertModalVisible">
+      <div class="alert-modal">
+        <div class="alert-modal-header">
+          <h5>{{ alertModalTitle }}</h5>
+          <span
+            class="action-btn close"
+            (click)="alertModalVisible = false"
+            (keypress)="alertModalVisible = false"
+          >
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="alert-modal-body">
+          <p>{{ alertModalMessage }}</p>
+        </div>
+        <div class="alert-modal-footer">
+          <button
+            class="btn"
+            [ngClass]="
+              alertModalType === 'warning' ? 'negative-btn' : 'primary-btn'
+            "
+            (click)="alertModalConfirmAction(); alertModalVisible = false"
+          >
+            <i class="fas fa-check"></i> {{ alertModalConfirmText }}
+          </button>
+          <button class="btn secondary-btn" (click)="alertModalVisible = false">
+            <i class="fas fa-times"></i> {{ alertModalCancelText }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert modal with confirmation and cancel buttons -->
+    <div id="alertModal" class="custom-modal" [ngClass]="{ 'show': showAlertModal }">
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header">
+          <span class="action-btn close" (click)="closeAlertModal()">
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <p class="alert-modal-text">{{ alertModalText }}</p>
+          <div class="alert-modal-buttons">
+            <button
+              class="btn primary-btn"
+              title="Confirmar"
+              (click)="confirmAction(); closeAlertModal()"
+            >
+              <i class="fas fa-check"></i> Confirmar
+            </button>
+            <button
+              *ngIf="showCancelButton"
+              class="btn primary-btn"
+              title="Cancelar"
+              (click)="closeAlertModal()"
+            >
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para seleccionar duración de deshabilitación -->
+    <div id="disableDurationModal" class="custom-modal" [ngClass]="{ 'show': alertModalVisible }">
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header with-title">
+          <h5 class="modal-title">{{ alertModalTitle }}</h5>
+          <span class="action-btn close" (click)="alertModalVisible = false">
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <p class="alert-modal-text">{{ alertModalMessage }}</p>
+          
+          <!-- Ban duration dropdown - solo mostrar cuando estamos deshabilitando -->
+          <div class="alert-modal-container" *ngIf="isDisablingUser">
+            <p class="alert-modal-text-left">Duración de la deshabilitación:</p>
+            <div class="input-group-append above">
+              <button
+                class="btn btn-secondary branding-dropdown-toggle fa-dropdown-toggle"
+                type="button"
+                id="disableDurationDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {{ getSelectedDurationLabel() }}
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-dark branding-dropdown-menu above"
+                aria-labelledby="disableDurationDropdown"
+              >
+                <li *ngFor="let duration of disableDurations">
+                  <a class="dropdown-item" (click)="setDisableDuration(duration.value)">
+                    {{ duration.label }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="alert-modal-buttons">
+            <button
+              class="btn primary-btn"
+              title="Confirmar"
+              (click)="alertModalConfirmAction(); alertModalVisible = false"
+            >
+              <i class="fas fa-check"></i> {{ alertModalConfirmText }}
+            </button>
+            <button
+              class="btn primary-btn"
+              title="Cancelar"
+              (click)="alertModalVisible = false"
+            >
+              <i class="fas fa-times"></i> {{ alertModalCancelText }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

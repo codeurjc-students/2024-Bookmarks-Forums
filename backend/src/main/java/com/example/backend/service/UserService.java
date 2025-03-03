@@ -218,6 +218,32 @@ public class UserService {
         }
     }
 
+    public List<Object[]> getMostBannedUsersCount(int size) {
+        List<Object[]> userList = userRepository.getUsersWithMostBansCount();
+        if (userList != null) {
+            if (size > userList.size()) {
+                return userList;
+            } else {
+                return userList.subList(0, size);
+            }
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public List<Object[]> getMostDislikedUsersCount(int size) {
+        List<Object[]> userList = userRepository.getUsersWithMostDislikesCount();
+        if (userList != null) {
+            if (size > userList.size()) {
+                return userList;
+            } else {
+                return userList.subList(0, size);
+            }
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
     // ADMIN ONLY: Disable a user account
     public User disableUser(String username, int duration) {
         User user = userRepository.findByUsername(username);
@@ -268,6 +294,10 @@ public class UserService {
             }
         }
         return false;
+    }
+
+    public Page<User> searchUsersOrderByBanCount(String query, Pageable pageable) {
+        return userRepository.getUsersSortedByBanCount(query, pageable);
     }
 
 }

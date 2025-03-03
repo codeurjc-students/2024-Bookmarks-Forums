@@ -6,6 +6,8 @@ import { User } from '../models/user.model';
 import { Community } from '../models/community.model';
 
 type UsersLikesCount = [string, number];
+type UsersBansCount = [string, number];
+type UsersDislikesCount = [string, number];
 
 const API_URL = '/api/v1/users';
 
@@ -15,6 +17,7 @@ const baseUrl = '/api/v1';
   providedIn: 'root',
 })
 export class UserService {
+  
   constructor(private readonly http: HttpClient) {}
 
   getUser(username: string): Observable<User> {
@@ -202,5 +205,36 @@ export class UserService {
     return this.http
       .get<boolean>(API_URL + '/' + username + '/following/' + otherUsername)
       .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  // Get users sorted by ban count (admin only)
+  getUsersByBanCount(query: string, page: number, size: number): Observable<User[]> {
+    return this.http.get<User[]>(API_URL + '/bans?query=' + query + '&page=' + page + '&size=' + size);
+  }
+
+  // Disable a user (admin only)
+  disableUser(username: string, duration: string): Observable<User> {
+    return this.http.put<User>(API_URL + '/' + username + '/disable?duration=' + duration, {});
+  }
+
+  // Get users with most bans (admin only)
+  getMostBannedUsers(size: number): Observable<UsersBansCount[]> {
+    let params = new HttpParams().set('size', size);
+    return this.http
+      .get<UsersBansCount[]>(API_URL + '/most-banned', { params: params })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  // Get users with most dislikes (admin only)
+  getMostDislikedUsers(size: number): Observable<UsersDislikesCount[]> {
+    let params = new HttpParams().set('size', size);
+    return this.http
+      .get<UsersDislikesCount[]>(API_URL + '/most-disliked', { params: params })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  // Enable a user (admin only)
+  enableUser(username: string): Observable<User> {
+    return this.http.put<User>(API_URL + '/' + username + '/enable', {});
   }
 }

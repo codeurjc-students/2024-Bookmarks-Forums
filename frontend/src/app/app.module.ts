@@ -26,6 +26,7 @@ import { UserComponent } from './component/user/user.component';
 import { ModifyUserComponent } from './component/modifyUser/modifyUser.component';
 import { SearchComponent } from './component/search/search.component';
 import { ErrorComponent } from './component/error/error.component';
+import { AdminComponent } from './component/admin/admin.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { ErrorComponent } from './component/error/error.component';
     ModifyUserComponent,
     SearchComponent,
     ErrorComponent,
+    AdminComponent,
   ],
   imports: [
     BrowserModule,

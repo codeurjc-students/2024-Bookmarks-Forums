@@ -39,6 +39,9 @@ public class User {
     public interface CommunitiesInfo {
     }
 
+    public interface BanInfo extends BasicInfo {
+    }
+
     @JsonView(UsernameInfo.class)
     @Id
     private String username;
@@ -65,7 +68,7 @@ public class User {
     @Lob
     private Blob pfp;
 
-    @JsonView(BasicInfo.class)
+    @JsonView(BanInfo.class)
     private int banCount = 0; // Accumulative, never decreases
 
     @JsonView(BasicInfo.class)
@@ -77,10 +80,10 @@ public class User {
     @JsonView(BasicInfo.class)
     private int following = 0;
 
-    @JsonView(BasicInfo.class)
+    @JsonView(BanInfo.class)
     private boolean isDisabled = false; // If true, user cannot log in
 
-    @JsonView(BasicInfo.class)
+    @JsonView(BanInfo.class)
     private LocalDateTime disabledUntil;
 
     @JsonView(FollowersInfo.class)

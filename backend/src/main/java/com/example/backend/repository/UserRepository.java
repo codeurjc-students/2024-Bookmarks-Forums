@@ -94,4 +94,15 @@ public interface UserRepository extends JpaRepository<User, String> {
         @Query("SELECT u.username, SUM(p.upvotes) as totalUpvotes FROM User u JOIN u.posts p GROUP BY u.username ORDER BY totalUpvotes DESC")
         List<Object[]> getUsersWithMostLikedContentCount();
 
+        // Get users sorted by banCount and query by username
+        @Query("SELECT u FROM User u WHERE u.username LIKE %:username% ORDER BY u.banCount DESC")
+        Page<User> getUsersSortedByBanCount(@Param("username") String username, Pageable pageable);
+
+        // Get users with most bans and return both the username and the total number of bans
+        @Query("SELECT u.username, u.banCount FROM User u ORDER BY u.banCount DESC")
+        List<Object[]> getUsersWithMostBansCount();
+
+        // Get users with most dislikes and return both the username and the total number of dislikes
+        @Query("SELECT u.username, SUM(p.downvotes) as totalDownvotes FROM User u JOIN u.posts p GROUP BY u.username ORDER BY totalDownvotes DESC")
+        List<Object[]> getUsersWithMostDislikesCount();
 }

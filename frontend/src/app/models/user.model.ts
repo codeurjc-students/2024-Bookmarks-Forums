@@ -10,4 +10,7 @@ export interface User {
   fullCreationDate: string;
   creationDate?: string;
   creationTime?: string;
+  banCount: number;
+  isDisabled: boolean;
+  disabledUntil: string;
 }

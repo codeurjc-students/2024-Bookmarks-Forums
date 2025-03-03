@@ -25,6 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.example.backend.dto.SignupRequestDTO;
 import com.example.backend.entity.Community;
 import com.example.backend.entity.User;
+import com.example.backend.entity.User.BanInfo;
 import com.example.backend.service.MailService;
 import com.example.backend.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -218,7 +219,7 @@ public class APIUserController {
     @GetMapping("/users")
     public ResponseEntity<List<User>> searchUsers(
             @RequestParam String query,
-            @RequestParam boolean orderByCreationDate,
+            @RequestParam(required = false) Boolean orderByCreationDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         List<User> users = orderByCreationDate
@@ -666,7 +667,58 @@ public class APIUserController {
     @GetMapping("/users/most-popular")
     public ResponseEntity<List<Object[]>> getMostPopularUsers(@RequestParam(defaultValue = "10") int size) {
         return new ResponseEntity<>(userService.getMostPopularUsersCount(size), HttpStatus.OK);
+    }
 
+    // Get users with most bans | SECURITY: CHECKED
+    @JsonView(UserBasicView.class)
+    @Operation(summary = "Get users with most bans")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Users not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+    })
+    @GetMapping("/users/most-banned")
+    public ResponseEntity<List<Object[]>> getMostBannedUsers(HttpServletRequest request, @RequestParam(defaultValue = "10") int size) {
+        // Is user logged in?
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Is user a site admin?
+        String requesterUsername = request.getUserPrincipal().getName();
+        if (!userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        return new ResponseEntity<>(userService.getMostBannedUsersCount(size), HttpStatus.OK);
+    }
+
+    // Get users with most dislikes | SECURITY: CHECKED
+    @JsonView(UserBasicView.class)
+    @Operation(summary = "Get users with most dislikes")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Users not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+    })
+    @GetMapping("/users/most-disliked")
+    public ResponseEntity<List<Object[]>> getMostDislikedUsers(HttpServletRequest request, @RequestParam(defaultValue = "10") int size) {
+        // Is user logged in?
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Is user a site admin?
+        String requesterUsername = request.getUserPrincipal().getName();
+        if (!userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        return new ResponseEntity<>(userService.getMostDislikedUsersCount(size), HttpStatus.OK);
     }
 
     // ADMIN ONLY: Disable a user account
@@ -683,8 +735,9 @@ public class APIUserController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content),
     })
     @PutMapping("/users/{username}/disable")
-    public ResponseEntity<User> disableUser(HttpServletRequest request, @PathVariable String username, @RequestParam String duration) {
-        
+    public ResponseEntity<User> disableUser(HttpServletRequest request, @PathVariable String username,
+            @RequestParam String duration) {
+
         // Is user logged in?
         if (request.getUserPrincipal() == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -760,5 +813,35 @@ public class APIUserController {
         }
 
         return new ResponseEntity<>(userService.enableUser(username), HttpStatus.OK);
+    }
+
+    // Search users and sort by banCount (admin only)
+    @JsonView(BanInfo.class)
+    @Operation(summary = "Search users and sort by banCount (admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)),
+            }),
+            @ApiResponse(responseCode = "404", description = "Users not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+    })
+    @GetMapping("/users/bans")
+    public ResponseEntity<List<User>> searchUsersOrderByBanCount(HttpServletRequest request, @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // Is user logged in?
+        if (request.getUserPrincipal() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Is user a site admin?
+        String requesterUsername = request.getUserPrincipal().getName();
+        if (!userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        List<User> users = userService.searchUsersOrderByBanCount(query, PageRequest.of(page, size)).getContent();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }

@@ -3605,3 +3605,79 @@ html {
   font-size: 1.5rem !important;
   margin-bottom: 0 !important;
 }
+
+.admin-user-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--branding-forums-dark-grey);
+  color: var(--branding-light-grey) !important;
+  border: 2px solid transparent !important;
+  border-radius: 25px !important;
+  padding: 0.7rem 1rem !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.2s ease-in-out !important;
+  margin-bottom: 0.5rem;
+}
+
+.admin-user-card:hover {
+  border: 2px solid var(--branding-peach) !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
+}
+
+.admin-user-info {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  flex: 1;
+}
+
+.admin-user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-user-username {
+  color: var(--branding-light-grey) !important;
+  margin: 0 !important;
+  font-weight: 500;
+}
+
+.admin-user-status {
+  font-size: 0.8rem;
+  color: var(--branding-grey);
+  margin: 0 !important;
+}
+
+.admin-user-ban-count {
+  background-color: var(--branding-brown);
+  color: var(--branding-white);
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-left: 0.5rem;
+}
+
+.admin-user-actions {
+  display: flex;
+}
+
+.right-half-pill-button{
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  margin-right: 0 !important;
+  height: 100%;
+
+}
+
+.left-half-pill-button{
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-right: none !important;
+  margin-left: 0 !important;
+  height: 100%;
+
+}
