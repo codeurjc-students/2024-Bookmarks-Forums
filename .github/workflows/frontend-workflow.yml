@@ -30,6 +30,10 @@ jobs:
           install-dependencies: true
           install-chromedriver: true
 
+      - name: Prevent Chrome auto-updates
+        run: |
+          sudo apt-mark hold google-chrome-stable
+
       - name: Set up Docker (database container setup)
         run: sudo docker run -d --name bookmarks-forums-DB-GitHub-actions-selenium -p 3306:3306 -e MYSQL_DATABASE=BFDB -e MYSQL_ROOT_PASSWORD=password mysql:8.3.0
 
