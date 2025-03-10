@@ -1396,6 +1396,88 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "ADMIN: Disable Account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/BookReader_14/disable?duration=day",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"BookReader_14",
+								"disable"
+							],
+							"query": [
+								{
+									"key": "duration",
+									"value": "day"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADMIN: Enable Account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/BookReader_14/enable",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"BookReader_14",
+								"enable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADMIN: Search Users Sort by BanCount",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/users/bans?query=bookreader&page=0&size=10",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"bans"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "bookreader"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
