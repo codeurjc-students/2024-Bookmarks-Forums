@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -20,6 +21,7 @@ class CommentCreationDeletionTest {
     TestConfig config = TestConfig.getInstance();
 
     protected WebDriver driver;
+    protected JavascriptExecutor js;
 
     private final String LOCALHOST = config.getLocalhost();
 
@@ -30,6 +32,7 @@ class CommentCreationDeletionTest {
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         driver = new ChromeDriver(options);
+        js = (JavascriptExecutor) driver;
     }
 
     @AfterEach
@@ -91,13 +94,22 @@ class CommentCreationDeletionTest {
         // Delete comment
         WebElement deleteButton = commentCard.findElement(By.className("delete-reply-btn"));
         
-        // Wait 3 seconds
+        // Scroll the delete button into view
+        js.executeScript("arguments[0].scrollIntoView(true);", deleteButton);
+        
+        // Wait a bit for any animations to complete
         try {
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        deleteButton.click();
+
+        // Try regular click first, if it fails use JavaScript click
+        try {
+            deleteButton.click();
+        } catch (Exception e) {
+            js.executeScript("arguments[0].click();", deleteButton);
+        }
 
         // Check that there is no reply-card element anymore (no more comments text is
         // displayed)

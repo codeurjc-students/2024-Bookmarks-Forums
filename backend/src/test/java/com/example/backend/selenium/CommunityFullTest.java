@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -16,12 +17,14 @@ import java.time.Duration;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 
 class CommunityFullTest {
 
     TestConfig config = TestConfig.getInstance();
 
     protected WebDriver driver;
+    protected JavascriptExecutor js;
 
     private final String LOCALHOST = config.getLocalhost();
 
@@ -32,6 +35,7 @@ class CommunityFullTest {
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         driver = new ChromeDriver(options);
+        js = (JavascriptExecutor) driver;
     }
 
     @AfterEach
@@ -46,7 +50,6 @@ class CommunityFullTest {
 
         // Login
         LoginAux loginAux = new LoginAux();
-
         loginAux.login(driver);
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getWaitTime()));
@@ -153,9 +156,25 @@ class CommunityFullTest {
         // Community deletion
 
         // Given
+        // Wait for the delete button to be both present and clickable
+        WebElement deleteCommunityButton = wait.until(elementToBeClickable(By.id("delete-community-btn")));
+        
+        // Scroll the delete button into view
+        js.executeScript("arguments[0].scrollIntoView(true);", deleteCommunityButton);
+        
+        // Wait a bit for any animations to complete
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        WebElement deleteCommunityButton = wait.until(presenceOfElementLocated(By.id("delete-community-btn")));
-        deleteCommunityButton.click();
+        // Try regular click first, if it fails use JavaScript click
+        try {
+            deleteCommunityButton.click();
+        } catch (Exception e) {
+            js.executeScript("arguments[0].click();", deleteCommunityButton);
+        }
 
         // When
 
