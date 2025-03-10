@@ -74,6 +74,13 @@ class UserCreationDeletionTest {
 
         WebElement loginGreeting = wait.until(presenceOfElementLocated(By.id("login-greeting-text")));
 
+        // Wait for 5 seconds to allow the page to load
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         if (driver.getCurrentUrl().equals(LOCALHOST + ":" + port + "/login") && loginGreeting.isDisplayed()) {
             WebElement usernameField2 = wait.until(presenceOfElementLocated(By.id("username-field")));
             usernameField2.sendKeys(username);
@@ -84,6 +91,13 @@ class UserCreationDeletionTest {
         }
 
         // Then (check logged in)
+
+        // Wait for 5 seconds to allow the page to load
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         WebElement landingGreeting = wait.until(presenceOfElementLocated(By.id("landing-greeting")));
 

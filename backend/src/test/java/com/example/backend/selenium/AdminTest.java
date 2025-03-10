@@ -10,12 +10,15 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.time.Duration;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 class AdminTest {
 
@@ -29,6 +32,7 @@ class AdminTest {
         options.addArguments("--headless");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--window-size=1920,1080"); // Set a standard window size
         driver = new ChromeDriver(options);
     }
 
@@ -107,18 +111,19 @@ class AdminTest {
         }
 
         // Test user disable functionality for non-admin user
-        WebElement disableButton = wait.until(presenceOfElementLocated(By.className("negative-btn")));
+        WebElement disableButton = wait.until(elementToBeClickable(By.className("negative-btn")));
         disableButton.click();
 
-        // Wait for modal to appear
-        wait.until(presenceOfElementLocated(By.id("disableDurationModal")));
+        // Wait for modal to be visible and interactable
+        WebElement modal = wait.until(visibilityOf(driver.findElement(By.id("disableDurationModal"))));
+        assertTrue(modal.isDisplayed(), "Modal should be visible");
 
-        // Select duration (1 day)
-        WebElement durationSlider = wait.until(presenceOfElementLocated(By.id("durationSlider")));
+        // Wait for and interact with duration slider
+        WebElement durationSlider = wait.until(elementToBeClickable(By.id("durationSlider")));
         durationSlider.sendKeys("0"); // Set to first option (1 day)
 
-        // Confirm disable action
-        WebElement confirmButton = wait.until(presenceOfElementLocated(By.id("confirm-modal-btn")));
+        // Wait for confirm button to be clickable and click it
+        WebElement confirmButton = wait.until(elementToBeClickable(By.id("confirm-modal-btn")));
         confirmButton.click();
 
         // Wait for modal to disappear and verify user is disabled
@@ -133,14 +138,15 @@ class AdminTest {
         assertTrue(userStatus.getText().contains("Cuenta deshabilitada"));
 
         // Test user enable functionality
-        WebElement enableButton = wait.until(presenceOfElementLocated(By.className("primary-btn")));
+        WebElement enableButton = wait.until(elementToBeClickable(By.className("primary-btn")));
         enableButton.click();
 
-        // Wait for confirmation modal
-        wait.until(presenceOfElementLocated(By.className("alert-modal")));
+        // Wait for confirmation modal to be visible and interactable
+        WebElement alertModal = wait.until(visibilityOf(driver.findElement(By.className("alert-modal"))));
+        assertTrue(alertModal.isDisplayed(), "Alert modal should be visible");
 
-        // Confirm enable action
-        WebElement enableConfirmButton = wait.until(presenceOfElementLocated(By.id("confirm-modal-btn")));
+        // Wait for and click the enable confirm button
+        WebElement enableConfirmButton = wait.until(elementToBeClickable(By.id("confirm-modal-btn")));
         enableConfirmButton.click();
 
         // Wait for modal to disappear and verify user is enabled
