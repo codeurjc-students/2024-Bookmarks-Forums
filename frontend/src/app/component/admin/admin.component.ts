@@ -1,16 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../services/session.service';
-import { PostService } from '../../services/post.service';
 import { UserService } from '../../services/user.service';
-import { CommunityService } from '../../services/community.service';
 import { User } from '../../models/user.model';
-import { Post } from '../../models/post.model';
-import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
-import { Ban } from '../../models/ban.model';
 import { Router } from '@angular/router';
 
 Chart.register(...registerables);
@@ -18,7 +11,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.css', '../../../animations.css'],
+  styleUrls: ['./admin.component.css', './disable-duration-slider.css', '../../../animations.css', './duration-slider.css'],
   providers: [DatePipe],
 })
 export class AdminComponent implements OnInit {
@@ -70,7 +63,8 @@ export class AdminComponent implements OnInit {
     { value: 'year', label: '1 año' },
     { value: 'forever', label: 'Permanente' }
   ];
-  selectedDuration: string = '86400';
+  selectedDuration: string = 'day'; // Valor por defecto: 1 día
+  selectedDurationIndex: number = 0; // Índice del valor seleccionado en el deslizador
 
   showAlertModal: boolean = false;
   alertModalText: string = '';
@@ -84,17 +78,12 @@ export class AdminComponent implements OnInit {
   alertModalCancelText: string = '';
   alertModalType: string = '';
   alertModalVisible: boolean = false;
-  alertModalConfirmAction: () => void = () => {};
   isDisablingUser: boolean = false; // Variable para controlar si estamos deshabilitando o habilitando
 
   constructor(
-    private http: HttpClient,
     public loginService: LoginService,
     public profileService: UserService,
-    public postService: PostService,
-    public communityService: CommunityService,
-    private route: ActivatedRoute,
-    private router: Router
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -253,9 +242,15 @@ export class AdminComponent implements OnInit {
 
   loadUsers() {
     if (!this.isAdmin) {
-      return;
+      // redirect to error page
+      this.router.navigate(['/error'], {
+        queryParams: {
+          title: 'Sin permisos',
+          description: 'No tienes permisos para acceder a esta página',
+          code: 403,
+        },
+      });
     }
-    
     this.profileService.getUsersByBanCount(this.searchTerm, this.page, this.size).subscribe({
       next: (users) => {
         if (!users || users.length === 0) {
@@ -283,43 +278,6 @@ export class AdminComponent implements OnInit {
   loadMoreUsers() {
     this.loadingMoreUsers = true;
     this.loadUsers();
-  }
-
-  doesPostHaveImage(postID: number) {
-    let post: Post | undefined;
-
-    this.postService.getPostById(postID).subscribe({
-      next: (p) => {
-        post = p;
-      },
-      error: (r) => {
-        this.router.navigate(['/error'], {
-          queryParams: {
-            title: 'Error al obtener el post',
-            description: r.error.message,
-            code: r.status,
-          },
-        });
-      },
-    });
-
-    if (post) {
-      this.postService.getPostImage(postID).subscribe({
-        next: () => {
-          return true;
-        },
-        error: (r) => {
-          this.router.navigate(['/error'], {
-            queryParams: {
-              title: 'Error al obtener la imagen del post',
-              description: r.error.message,
-              code: r.status,
-            },
-          });
-          return false;
-        },
-      });
-    }
   }
 
   checkIfLoggedIn() {
@@ -366,24 +324,6 @@ export class AdminComponent implements OnInit {
         this.router.navigate(['/login']);
       },
     });
-  }
-
-  postImage(postID: number) {
-    return this.postService.getPostImage(postID);
-  }
-
-  postImageURL(postID: number | undefined): string {
-    if (!postID) {
-      return '';
-    }
-    return this.postService.getPostImageURL(postID);
-  }
-
-  communityBannerURL(communityID: number | undefined): string {
-    if (!communityID) {
-      return '';
-    }
-    return this.communityService.getCommunityImageURL(communityID);
   }
 
   // Get user profile picture
@@ -464,13 +404,41 @@ export class AdminComponent implements OnInit {
     this.alertModalType = 'warning';
     this.alertModalVisible = true;
     this.isDisablingUser = true; // Estamos deshabilitando
-    this.alertModalConfirmAction = () => {
+    this.confirmAction = () => {
       this.profileService.disableUser(username, this.selectedDuration).subscribe({
         next: () => {
           const userIndex = this.users.findIndex(user => user.username === username);
           if (userIndex !== -1) {
             this.users[userIndex].isDisabled = true;
-            this.users[userIndex].disabledUntil = this.selectedDuration === 'forever' ? '' : new Date(Date.now() + parseInt(this.selectedDuration) * 1000).toISOString();
+            // Calculate disabled until date based on duration
+            let disabledUntil: string;
+            if (this.selectedDuration === 'forever') {
+              disabledUntil = '';
+            } else {
+              const now = new Date();
+              switch (this.selectedDuration) {
+                case 'day':
+                  now.setDate(now.getDate() + 1);
+                  break;
+                case 'week':
+                  now.setDate(now.getDate() + 7);
+                  break;
+                case '2weeks':
+                  now.setDate(now.getDate() + 14);
+                  break;
+                case 'month':
+                  now.setMonth(now.getMonth() + 1);
+                  break;
+                case '6months':
+                  now.setMonth(now.getMonth() + 6);
+                  break;
+                case 'year':
+                  now.setFullYear(now.getFullYear() + 1);
+                  break;
+              }
+              disabledUntil = now.toISOString();
+            }
+            this.users[userIndex].disabledUntil = disabledUntil;
           }
           this.alertModalVisible = false;
         },
@@ -490,7 +458,7 @@ export class AdminComponent implements OnInit {
     this.alertModalType = 'warning';
     this.alertModalVisible = true;
     this.isDisablingUser = false; // No estamos deshabilitando
-    this.alertModalConfirmAction = () => {
+    this.confirmAction = () => {
       this.profileService.enableUser(username).subscribe({
         next: () => {
           const userIndex = this.users.findIndex(user => user.username === username);
@@ -528,5 +496,11 @@ export class AdminComponent implements OnInit {
   getSelectedDurationLabel(): string {
     const duration = this.disableDurations.find(d => d.value === this.selectedDuration);
     return duration ? duration.label : 'Seleccionar duración';
+  }
+
+  onDurationSliderChange(event: Event) {
+    const index = parseInt((event.target as HTMLInputElement).value);
+    this.selectedDurationIndex = index;
+    this.selectedDuration = this.disableDurations[index].value;
   }
 }

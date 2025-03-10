@@ -15,6 +15,7 @@ public class TestRunner {
     private PostVisitTest postVisitTest;
     private SearchTest searchTest;
     private UserCreationDeletionTest userCreationDeletionTest;
+    private AdminTest adminTest;
 
     @BeforeEach
     public void setup() {
@@ -27,6 +28,7 @@ public class TestRunner {
         searchTest = new SearchTest();
         userCreationDeletionTest = new UserCreationDeletionTest();
         userEditTest = new UserEditTest();
+        adminTest = new AdminTest();
     }
 
     @AfterEach
@@ -40,7 +42,7 @@ public class TestRunner {
         searchTest.teardown();
         userCreationDeletionTest.teardown();
         userEditTest.teardown();
-
+        adminTest.teardown();
     }
 
     @Test
@@ -104,5 +106,12 @@ public class TestRunner {
         userEditTest.setupTest();
         userEditTest.userEditTest();
         userEditTest.teardown();
+    }
+
+    @Test
+    public void testAdmin() {
+        adminTest.setupTest();
+        adminTest.adminTest();
+        adminTest.teardown();
     }
 }

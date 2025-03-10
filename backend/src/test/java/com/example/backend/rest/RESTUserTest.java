@@ -713,4 +713,171 @@ class RESTUserTest {
                 .statusCode(400)
                 .body("status", equalTo("FAILURE"));
     }
+
+    @Test
+    void testDisableUser() {
+        String username = "YourReader";
+        String targetUsername = "BookReader_14";
+
+        // Case 1: Not logged in
+        given()
+                .when()
+                .put("/users/{username}/disable?duration=day", targetUsername)
+                .then()
+                .statusCode(401);
+
+        // Case 2: Logged in as non-admin user
+        String nonAdminCookie = given()
+                .contentType("application/json")
+                .body("{\"username\": \"" + username + "\", \"password\": \"NewPass!234\"}")
+                .when()
+                .post("/login")
+                .then()
+                .statusCode(200)
+                .cookie("AuthToken")
+                .extract()
+                .cookie("AuthToken");
+
+        given()
+                .cookie("AuthToken", nonAdminCookie)
+                .when()
+                .put("/users/{username}/disable?duration=day", targetUsername)
+                .then()
+                .statusCode(401);
+
+        // Case 3: Logged in as admin
+        String adminCookie = given()
+                .contentType("application/json")
+                .body("{\"username\": \"AdminReader\", \"password\": \"adminpass\"}")
+                .when()
+                .post("/login")
+                .then()
+                .statusCode(200)
+                .cookie("AuthToken")
+                .extract()
+                .cookie("AuthToken");
+
+        // Case 3.1: Admin trying to disable their own account
+        given()
+                .cookie("AuthToken", adminCookie)
+                .when()
+                .put("/users/{username}/disable?duration=day", "AdminReader")
+                .then()
+                .statusCode(403);
+
+        // Case 3.2: Admin trying to disable another admin
+        given()
+                .cookie("AuthToken", adminCookie)
+                .when()
+                .put("/users/{username}/disable?duration=day", "AdminReader")
+                .then()
+                .statusCode(403);
+
+        // Case 3.3: Admin disabling a regular user with different durations
+        String[] durations = {"day", "week", "2weeks", "month", "6months", "year", "forever"};
+        for (String duration : durations) {
+            given()
+                    .cookie("AuthToken", adminCookie)
+                    .when()
+                    .put("/users/{username}/disable?duration=" + duration, targetUsername)
+                    .then()
+                    .statusCode(200)
+                    .body("username", equalTo(targetUsername))
+                    .body("isDisabled", equalTo(true));
+        }
+
+        // Case 3.4: Admin trying to disable with invalid duration
+        given()
+                .cookie("AuthToken", adminCookie)
+                .when()
+                .put("/users/{username}/disable?duration=invalid", targetUsername)
+                .then()
+                .statusCode(422);
+
+        // Case 3.5: Admin trying to disable non-existent user
+        given()
+                .cookie("AuthToken", adminCookie)
+                .when()
+                .put("/users/{username}/disable?duration=day", "NonExistentUser")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    void testEnableUser() {
+        String username = "FanBook_785";
+        String targetUsername = "BookReader_14";
+
+        // Case 1: Not logged in
+        given()
+                .when()
+                .put("/users/{username}/enable", targetUsername)
+                .then()
+                .statusCode(401);
+
+        // Case 2: Logged in as non-admin user
+        String nonAdminCookie = given()
+                .contentType("application/json")
+                .body("{\"username\": \"" + username + "\", \"password\": \"pass\"}")
+                .when()
+                .post("/login")
+                .then()
+                .statusCode(200)
+                .cookie("AuthToken")
+                .extract()
+                .cookie("AuthToken");
+
+        given()
+                .cookie("AuthToken", nonAdminCookie)
+                .when()
+                .put("/users/{username}/enable", targetUsername)
+                .then()
+                .statusCode(401);
+
+        // Case 3: Logged in as admin
+        String adminCookie = given()
+                .contentType("application/json")
+                .body("{\"username\": \"AdminReader\", \"password\": \"adminpass\"}")
+                .when()
+                .post("/login")
+                .then()
+                .statusCode(200)
+                .cookie("AuthToken")
+                .extract()
+                .cookie("AuthToken");
+
+        // Case 3.1: Admin trying to enable their own account
+        given()
+                .cookie("AuthToken", adminCookie)
+                .when()
+                .put("/users/{username}/enable", "AdminReader")
+                .then()
+                .statusCode(403);
+
+        // Case 3.2: Admin trying to enable another admin
+        given()
+                .cookie("AuthToken", adminCookie)
+                .when()
+                .put("/users/{username}/enable", "AdminReader")
+                .then()
+                .statusCode(403);
+
+        // Case 3.3: Admin enabling a regular user
+        given()
+                .cookie("AuthToken", adminCookie)
+                .when()
+                .put("/users/{username}/enable", targetUsername)
+                .then()
+                .statusCode(200)
+                .body("username", equalTo(targetUsername))
+                .body("isDisabled", equalTo(false));
+
+        // Case 3.4: Admin trying to enable non-existent user
+        given()
+                .cookie("AuthToken", adminCookie)
+                .when()
+                .put("/users/{username}/enable", "NonExistentUser")
+                .then()
+                .statusCode(404);
+    }
 }

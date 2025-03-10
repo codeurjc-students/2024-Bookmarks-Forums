@@ -680,7 +680,8 @@ public class APIUserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
     })
     @GetMapping("/users/most-banned")
-    public ResponseEntity<List<Object[]>> getMostBannedUsers(HttpServletRequest request, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<List<Object[]>> getMostBannedUsers(HttpServletRequest request,
+            @RequestParam(defaultValue = "10") int size) {
         // Is user logged in?
         if (request.getUserPrincipal() == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -706,7 +707,8 @@ public class APIUserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
     })
     @GetMapping("/users/most-disliked")
-    public ResponseEntity<List<Object[]>> getMostDislikedUsers(HttpServletRequest request, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<List<Object[]>> getMostDislikedUsers(HttpServletRequest request,
+            @RequestParam(defaultValue = "10") int size) {
         // Is user logged in?
         if (request.getUserPrincipal() == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -722,7 +724,7 @@ public class APIUserController {
     }
 
     // ADMIN ONLY: Disable a user account
-    @JsonView(UserBasicView.class)
+    @JsonView(BanInfo.class)
     @Operation(summary = "Disable a user account")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User disabled", content = {
@@ -747,6 +749,11 @@ public class APIUserController {
         String requesterUsername = request.getUserPrincipal().getName();
         if (!userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Does the user exist?
+        if (userService.getUserByUsername(username) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         // The site admin cannot disable their own account
@@ -784,7 +791,7 @@ public class APIUserController {
     }
 
     // ADMIN ONLY: Enable a user account
-    @JsonView(UserBasicView.class)
+    @JsonView(BanInfo.class)
     @Operation(summary = "Enable a user account")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User enabled", content = {
@@ -805,6 +812,11 @@ public class APIUserController {
         String requesterUsername = request.getUserPrincipal().getName();
         if (!userService.getUserByUsername(requesterUsername).getRoles().contains("ADMIN")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Does the user exist?
+        if (userService.getUserByUsername(username) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         // The site admin cannot execute this on themselves

@@ -64,16 +64,17 @@
         <div class="row justify-content-between">
           <!-- Users Column -->
           <div class="col-lg-7">
-            <!-- User search bar -->
+            <!-- Users list -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
-                <h5 class="card-title mb-0">Gestión de usuarios</h5>
+                <h5 class="card-title mb-0">
+                  Usuarios ordenados por número de baneos
+                </h5>
               </div>
               <div class="card-body">
+                <!-- User search bar -->
                 <div class="post-search-container">
-                  <div
-                    class="search-bar-button-group wide-search-bar-button-group"
-                  >
+                  <div class="search-bar-button-group wide-search-bar-button-group">
                     <input
                       type="text"
                       class="form-control search-input"
@@ -97,20 +98,9 @@
                     </button>
                   </div>
                 </div>
-              </div>
-            </div>
-            <hr class="post-container-divider" />
-
-            <!-- Users list -->
-            <div class="card dark-card mb-4">
-              <div class="post-container-card-top">
-                <h5 class="card-title mb-0">
-                  Usuarios ordenados por número de baneos
-                </h5>
-              </div>
-              <div class="card-body">
+                <hr class="post-container-divider mt-4" />
                 <div class="community-members-container">
-                  <div class="admin-user-card" *ngFor="let user of users">
+                  <div class="admin-user-card" *ngFor="let user of users" [routerLink]="['/profile', user.username]" style="cursor: pointer;">
                     <div class="admin-user-info">
                       <img
                         [src]="
@@ -120,16 +110,13 @@
                         class="community-member-profile-picture"
                       />
                       <div class="admin-user-details">
-                        <a
-                          [routerLink]="['/profile', user.username]"
-                          class="admin-user-username"
-                        >
+                        <span class="admin-user-username">
                           {{ user.username }}
                           <span class="admin-user-ban-count">
                             <i class="fas fa-gavel"></i>
                             {{ user.banCount }} sanciones
                           </span>
-                        </a>
+                        </span>
                         <p class="admin-user-status" *ngIf="user.isDisabled">
                           <i class="fas fa-ban me-1"></i>
                           Cuenta deshabilitada hasta
@@ -141,13 +128,14 @@
                         </p>
                       </div>
                     </div>
-                    <div class="admin-user-actions">
+                    <div class="admin-user-actions" (click)="$event.stopPropagation()">
                       <button
                         *ngIf="!user.isDisabled"
                         type="button"
                         class="btn negative-btn"
+                        [disabled]="user.roles.includes('ADMIN')"
                         (click)="disableUser(user.username)"
-                        title="Deshabilitar cuenta"
+                        [title]="user.roles.includes('ADMIN') ? 'No puedes deshabilitar cuentas de administradores del sitio' : 'Deshabilitar cuenta'"
                       >
                         Deshabilitar
                       </button>
@@ -227,7 +215,7 @@
             [ngClass]="
               alertModalType === 'warning' ? 'negative-btn' : 'primary-btn'
             "
-            (click)="alertModalConfirmAction(); alertModalVisible = false"
+            (click)="confirmAction(); alertModalVisible = false"
           >
             <i class="fas fa-check"></i> {{ alertModalConfirmText }}
           </button>
@@ -238,38 +226,7 @@
       </div>
     </div>
 
-    <!-- Alert modal with confirmation and cancel buttons -->
-    <div id="alertModal" class="custom-modal" [ngClass]="{ 'show': showAlertModal }">
-      <div class="custom-modal-content no-scroll">
-        <div class="custom-modal-header">
-          <span class="action-btn close" (click)="closeAlertModal()">
-            <i class="fas fa-times"></i>
-          </span>
-        </div>
-        <div class="custom-modal-body">
-          <p class="alert-modal-text">{{ alertModalText }}</p>
-          <div class="alert-modal-buttons">
-            <button
-              class="btn primary-btn"
-              title="Confirmar"
-              (click)="confirmAction(); closeAlertModal()"
-            >
-              <i class="fas fa-check"></i> Confirmar
-            </button>
-            <button
-              *ngIf="showCancelButton"
-              class="btn primary-btn"
-              title="Cancelar"
-              (click)="closeAlertModal()"
-            >
-              <i class="fas fa-times"></i> Cancelar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal para seleccionar duración de deshabilitación -->
+    <!-- Modal -->
     <div id="disableDurationModal" class="custom-modal" [ngClass]="{ 'show': alertModalVisible }">
       <div class="custom-modal-content no-scroll">
         <div class="custom-modal-header with-title">
@@ -281,42 +238,37 @@
         <div class="custom-modal-body">
           <p class="alert-modal-text">{{ alertModalMessage }}</p>
           
-          <!-- Ban duration dropdown - solo mostrar cuando estamos deshabilitando -->
-          <div class="alert-modal-container" *ngIf="isDisablingUser">
-            <p class="alert-modal-text-left">Duración de la deshabilitación:</p>
-            <div class="input-group-append above">
-              <button
-                class="btn btn-secondary branding-dropdown-toggle fa-dropdown-toggle"
-                type="button"
-                id="disableDurationDropdown"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                {{ getSelectedDurationLabel() }}
-              </button>
-              <ul
-                class="dropdown-menu dropdown-menu-dark branding-dropdown-menu above"
-                aria-labelledby="disableDurationDropdown"
-              >
-                <li *ngFor="let duration of disableDurations">
-                  <a class="dropdown-item" (click)="setDisableDuration(duration.value)">
-                    {{ duration.label }}
-                  </a>
-                </li>
-              </ul>
+          <!-- Duration container -->
+          <div class="duration-slider-container" *ngIf="isDisablingUser">
+            <label for="durationSlider" class="duration-slider-label">Duración de la deshabilitación:</label>
+            <input
+              id="durationSlider"
+              type="range"
+              class="duration-slider"
+              min="0"
+              max="6"
+              step="1"
+              [value]="selectedDurationIndex"
+              (input)="onDurationSliderChange($event)"
+            >
+            <div class="duration-labels">
+              <span *ngFor="let duration of disableDurations" class="duration-label">
+                {{ duration.label }}
+              </span>
             </div>
           </div>
-          
+
           <div class="alert-modal-buttons">
             <button
+              id="confirm-modal-btn"
               class="btn primary-btn"
-              title="Confirmar"
-              (click)="alertModalConfirmAction(); alertModalVisible = false"
+              (click)="confirmAction(); alertModalVisible = false"
             >
               <i class="fas fa-check"></i> {{ alertModalConfirmText }}
             </button>
             <button
-              class="btn primary-btn"
+              id="cancel-modal-btn"
+              class="btn primary-dimmed-btn"
               title="Cancelar"
               (click)="alertModalVisible = false"
             >

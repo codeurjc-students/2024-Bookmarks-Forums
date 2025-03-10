@@ -64,9 +64,9 @@ class SearchTest {
 
         WebElement searchPageTitle = wait.until(presenceOfElementLocated(By.className("page-title")));
 
-        // Wait for 5 seconds
+        // Wait for 8 seconds
         try {
-            Thread.sleep(5000);
+            Thread.sleep(8000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
