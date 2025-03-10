@@ -7,7 +7,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
@@ -60,7 +59,14 @@ class LoginAux {
 
         assertEquals(LOCALHOST + ":" + port + "/", driver.getCurrentUrl(), "URL should be the landing page");
         assertTrue(landingGreeting.isDisplayed(), "Landing greeting should be displayed");
-        await().atMost(Duration.ofSeconds(5)).until(() -> true); // waits for username text to load
+
+        // Wait for 3 seconds to allow the username to be displayed
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         assertTrue(landingGreeting.getText().contains("Muy buenas, " + username),
                 "Landing greeting should contain alias");
 
@@ -105,7 +111,14 @@ class LoginAux {
         assertEquals(LOCALHOST + ":" + config.getPort() + "/", driver.getCurrentUrl(),
                 "URL should be the landing page");
         assertTrue(landingGreeting.isDisplayed(), "Landing greeting should be displayed");
-        await().atMost(Duration.ofSeconds(5)).until(() -> true);
+
+        // Wait for 3 seconds to allow the username to be displayed
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         assertTrue(landingGreeting.getText().contains("Muy buenas, AdminReader"),
                 "Landing greeting should contain admin");
     }
