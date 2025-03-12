@@ -48,13 +48,24 @@ public class ChatService {
             ZoneId.systemDefault()
         ));
         
+        // Add message to chat
         chat.addMessage(message);
+        
+        // Save the chat which will cascade save the message
         chatRepository.save(chat);
     }
 
     public Page<Chat> getUserChats(String username, Pageable pageable) {
         System.out.println("Getting chats for user: " + username);
         Page<Chat> chats = chatRepository.findByUsername(username, pageable);
+        
+        // Calculate unread counts for each chat
+        if (chats != null) {
+            chats.getContent().forEach(chat -> {
+                chat.setUnreadCount(chat.calculateUnreadCount(username));
+            });
+        }
+        
         System.out.println("Found " + (chats != null ? chats.getContent().size() : 0) + " chats");
         if (chats != null && !chats.getContent().isEmpty()) {
             System.out.println("First chat id: " + chats.getContent().get(0).getId());
@@ -62,6 +73,7 @@ public class ChatService {
         return chats;
     }
 
+    @Transactional(readOnly = true)
     public List<Message> getChatMessages(Long chatId, String username) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new IllegalArgumentException("Chat not found"));
@@ -72,9 +84,13 @@ public class ChatService {
             throw new IllegalArgumentException("User not authorized to access this chat");
         }
 
-        return chat.getMessages();
+        // Force loading of messages
+        List<Message> messages = chat.getMessages();
+        messages.size(); // Force initialization of the lazy collection
+        return messages;
     }
 
+    @Transactional
     public void markMessagesAsRead(Long chatId, String username) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new IllegalArgumentException("Chat not found"));

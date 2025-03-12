@@ -25,6 +25,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   messages: Message[] = [];
   newMessage: string = '';
   loadingMessages: boolean = false;
+  loadingTemporaryChat: boolean = false;
 
   // User state
   loggedUsername: string = '';
@@ -103,13 +104,41 @@ export class ChatComponent implements OnInit, OnDestroy {
       error: (error) => this.handleError('Error al recibir mensajes', error)
     });
 
-    // Load initial chats
-    this.loadChats();
-
-    // Only open direct chat if username provided
+    // Load initial chats and handle direct chat opening
     if (this.recipientUsername) {
-      this.openOrCreateChat(this.recipientUsername);
+      const username = this.recipientUsername; // Store in local variable to avoid null check issues
+      this.loadingChats = true;
+      this.chatService.getChats(0, this.chatsSize).subscribe({
+        next: (response: Chat[]) => {
+          this.chats = response;
+          this.noMoreChats = response.length < this.chatsSize;
+          this.chatsPage = 1;
+          
+          // Check for existing chat with the recipient
+          const existingChat = this.chats.find(chat => 
+            this.getOtherUser(chat) === username
+          );
+
+          if (existingChat) {
+            // If chat exists, open it
+            this.openChat(existingChat);
+          } else {
+            // If no chat exists, create a temporary one
+            this.openOrCreateChat(username);
+          }
+          
+          this.loadingChats = false;
+        },
+        error: (error) => {
+          this.handleError('Error al cargar los chats', error);
+          this.loadingChats = false;
+          // Still create temporary chat in case of error
+          this.openOrCreateChat(username);
+        }
+      });
     } else {
+      // If no recipient specified, just load the chat list
+      this.loadChats();
       this.currentChat = null;
       this.messages = [];
     }
@@ -152,6 +181,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.currentChat = chat;
     this.loadMessages(chat.id);
     this.chatService.markMessagesAsRead(chat.id).subscribe({
+      next: () => {
+        // Update local unread count after marking messages as read
+        if (chat.unreadCount > 0) {
+          chat.unreadCount = 0;
+        }
+      },
       error: (error) => this.handleError('Error al marcar mensajes como leídos', error)
     });
   }
@@ -219,6 +254,55 @@ export class ChatComponent implements OnInit, OnDestroy {
     
     // Send message through WebSocket
     this.chatService.sendMessage(recipientUsername, content);
+
+    // If this is a temporary chat, update the chat list after a short delay
+    if (this.currentChat.id === 0) {
+      this.loadingTemporaryChat = true;
+      setTimeout(() => {
+        this.chatsPage = 0;
+        this.loadingChats = true;
+        
+        this.chatService.getChats(0, this.chatsSize).subscribe({
+          next: (response: Chat[]) => {
+            const newChat = response.find(chat => 
+              chat.user1.username === recipientUsername || chat.user2.username === recipientUsername
+            );
+            
+            if (newChat) {
+              // Update chat list
+              this.chats = response;
+              this.noMoreChats = response.length < this.chatsSize;
+              
+              // Update current chat
+              this.currentChat = newChat;
+              this.loadMessages(newChat.id);
+            }
+            
+            this.loadingChats = false;
+            this.loadingTemporaryChat = false;
+            this.chatsPage = 1; // Set to 1 since we've loaded the first page
+          },
+          error: (error) => {
+            this.handleError('Error al cargar el chat nuevo', error);
+            this.loadingChats = false;
+            this.loadingTemporaryChat = false;
+          }
+        });
+      }, 500); // Small delay to ensure backend has processed the message
+    } else {
+      // For existing chats, update the chat list immediately
+      const chatIndex = this.chats.findIndex(c => c.id === this.currentChat!.id);
+      if (chatIndex > -1) {
+        const chat = this.chats[chatIndex];
+        chat.messages = [tempMessage, ...chat.messages];
+        chat.lastMessage = tempMessage;
+        chat.lastMessageTime = tempMessage.timestamp;
+
+        // Move chat to top of the list
+        this.chats.splice(chatIndex, 1);
+        this.chats.unshift(chat);
+      }
+    }
   }
 
   getOtherUser(chat: Chat): string {
@@ -248,7 +332,15 @@ export class ChatComponent implements OnInit, OnDestroy {
         // Move chat to top
         const chat = this.chats[chatIndex];
         chat.messages = [message, ...chat.messages];
+        chat.lastMessage = message;  // Update lastMessage property
         chat.lastMessageTime = message.timestamp;
+
+        // Update unread count if message is not from current user and chat is not currently open
+        if (message.sender.username !== this.loggedUsername && 
+            (!this.currentChat || this.currentChat.id !== chat.id)) {
+          chat.unreadCount = (chat.unreadCount || 0) + 1;
+        }
+
         this.chats.splice(chatIndex, 1);
         this.chats.unshift(chat);
 
@@ -263,7 +355,38 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
     } else if (this.currentChat?.id === 0 && 
               (otherUsername === this.getOtherUser(this.currentChat))) {
-      // New chat was created
+      // New chat was created - reload chats and update current chat
+      this.chatsPage = 0;
+      this.loadingChats = true;
+      
+      // Get fresh chat list and update current chat in a single operation
+      this.chatService.getChats(0, this.chatsSize).subscribe({
+        next: (response: Chat[]) => {
+          const newChat = response.find(chat => 
+            chat.user1.username === otherUsername || chat.user2.username === otherUsername
+          );
+          
+          if (newChat) {
+            // Update chat list
+            this.chats = response;
+            this.noMoreChats = response.length < this.chatsSize;
+            
+            // Update current chat
+            this.currentChat = newChat;
+            this.loadMessages(newChat.id);
+          }
+          
+          this.loadingChats = false;
+          this.chatsPage = 1; // Set to 1 since we've loaded the first page
+        },
+        error: (error) => {
+          this.handleError('Error al cargar el chat nuevo', error);
+          this.loadingChats = false;
+        }
+      });
+    } else if (!existingChat && !this.currentChat) {
+      // If we don't have the chat in our list and no chat is open, reload the list
+      // This handles receiving a message for a new chat when no chat is open
       this.chatsPage = 0;
       this.loadChats();
     }

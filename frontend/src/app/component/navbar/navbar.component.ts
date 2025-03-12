@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoginService } from '../../services/session.service';
 import { UserService } from '../../services/user.service';
 import { ChatService } from '../../services/chat.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   page = 0;
   userSearch = false;
   loggedIn = false;
@@ -21,6 +22,7 @@ export class NavbarComponent implements OnInit {
   isAdmin = false;
 
   unreadMessages: number = 0;
+  private unreadCountSubscription?: Subscription;
 
   constructor(
     private router: Router,
@@ -83,9 +85,11 @@ export class NavbarComponent implements OnInit {
                 this.isAdmin = true;
               }
 
-              this.chatService.getUnreadCount().subscribe(count => {
-                this.unreadMessages = count;
-              });
+              // Subscribe to unread count updates
+              this.unreadCountSubscription = this.chatService.getUnreadCount()
+                .subscribe(count => {
+                  this.unreadMessages = count;
+                });
             },
             error: (r) => {
               console.error('Error: ' + JSON.stringify(r));
@@ -118,6 +122,10 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    // Clean up subscription
+    if (this.unreadCountSubscription) {
+      this.unreadCountSubscription.unsubscribe();
+    }
     window.removeEventListener('scroll', this.onScroll);
   }
 

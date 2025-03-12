@@ -29,8 +29,11 @@ public class ChatController {
         this.chatService = chatService;
     }
 
-    interface ChatBasicView extends Chat.BasicInfo, User.UsernameInfo {}
-    interface MessageBasicView extends Message.BasicInfo, User.UsernameInfo {}
+    // Define a view that includes all necessary message fields
+    interface ChatMessageView extends Message.BasicInfo, User.UsernameInfo {}
+    interface ChatBasicView extends Chat.BasicInfo, ChatMessageView {}
+    interface ChatListMessageView extends Message.BasicInfoForChatList, User.UsernameInfo {}
+    interface ChatListBasicView extends Chat.BasicInfoForChatList, ChatListMessageView {}
 
     private String getCurrentUsername(HttpServletRequest request) {
         if (request.getUserPrincipal() == null) {
@@ -39,7 +42,7 @@ public class ChatController {
         return request.getUserPrincipal().getName();
     }
 
-    @JsonView(ChatBasicView.class)
+    @JsonView(ChatListBasicView.class)
     @Operation(summary = "Get user's chats")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Chats found", content = {
@@ -60,7 +63,7 @@ public class ChatController {
         return ResponseEntity.ok(chats);
     }
 
-    @JsonView(MessageBasicView.class)
+    @JsonView(ChatMessageView.class)
     @Operation(summary = "Get messages from a specific chat")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Messages found", content = {

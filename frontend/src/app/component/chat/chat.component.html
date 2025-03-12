@@ -55,9 +55,12 @@
                            alt="Profile picture" 
                            class="chat-profile-picture">
                       <span class="chat-username">{{ getOtherUser(chat) }}</span>
+                      <span class="badge bg-danger ms-2" *ngIf="chat.unreadCount > 0">
+                        {{ chat.unreadCount }}
+                      </span>
                     </div>
-                    <div class="chat-item-last-message" *ngIf="chat.messages.length > 0">
-                      {{ chat.messages[0].content }}
+                    <div class="chat-item-last-message" *ngIf="chat.lastMessage">
+                      {{ chat.lastMessage.content }}
                     </div>
                     <div class="chat-item-timestamp" *ngIf="chat.lastMessageTime">
                       {{ chat.lastMessageTime | date:'short' }}
@@ -87,7 +90,7 @@
             <div class="card-body">
               <!-- No chat selected message -->
               <div class="no-chat-selected" *ngIf="!currentChat">
-                <p class="text-center">Selecciona un chat de la izquierda para comenzar</p>
+                <p class="text-center">Selecciona un chat de la izquierda para comenzar o inicia un nuevo chat desde el perfil de un usuario.</p>
               </div>
 
               <!-- Chat content when selected -->
@@ -95,10 +98,12 @@
                 <!-- Chat header -->
                 <div class="chat-header">
                   <div class="chat-header-user-info">
-                    <img [src]="profilePicture(getOtherUser(currentChat))" 
-                         alt="Profile picture" 
-                         class="chat-profile-picture">
-                    <span class="chat-username">{{ getOtherUser(currentChat) }}</span>
+                    <a [routerLink]="['/profile', getOtherUser(currentChat)]" class="user-profile-link">
+                      <img [src]="profilePicture(getOtherUser(currentChat))" 
+                           alt="Profile picture" 
+                           class="chat-profile-picture">
+                      <span class="chat-username">{{ getOtherUser(currentChat) }}</span>
+                    </a>
                   </div>
                 </div>
                 <hr class="post-container-divider" />
@@ -133,10 +138,11 @@
                            class="form-control input-field message-input-field" 
                            placeholder="Escribe un mensaje..." 
                            [(ngModel)]="newMessage"
+                           [disabled]="loadingTemporaryChat"
                            (keyup.enter)="sendMessage()">
                     <button class="btn primary-btn" 
                             (click)="sendMessage()"
-                            [disabled]="!newMessage.trim()"
+                            [disabled]="!newMessage.trim() || loadingTemporaryChat"
                             title="Enviar mensaje">
                       <i class="fas fa-paper-plane"></i>
                     </button>

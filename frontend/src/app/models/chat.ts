@@ -12,7 +12,6 @@ export interface Chat {
     user2: ChatUser;
     messages: Message[];
     lastMessageTime: Date;
-    lastMessage?: string;
-    lastMessageTimestamp?: Date;
+    lastMessage?: Message;
     unreadCount: number;
 } 

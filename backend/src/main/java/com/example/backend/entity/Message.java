@@ -4,11 +4,14 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "messages")
 public class Message {
-    public interface BasicInfo {}
+    public interface BasicInfoForChatList {}
+    public interface BasicInfo extends BasicInfoForChatList {}
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,16 +20,18 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
-    @JsonView(BasicInfo.class)
+    @JsonView(BasicInfoForChatList.class)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User sender;
 
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     @JsonView(BasicInfo.class)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User receiver;
 
     @Column(nullable = false)
-    @JsonView(BasicInfo.class)
+    @JsonView(BasicInfoForChatList.class)
     private String content;
 
     @Column(name = "is_read")
@@ -41,6 +46,7 @@ public class Message {
     @JoinColumn(name = "chat_id")
     @JsonView(BasicInfo.class)
     @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Chat chat;
 
     // Constructors

@@ -12,6 +12,7 @@ export class ChatService {
   private API_URL = '/api/v1/chats';
   private webSocket: WebSocket | null = null;
   private messageSubject = new Subject<Message>();
+  private unreadCountSubject = new Subject<number>();
   private currentUsername: string = '';
 
   constructor(private http: HttpClient) {}
@@ -96,7 +97,14 @@ export class ChatService {
             const fixedResponse = response.replace(/"roles"\s*:\s*\[\s*\]/g, '"roles": []');
             const parsedResponse = JSON.parse(fixedResponse);
             console.log('Parsed response:', parsedResponse);
-            return parsedResponse;
+
+            // Ensure each chat has an unreadCount property
+            return parsedResponse.map((chat: Chat) => ({
+              ...chat,
+              unreadCount: chat.unreadCount || 0,
+              messages: chat.messages || [],
+              lastMessageTime: chat.lastMessageTime ? new Date(chat.lastMessageTime) : new Date()
+            }));
           } catch (e) {
             console.error('Error parsing chats response:', e);
             console.error('Response that failed to parse:', response);
@@ -123,15 +131,29 @@ export class ChatService {
   }
 
   markMessagesAsRead(chatId: number): Observable<void> {
-    return this.http.post<void>(`${this.API_URL}/${chatId}/read`, {});
+    return new Observable(observer => {
+      this.http.post<void>(`${this.API_URL}/${chatId}/read`, {}).subscribe({
+        next: () => {
+          // After marking messages as read, get updated unread count
+          this.http.get<number>(`${this.API_URL}/unread-count`).subscribe(count => {
+            this.unreadCountSubject.next(count);
+            observer.next();
+            observer.complete();
+          });
+        },
+        error: (error) => observer.error(error)
+      });
+    });
   }
 
   getUnreadCount(): Observable<number> {
-    return this.messageSubject.pipe(
-      filter((message: Message) => !message.read),
-      map(() => 1),
-      scan((acc: number) => acc + 1, 0)
+    // Initial load of unread count
+    this.http.get<number>(`${this.API_URL}/unread-count`).subscribe(
+      count => this.unreadCountSubject.next(count)
     );
+    
+    // Return observable that combines initial count and updates
+    return this.unreadCountSubject.asObservable();
   }
 
   getMessages(): Observable<Message> {

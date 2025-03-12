@@ -14,7 +14,7 @@ header {
 }
 
 .chats-list {
-  height: 600px;
+  height: 100%;
   overflow-y: overlay;
   padding: 1rem;
   display: flex;
@@ -73,7 +73,15 @@ header {
 .chat-item-user-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 10px;
+}
+
+.chat-item-user-info .badge {
+  font-size: 0.75rem;
+  padding: 0.25em 0.6em;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
 }
 
 .chat-profile-picture {
@@ -324,4 +332,21 @@ header {
   width: 350px;
   flex: 0 0 auto;
   padding-right: 1rem;
+}
+
+.user-profile-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.user-profile-link:hover {
+  text-decoration: underline;
+  color: var(--branding-peach);
+}
+
+.user-profile-link .chat-profile-picture {
+  margin-right: 10px;
 }
