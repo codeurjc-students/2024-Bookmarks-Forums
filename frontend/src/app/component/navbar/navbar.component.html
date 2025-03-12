@@ -66,6 +66,19 @@
           </a>
         </li>
 
+        <!-- Chats option -->
+        <li class="bm-nav-item" *ngIf="loggedIn" style="cursor: pointer">
+          <a
+            class="bm-nav-link"
+            [routerLink]="['/chats']"
+            routerLinkActive="underline-active"
+          >
+            <i class="fa fas fa-comments"></i>
+            Chats
+            <span class="badge bg-danger" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
+          </a>
+        </li>
+
         <!-- Administrator menu option -->
         <!--{{#admin}} -->
         <li class="bm-nav-item">

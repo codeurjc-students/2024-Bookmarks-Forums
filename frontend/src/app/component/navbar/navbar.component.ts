@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoginService } from '../../services/session.service';
 import { UserService } from '../../services/user.service';
+import { ChatService } from '../../services/chat.service';
 
 @Component({
   selector: 'app-navbar',
@@ -19,11 +20,14 @@ export class NavbarComponent implements OnInit {
 
   isAdmin = false;
 
+  unreadMessages: number = 0;
+
   constructor(
     private router: Router,
     public userService: UserService,
     private sessionService: LoginService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private chatService: ChatService
   ) {
     this.activatedRoute.params.subscribe((params) => {
       if (this.router.url.includes('search')) {
@@ -78,6 +82,10 @@ export class NavbarComponent implements OnInit {
               if (r.roles.includes('ADMIN')) {
                 this.isAdmin = true;
               }
+
+              this.chatService.getUnreadCount().subscribe(count => {
+                this.unreadMessages = count;
+              });
             },
             error: (r) => {
               console.error('Error: ' + JSON.stringify(r));

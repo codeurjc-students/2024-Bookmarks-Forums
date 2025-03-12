@@ -14,6 +14,7 @@ import { ModifyUserComponent } from './component/modifyUser/modifyUser.component
 import { SearchComponent } from './component/search/search.component';
 import { ErrorComponent } from './component/error/error.component';
 import { AdminComponent } from './component/admin/admin.component';
+import { ChatComponent } from './component/chat/chat.component';
 
 const routes: Routes = [
   {
@@ -38,6 +39,7 @@ const routes: Routes = [
   { path: 'search', component: SearchComponent },
   { path: 'error', component: ErrorComponent },
   { path: 'admin', component: AdminComponent },
+  { path: 'chats', component: ChatComponent },
   {
     path: '**',
     redirectTo: '/error?title=Página%20no%20encontrada&description=No%20sabemos%20qué%20estas%20buscando%20pero,%20sea%20lo%20que%20sea,%20no%20está%20aquí.&code=404',

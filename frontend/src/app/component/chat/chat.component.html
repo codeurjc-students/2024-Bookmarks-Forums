@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chats</title>
+</head>
+<body>
+  <div class="main-body-container">
+    <!-- Page hero ---------------------------------------------------- -->
+    <header class="bg-branding-white py-1 page-hero">
+      <div class="container px-4 px-lg-5 my-5">
+        <div class="text-start text-dark">
+          <div class="post-author-container">
+            <div class="user-hero-username-alias">
+              <h1 class="display-4 fw-bolder header-main-text landing-hero hero-username">Chats</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- ----------------------------------------------------------------- -->
+
+    <!-- Page content-->
+    <div class="container">
+      <div class="row justify-content-between">
+        <!-- Left column: Chat list -->
+        <div class="col-lg-4">
+          <div class="card dark-card mb-4 chat-list-card">
+            <div class="post-container-card-top">
+              <h5 class="card-title mb-0">Chats recientes</h5>
+            </div>
+            <div class="card-body chat-list-container">
+              <div class="chats-list">
+                <!-- Loading state -->
+                <div *ngIf="loadingChats && chats.length === 0" class="text-center p-4">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                </div>
+
+                <!-- Empty state -->
+                <div *ngIf="!loadingChats && chats.length === 0" class="text-center p-4">
+                  <p class="mb-0">No tienes chats aún</p>
+                </div>
+
+                <!-- Chat list -->
+                <div *ngFor="let chat of chats" 
+                     class="chat-item" 
+                     [class.active]="currentChat?.id === chat.id"
+                     (click)="openChat(chat)">
+                  <div class="chat-item-content">
+                    <div class="chat-item-user-info">
+                      <img [src]="profilePicture(getOtherUser(chat))" 
+                           alt="Profile picture" 
+                           class="chat-profile-picture">
+                      <span class="chat-username">{{ getOtherUser(chat) }}</span>
+                    </div>
+                    <div class="chat-item-last-message" *ngIf="chat.messages.length > 0">
+                      {{ chat.messages[0].content }}
+                    </div>
+                    <div class="chat-item-timestamp" *ngIf="chat.lastMessageTime">
+                      {{ chat.lastMessageTime | date:'short' }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Load more button -->
+                <div class="load-more-container" *ngIf="!noMoreChats && chats.length > 0">
+                  <button class="btn primary-btn w-100" 
+                          (click)="loadMoreChats()" 
+                          [disabled]="loadingChats">
+                    <span *ngIf="!loadingChats">Cargar más</span>
+                    <div *ngIf="loadingChats" class="spinner-border spinner-border-sm" role="status">
+                      <span class="visually-hidden">Cargando...</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column: Current chat -->
+        <div class="col-lg-8">
+          <div class="card dark-card mb-4 chat-card">
+            <div class="card-body">
+              <!-- No chat selected message -->
+              <div class="no-chat-selected" *ngIf="!currentChat">
+                <p class="text-center">Selecciona un chat de la izquierda para comenzar</p>
+              </div>
+
+              <!-- Chat content when selected -->
+              <div *ngIf="currentChat" class="chat-content">
+                <!-- Chat header -->
+                <div class="chat-header">
+                  <div class="chat-header-user-info">
+                    <img [src]="profilePicture(getOtherUser(currentChat))" 
+                         alt="Profile picture" 
+                         class="chat-profile-picture">
+                    <span class="chat-username">{{ getOtherUser(currentChat) }}</span>
+                  </div>
+                </div>
+                <hr class="post-container-divider" />
+
+                <!-- Messages container -->
+                <div class="messages-container">
+                  <!-- Loading state -->
+                  <div *ngIf="loadingMessages" class="loading-spinner">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Cargando mensajes...</span>
+                    </div>
+                  </div>
+
+                  <!-- Messages list -->
+                  <div class="message-list" *ngIf="!loadingMessages">
+                    <div *ngFor="let message of messages" 
+                         class="message" 
+                         [class.own-message]="isOwnMessage(message)">
+                      <div class="message-content">
+                        {{ message.content }}
+                      </div>
+                      <div class="message-timestamp">
+                        {{ message.timestamp | date:'short' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Message input -->
+                <div class="message-input-container">
+                  <div class="input-group message-input-group">
+                    <input type="text" 
+                           class="form-control input-field message-input-field" 
+                           placeholder="Escribe un mensaje..." 
+                           [(ngModel)]="newMessage"
+                           (keyup.enter)="sendMessage()">
+                    <button class="btn primary-btn" 
+                            (click)="sendMessage()"
+                            [disabled]="!newMessage.trim()"
+                            title="Enviar mensaje">
+                      <i class="fas fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

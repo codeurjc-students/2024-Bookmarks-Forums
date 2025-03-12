@@ -346,6 +346,13 @@
                       Dejar de seguir
                     </button>
                   </ng-container>
+                  <button *ngIf="loggedIn && profileUser?.username !== loggedUsername" 
+                          class="btn primary-btn" 
+                          [routerLink]="['/chats']" 
+                          [queryParams]="{username: profileUser?.username}"
+                          title="Enviar mensaje">
+                    <i class="fas fa-comments"></i>
+                  </button>
                 </div>
                 <!-- If the user is not logged in -->
                 <ng-template #loginToFollow>

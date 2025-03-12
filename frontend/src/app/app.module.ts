@@ -27,6 +27,7 @@ import { ModifyUserComponent } from './component/modifyUser/modifyUser.component
 import { SearchComponent } from './component/search/search.component';
 import { ErrorComponent } from './component/error/error.component';
 import { AdminComponent } from './component/admin/admin.component';
+import { ChatComponent } from './component/chat/chat.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { AdminComponent } from './component/admin/admin.component';
     SearchComponent,
     ErrorComponent,
     AdminComponent,
+    ChatComponent,
   ],
   imports: [
     BrowserModule,

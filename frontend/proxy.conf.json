@@ -1,8 +1,13 @@
 {
-  "/api/**": {
-    "target": "https://localhost:8443/",
+  "/api": {
+    "target": "https://localhost:8443",
     "secure": false,
-    "logLevel": "debug",
+    "changeOrigin": true
+  },
+  "/ws": {
+    "target": "wss://localhost:8443",
+    "ws": true,
+    "secure": false,
     "changeOrigin": true
   }
 }
