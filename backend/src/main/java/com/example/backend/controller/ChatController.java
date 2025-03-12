@@ -88,7 +88,7 @@ public class ChatController {
         @ApiResponse(responseCode = "404", description = "Chat not found", content = @Content)
     })
     @PostMapping("/{chatId}/read")
-    public ResponseEntity<?> markMessagesAsRead(HttpServletRequest request, @PathVariable Long chatId) {
+    public ResponseEntity<Void> markMessagesAsRead(HttpServletRequest request, @PathVariable Long chatId) {
         String username = getCurrentUsername(request);
         chatService.markMessagesAsRead(chatId, username);
         return ResponseEntity.ok().build();

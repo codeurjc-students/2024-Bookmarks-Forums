@@ -419,8 +419,8 @@ public class APIUserController {
                 }
                 user.setEmail(email);
                 try {
-                    mailService.sendEmail(oldEmail, oldUsername, "Email changed",
-                            "Your email has been changed successfully to " + email);
+                    mailService.sendEmail(oldEmail, oldUsername, "Email cambiado",
+                            "Tu email ha sido cambiado correctamente a " + email);
                 } catch (MessagingException e) {
                     return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
                 }
@@ -433,8 +433,8 @@ public class APIUserController {
                 } else {
                     try {
                         user.setPassword(passwordEncoder.encode(newPassword));
-                        mailService.sendEmail(oldEmail, oldUsername, "Password changed",
-                                "Your password has been changed successfully");
+                        mailService.sendEmail(oldEmail, oldUsername, "Contraseña cambiada",
+                                "Tu contraseña ha sido cambiada correctamente");
                     } catch (MessagingException e) {
                         return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
                     }
