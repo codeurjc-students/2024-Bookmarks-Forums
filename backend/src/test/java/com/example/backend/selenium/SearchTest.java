@@ -80,6 +80,13 @@ class SearchTest {
         searchInput.sendKeys(searchTerm);
         searchInput.sendKeys(Keys.ENTER);
 
+        // Wait for the search results to appear and be stable
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement searchResult = wait.until(presenceOfElementLocated(By.className("post-card")));
         WebElement postTitle = searchResult.findElement(By.className("card-title"));
         WebElement postContent = searchResult.findElement(By.className("card-post-content"));
@@ -108,6 +115,13 @@ class SearchTest {
 
         // Then
 
+        // Wait for the search results to appear
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement communitySearchResult = wait.until(presenceOfElementLocated(By.className("community-card")));
         WebElement communityTitle = communitySearchResult.findElement(By.className("card-text"));
         assertTrue(communityTitle.getText().toLowerCase().contains(communitySearchTerm));
@@ -126,6 +140,14 @@ class SearchTest {
         searchButton.click();
 
         // Then
+
+        // Wait for the search results to appear
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         // Wait for the search results to appear and be stable
         await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> {
             List<WebElement> results = driver.findElements(By.className("community-member-card"));
@@ -167,6 +189,13 @@ class SearchTest {
 
         // Then (there should be no post, community or member card elements)
 
+        // Wait for the search results to appear
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         List<WebElement> postCards = driver.findElements(By.className("post-card"));
         List<WebElement> communityCards = driver.findElements(By.className("community-card"));
         List<WebElement> memberCards = driver.findElements(By.className("community-member-card"));
@@ -192,6 +221,13 @@ class SearchTest {
 
         // Then
 
+        // Wait for the search results to appear
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement communitySearchResult2 = wait.until(presenceOfElementLocated(By.className("community-card")));
         WebElement communityTitle2 = communitySearchResult2.findElement(By.className("card-text"));
         String communityName2 = communityTitle2.getText();
@@ -200,6 +236,14 @@ class SearchTest {
         communitySearchResult2.click();
 
         // Then (check that the community name is displayed on the community page)
+
+        // Wait for the community page to load
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement community = wait.until(presenceOfElementLocated(By.id("community-name-text")));
         wait.until((ExpectedCondition<Boolean>) driver -> !community.getText().isEmpty());
         await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true);
