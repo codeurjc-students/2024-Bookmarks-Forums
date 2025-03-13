@@ -119,18 +119,35 @@ class SearchTest {
         // Search for user
 
         // Given
-
         String userSearchTerm = "admin";
         searchInput.sendKeys(userSearchTerm);
 
         // When
-
         searchButton.click();
 
         // Then
+        // Wait for the search results to appear and be stable
+        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> {
+            List<WebElement> results = driver.findElements(By.className("community-member-card"));
+            return !results.isEmpty();
+        });
 
+        // Re-find the search result and username elements to avoid stale elements
         WebElement userSearchResult = wait.until(presenceOfElementLocated(By.className("community-member-card")));
-        WebElement userName = userSearchResult.findElement(By.className("community-member-username"));
+        wait.until(elementToBeClickable(userSearchResult));
+        
+        // Add a small delay to ensure the DOM is stable
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        WebElement userName = wait.until(driver -> {
+            WebElement result = driver.findElement(By.className("community-member-card"));
+            return result.findElement(By.className("community-member-username"));
+        });
+        
         assertTrue(userName.getText().toLowerCase().contains(userSearchTerm));
 
         // Clear search
