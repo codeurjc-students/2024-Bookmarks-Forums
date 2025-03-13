@@ -4,11 +4,12 @@ on:
     branches:
       - main
       - ci-cd
+      - feature-chats
   pull_request:
     branches:
       - main
       - ci-cd
-
+      - feature-chats
 jobs:
   publish:
     runs-on: ubuntu-22.04

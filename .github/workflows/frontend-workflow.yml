@@ -5,11 +5,12 @@ on:
     branches:
       - main
       - ci-cd
+      - feature-chats
   pull_request:
     branches:
       - main
       - ci-cd
-
+      - feature-chats
 jobs:
   selenium-tests:
     runs-on: ubuntu-22.04

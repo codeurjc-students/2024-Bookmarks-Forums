@@ -6,11 +6,12 @@ on:
     branches:
       - main
       - ci-cd
+      - feature-chats
   pull_request:
     branches:
       - main
       - ci-cd
-
+      - feature-chats
 jobs:
   rest-tests:
     runs-on: ubuntu-latest

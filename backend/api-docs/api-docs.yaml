@@ -49,8 +49,6 @@ paths:
         schema:
           type: string
       responses:
-        "422":
-          description: Unprocessable Entity
         "400":
           description: Bad Request
         "200":
@@ -59,10 +57,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User_UserBasicView"
-        "401":
-          description: Unauthorized
         "404":
           description: User not found
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
     delete:
       tags:
       - api-user-controller
@@ -75,8 +75,6 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
         "404":
@@ -87,6 +85,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "401":
+          description: Unauthorized
   /api/v1/users/{username}/pictures:
     get:
       tags:
@@ -100,10 +100,10 @@ paths:
         schema:
           type: string
       responses:
-        "404":
-          description: Profile picture not found
         "500":
           description: Internal Server Error
+        "404":
+          description: Profile picture not found
         "200":
           description: Profile picture found
           content:
@@ -133,8 +133,6 @@ paths:
                   type: string
                   format: binary
       responses:
-        "400":
-          description: Bad Request
         "500":
           description: Internal Server Error
         "200":
@@ -143,10 +141,71 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User_UserBasicView"
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
         "404":
           description: User not found
+        "401":
+          description: Unauthorized
+  /api/v1/users/{username}/enable:
+    put:
+      tags:
+      - api-user-controller
+      summary: Enable a user account
+      operationId: enableUser
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "403":
+          description: Forbidden
+        "404":
+          description: User not found
+        "401":
+          description: Unauthorized
+        "200":
+          description: User enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_BanInfo"
+  /api/v1/users/{username}/disable:
+    put:
+      tags:
+      - api-user-controller
+      summary: Disable a user account
+      operationId: disableUser
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: duration
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+        "200":
+          description: User disabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_BanInfo"
+        "403":
+          description: Forbidden
+        "404":
+          description: User not found
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
   /api/v1/replies/{replyId}:
     get:
       tags:
@@ -189,14 +248,14 @@ paths:
       responses:
         "404":
           description: Reply not found
-        "401":
-          description: Unauthorized
         "200":
           description: Reply liked
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Reply_ReplyInfo"
+        "401":
+          description: Unauthorized
     delete:
       tags:
       - api-post-controller
@@ -234,16 +293,16 @@ paths:
           type: integer
           format: int64
       responses:
-        "200":
-          description: Post found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Post_PostInfo"
         "404":
           description: Post not found
           content:
             '*/*':
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
+        "200":
+          description: Post found
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Post_PostInfo"
     put:
@@ -354,18 +413,18 @@ paths:
                   type: string
                   format: binary
       responses:
-        "200":
-          description: Post image updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Post_PostInfo"
         "404":
           description: Post not found
         "400":
           description: Invalid input
         "403":
           description: Forbidden
+        "200":
+          description: Post image updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post_PostInfo"
     delete:
       tags:
       - api-post-controller
@@ -434,18 +493,18 @@ paths:
       responses:
         "404":
           description: Community not found
-        "422":
-          description: Unprocessable Entity
+        "400":
+          description: Bad Request
         "200":
           description: Updated the community
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community_CommunityBasicInfo"
-        "400":
-          description: Bad Request
         "401":
           description: Unauthorized
+        "422":
+          description: Unprocessable Entity
     delete:
       tags:
       - api-community-controller
@@ -488,18 +547,18 @@ paths:
         schema:
           type: string
       responses:
-        "422":
-          description: Unprocessable Entity
+        "404":
+          description: User is not a member of the community
         "200":
           description: User is a member of the community
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community"
-        "404":
-          description: User is not a member of the community
         "401":
           description: Unauthorized
+        "422":
+          description: Unprocessable Entity
     put:
       tags:
       - api-community-controller
@@ -533,8 +592,6 @@ paths:
         schema:
           type: string
       responses:
-        "422":
-          description: Unprocessable Entity
         "404":
           description: Entity not found
         "200":
@@ -543,10 +600,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community_CommunityUsersInfo"
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
   /api/v1/communities/{id}/pictures:
     get:
       tags:
@@ -563,14 +622,14 @@ paths:
       responses:
         "404":
           description: Entity not found
+        "500":
+          description: Internal Server Error
         "200":
           description: Found the banner
           content:
             image/jpeg:
               schema:
                 $ref: "#/components/schemas/Community"
-        "500":
-          description: Internal Server Error
         "401":
           description: Unauthorized
     put:
@@ -602,8 +661,6 @@ paths:
       responses:
         "404":
           description: Entity not found
-        "400":
-          description: Bad Request
         "500":
           description: Internal Server Error
         "200":
@@ -612,6 +669,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community_CommunityBasicInfo"
+        "400":
+          description: Bad Request
         "401":
           description: Unauthorized
   /api/v1/communities/{id}/moderators/{username}:
@@ -633,18 +692,18 @@ paths:
         schema:
           type: string
       responses:
-        "422":
-          description: Unprocessable Entity
+        "404":
+          description: Entity not found
         "200":
           description: Found the moderator
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community_CommunityUsersInfo"
-        "404":
-          description: Entity not found
         "401":
           description: Unauthorized
+        "422":
+          description: Unprocessable Entity
     put:
       tags:
       - api-community-controller
@@ -668,8 +727,6 @@ paths:
         schema:
           type: string
       responses:
-        "422":
-          description: Unprocessable Entity
         "404":
           description: Entity not found
         "200":
@@ -680,6 +737,8 @@ paths:
                 $ref: "#/components/schemas/Community_CommunityUsersInfo"
         "401":
           description: Unauthorized
+        "422":
+          description: Unprocessable Entity
   /api/v1/users:
     get:
       tags:
@@ -695,7 +754,7 @@ paths:
           type: string
       - name: orderByCreationDate
         in: query
-        required: true
+        required: false
         schema:
           type: boolean
       - name: page
@@ -757,16 +816,16 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: Token refreshed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthResponse"
         "400":
           description: Invalid token
           content:
             '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "200":
+          description: Token refreshed
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/AuthResponse"
   /api/v1/posts/{postId}/replies:
@@ -836,20 +895,20 @@ paths:
                 type: string
         required: true
       responses:
+        "413":
+          description: Payload too large
+        "400":
+          description: Invalid input
+        "403":
+          description: Forbidden
+        "401":
+          description: Unauthorized
         "201":
           description: Reply created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Reply_ReplyInfo"
-        "413":
-          description: Payload too large
-        "400":
-          description: Invalid input
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
   /api/v1/logout:
     post:
       tags:
@@ -887,16 +946,16 @@ paths:
               $ref: "#/components/schemas/LoginRequest"
         required: true
       responses:
-        "200":
-          description: Login successful
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthResponse"
         "400":
           description: Invalid credentials
           content:
             '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "200":
+          description: Login successful
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/AuthResponse"
   /api/v1/communities:
@@ -964,8 +1023,6 @@ paths:
                 type: string
         required: true
       responses:
-        "422":
-          description: Unprocessable Entity
         "201":
           description: Created the community
           content:
@@ -974,10 +1031,12 @@ paths:
                 $ref: "#/components/schemas/Community_CommunityBasicInfo"
         "400":
           description: Bad Request
-        "401":
-          description: Unauthorized
         "409":
           description: Conflict
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
   /api/v1/communities/{communityID}/posts:
     get:
       tags:
@@ -1051,16 +1110,38 @@ paths:
             schema:
               $ref: "#/components/schemas/PostDTO_PostInfo"
       responses:
-        "400":
-          description: Invalid input
         "201":
           description: Post created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Post_PostInfo"
+        "400":
+          description: Invalid input
         "401":
           description: Unauthorized
+  /api/v1/chats/{chatId}/read:
+    post:
+      tags:
+      - api-chat-controller
+      summary: Mark messages in a chat as read
+      operationId: markMessagesAsRead
+      parameters:
+      - name: chatId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Chat not found
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - User not part of this chat
+        "200":
+          description: Messages marked as read
   /api/v1/bans:
     post:
       tags:
@@ -1076,20 +1157,20 @@ paths:
                 type: string
         required: true
       responses:
-        "422":
-          description: Unprocessable Entity
         "404":
           description: Entity not found
+        "403":
+          description: Forbidden
+        "401":
+          description: Unauthorized
         "201":
           description: Banned the user from the community
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Ban_BasicInfo"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
+        "422":
+          description: Unprocessable Entity
   /api/v1/users/{username}/taken:
     get:
       tags:
@@ -1204,14 +1285,14 @@ paths:
           format: int32
           default: 10
       responses:
-        "404":
-          description: User not found
         "200":
           description: Following found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/User_UserBasicView"
+        "404":
+          description: User not found
   /api/v1/users/{username}/followers:
     get:
       tags:
@@ -1239,14 +1320,14 @@ paths:
           format: int32
           default: 10
       responses:
+        "404":
+          description: User not found
         "200":
           description: Followers found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/User_UserBasicView"
-        "404":
-          description: User not found
   /api/v1/users/{username}/communities:
     get:
       tags:
@@ -1281,14 +1362,14 @@ paths:
           format: int32
           default: 10
       responses:
-        "400":
-          description: Bad Request
         "200":
           description: Communities found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community_CommunitiesBasicView"
+        "400":
+          description: Bad Request
         "404":
           description: User not found
   /api/v1/users/{username}/communities/count:
@@ -1340,7 +1421,7 @@ paths:
           type: string
       responses:
         "200":
-          description: User is following
+          description: User is not following
           content:
             application/json:
               schema:
@@ -1400,6 +1481,56 @@ paths:
                 $ref: "#/components/schemas/User_UserBasicView"
         "404":
           description: Users not found
+  /api/v1/users/most-disliked:
+    get:
+      tags:
+      - api-user-controller
+      summary: Get users with most dislikes
+      operationId: getMostDislikedUsers
+      parameters:
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Users found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+        "404":
+          description: Users not found
+        "401":
+          description: Unauthorized
+  /api/v1/users/most-banned:
+    get:
+      tags:
+      - api-user-controller
+      summary: Get users with most bans
+      operationId: getMostBannedUsers
+      parameters:
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Users found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_UserBasicView"
+        "404":
+          description: Users not found
+        "401":
+          description: Unauthorized
   /api/v1/users/me:
     get:
       tags:
@@ -1407,16 +1538,16 @@ paths:
       summary: Get current user
       operationId: getCurrentUser
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: User not found
         "200":
           description: User found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/User_UserBasicView"
+        "404":
+          description: User not found
+        "401":
+          description: Unauthorized
   /api/v1/users/me/following/posts/most-liked:
     get:
       tags:
@@ -1507,6 +1638,43 @@ paths:
                 $ref: "#/components/schemas/Post_PostInfo"
         "204":
           description: Posts not found
+  /api/v1/users/bans:
+    get:
+      tags:
+      - api-user-controller
+      summary: Search users and sort by banCount (admin only)
+      operationId: searchUsersOrderByBanCount
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Users found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_BanInfo"
+        "404":
+          description: Users not found
+        "401":
+          description: Unauthorized
   /api/v1/test:
     get:
       tags:
@@ -1747,6 +1915,8 @@ paths:
       responses:
         "404":
           description: Community not found
+        "400":
+          description: Missing parameter
         "204":
           description: No content
         "200":
@@ -1755,8 +1925,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community_CommunityUsersInfo"
-        "400":
-          description: Missing parameter
   /api/v1/communities/{id}/moderators:
     get:
       tags:
@@ -1830,8 +1998,6 @@ paths:
           format: int32
           default: 10
       responses:
-        "422":
-          description: Unprocessable Entity
         "404":
           description: Entity not found
         "401":
@@ -1842,6 +2008,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community_CommunityBasicInfo"
+        "422":
+          description: Unprocessable Entity
   /api/v1/communities/most-popular/posts/most-recent:
     get:
       tags:
@@ -1902,6 +2070,80 @@ paths:
                 $ref: "#/components/schemas/Post_PostInfo"
         "204":
           description: Posts not found
+  /api/v1/chats:
+    get:
+      tags:
+      - api-chat-controller
+      summary: Get user's chats
+      operationId: getUserChats
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "404":
+          description: No chats found
+        "200":
+          description: Chats found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chat_ChatListBasicView"
+        "401":
+          description: Unauthorized
+  /api/v1/chats/{chatId}/messages:
+    get:
+      tags:
+      - api-chat-controller
+      summary: Get messages from a specific chat
+      operationId: getChatMessages
+      parameters:
+      - name: chatId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Chat not found
+        "200":
+          description: Messages found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message_ChatMessageView"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - User not part of this chat
+  /api/v1/chats/unread-count:
+    get:
+      tags:
+      - api-chat-controller
+      summary: Get count of unread messages
+      operationId: getUnreadCount
+      responses:
+        "401":
+          description: Unauthorized
+        "200":
+          description: Unread count retrieved
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
   /api/v1/bans/{id}:
     get:
       tags:
@@ -1921,8 +2163,6 @@ paths:
         schema:
           type: string
       responses:
-        "422":
-          description: Unprocessable Entity
         "404":
           description: Entity not found
         "200":
@@ -1933,6 +2173,8 @@ paths:
                 $ref: "#/components/schemas/Community_CommunityBanInfo"
         "401":
           description: Unauthorized
+        "422":
+          description: Unprocessable Entity
     delete:
       tags:
       - api-community-controller
@@ -1946,8 +2188,6 @@ paths:
           type: integer
           format: int64
       responses:
-        "422":
-          description: Unprocessable Entity
         "404":
           description: Entity not found
         "401":
@@ -1958,6 +2198,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community"
+        "422":
+          description: Unprocessable Entity
   /api/v1/bans/users/{username}/communities/{id}:
     get:
       tags:
@@ -1977,18 +2219,18 @@ paths:
           type: integer
           format: int64
       responses:
-        "422":
-          description: Unprocessable Entity
+        "404":
+          description: User is not banned from the community
         "200":
           description: User is banned from the community
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community_CommunityBanInfo"
-        "404":
-          description: User is not banned from the community
         "401":
           description: Unauthorized
+        "422":
+          description: Unprocessable Entity
   /api/v1/bans/communities/{id}:
     get:
       tags:
@@ -2021,14 +2263,14 @@ paths:
           description: Entity not found
         "204":
           description: No content
-        "401":
-          description: Unauthorized
         "200":
           description: Found the banned users
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Community_CommunityBanInfo"
+        "401":
+          description: Unauthorized
 components:
   schemas:
     LocalTime_UserBasicView:
@@ -2101,6 +2343,86 @@ components:
         fullCreationDate:
           type: string
           format: date-time
+    LocalTime_BanInfo:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        nano:
+          type: integer
+          format: int32
+    Post_BanInfo:
+      type: object
+    Reply_BanInfo:
+      type: object
+    User_BanInfo:
+      type: object
+      properties:
+        username:
+          type: string
+        alias:
+          type: string
+        email:
+          type: string
+        description:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        banCount:
+          type: integer
+          format: int32
+        pfpString:
+          type: string
+        followers:
+          type: integer
+          format: int32
+        following:
+          type: integer
+          format: int32
+        isDisabled:
+          type: boolean
+        disabledUntil:
+          type: string
+          format: date-time
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_BanInfo"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_BanInfo"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_BanInfo"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_BanInfo"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_BanInfo"
+        creationDate:
+          type: string
+          format: date
+        creationTime:
+          $ref: "#/components/schemas/LocalTime_BanInfo"
+        fullCreationDate:
+          type: string
+          format: date-time
+        disabled:
+          type: boolean
     LocalTime_ReplyInfo:
       type: object
       properties:
@@ -2702,6 +3024,9 @@ components:
           type: array
           items:
             type: string
+        banCount:
+          type: integer
+          format: int32
         pfpString:
           type: string
         followers:
@@ -2710,6 +3035,11 @@ components:
         following:
           type: integer
           format: int32
+        isDisabled:
+          type: boolean
+        disabledUntil:
+          type: string
+          format: date-time
         followersList:
           type: array
           items:
@@ -2750,6 +3080,8 @@ components:
         fullCreationDate:
           type: string
           format: date-time
+        disabled:
+          type: boolean
     Community_CommunitiesBasicView:
       type: object
       properties:
@@ -2830,6 +3162,110 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Reply_CommunitiesBasicView"
+    Chat_ChatListBasicView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user1:
+          $ref: "#/components/schemas/User_ChatListBasicView"
+        user2:
+          $ref: "#/components/schemas/User_ChatListBasicView"
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message_ChatListBasicView"
+        lastMessage:
+          $ref: "#/components/schemas/Message_ChatListBasicView"
+        lastMessageTime:
+          type: string
+          format: date-time
+        unreadCount:
+          type: integer
+          format: int64
+    Message_ChatListBasicView:
+      type: object
+      properties:
+        sender:
+          $ref: "#/components/schemas/User_ChatListBasicView"
+        content:
+          type: string
+    Post_ChatListBasicView:
+      type: object
+    Reply_ChatListBasicView:
+      type: object
+    User_ChatListBasicView:
+      type: object
+      properties:
+        username:
+          type: string
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_ChatListBasicView"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_ChatListBasicView"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_ChatListBasicView"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_ChatListBasicView"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_ChatListBasicView"
+    Message_ChatMessageView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        sender:
+          $ref: "#/components/schemas/User_ChatMessageView"
+        receiver:
+          $ref: "#/components/schemas/User_ChatMessageView"
+        content:
+          type: string
+        read:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+    Post_ChatMessageView:
+      type: object
+    Reply_ChatMessageView:
+      type: object
+    User_ChatMessageView:
+      type: object
+      properties:
+        username:
+          type: string
+        upvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_ChatMessageView"
+        downvotedPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_ChatMessageView"
+        likedReplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_ChatMessageView"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post_ChatMessageView"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reply_ChatMessageView"
     Community_CommunityBanInfo:
       type: object
       properties:
