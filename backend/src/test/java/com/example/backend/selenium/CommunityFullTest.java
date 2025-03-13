@@ -157,6 +157,13 @@ class CommunityFullTest {
 
         // Given
         // Wait for the delete button to be both present and clickable
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement deleteCommunityButton = wait.until(elementToBeClickable(By.id("delete-community-btn")));
         
         // Scroll the delete button into view

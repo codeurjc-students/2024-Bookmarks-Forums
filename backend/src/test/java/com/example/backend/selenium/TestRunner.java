@@ -3,7 +3,11 @@ package com.example.backend.selenium;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.Order;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestRunner {
 
     private CommentCreationDeletionTest commentCreationDeletionTest;
@@ -16,6 +20,7 @@ public class TestRunner {
     private SearchTest searchTest;
     private UserCreationDeletionTest userCreationDeletionTest;
     private AdminTest adminTest;
+    private ChatTest chatTest;
 
     @BeforeEach
     public void setup() {
@@ -29,6 +34,7 @@ public class TestRunner {
         userCreationDeletionTest = new UserCreationDeletionTest();
         userEditTest = new UserEditTest();
         adminTest = new AdminTest();
+        chatTest = new ChatTest();
     }
 
     @AfterEach
@@ -43,9 +49,11 @@ public class TestRunner {
         userCreationDeletionTest.teardown();
         userEditTest.teardown();
         adminTest.teardown();
+        chatTest.teardown();
     }
 
     @Test
+    @Order(1)
     public void testCommentCreationDeletion() {
         commentCreationDeletionTest.setupTest();
         commentCreationDeletionTest.commentCreationDeletionTest();
@@ -53,6 +61,7 @@ public class TestRunner {
     }
 
     @Test
+    @Order(2)
     public void testCommunityFull() {
         communityFullTest.setupTest();
         communityFullTest.communityFullTest();
@@ -60,6 +69,7 @@ public class TestRunner {
     }
 
     @Test
+    @Order(3)
     public void testLandingLogin() {
         landingLoginTest.setupTest();
         landingLoginTest.landingLoginTest();
@@ -67,6 +77,7 @@ public class TestRunner {
     }
 
     @Test
+    @Order(4)
     public void testPostCreationDeletion() {
         postCreationDeletionTest.setupTest();
         postCreationDeletionTest.postCreationDeletionTest();
@@ -74,6 +85,7 @@ public class TestRunner {
     }
 
     @Test
+    @Order(5)
     public void testPostEdit() {
         postEditTest.setupTest();
         postEditTest.postEditTest();
@@ -81,6 +93,7 @@ public class TestRunner {
     }
 
     @Test
+    @Order(6)
     public void testPostVisit() {
         postVisitTest.setupTest();
         postVisitTest.postVisitTest();
@@ -88,6 +101,7 @@ public class TestRunner {
     }
 
     @Test
+    @Order(7)
     public void testSearch() {
         searchTest.setupTest();
         searchTest.searchTest();
@@ -95,6 +109,7 @@ public class TestRunner {
     }
 
     @Test
+    @Order(8)
     public void testUserCreationDeletion() {
         userCreationDeletionTest.setupTest();
         userCreationDeletionTest.userCreationDeletionTest();
@@ -102,6 +117,7 @@ public class TestRunner {
     }
 
     @Test
+    @Order(9)
     public void testUserEdit() {
         userEditTest.setupTest();
         userEditTest.userEditTest();
@@ -109,9 +125,18 @@ public class TestRunner {
     }
 
     @Test
+    @Order(10)
     public void testAdmin() {
         adminTest.setupTest();
         adminTest.adminTest();
         adminTest.teardown();
+    }
+
+    @Test
+    @Order(11)
+    public void testChat() {
+        chatTest.setupTest();
+        chatTest.chatTest();
+        chatTest.teardown();
     }
 }

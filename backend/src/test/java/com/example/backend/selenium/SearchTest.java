@@ -62,6 +62,13 @@ class SearchTest {
 
         // Then
 
+        // Wait for the search page to load
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement searchPageTitle = wait.until(presenceOfElementLocated(By.className("page-title")));
 
         // Wait for 8 seconds
