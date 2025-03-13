@@ -142,4 +142,19 @@ class LoginAux {
         assertEquals(LOCALHOST + ":" + config.getPort() + "/login", driver.getCurrentUrl(),
                 "URL should be the login page");
     }
+
+    void logoutFromChatPage(WebDriver driver) {
+        driver.findElement(By.id("navbarDropdown")).click();
+        driver.findElement(By.id("logout-navbar-btn")).click();
+
+        // Check that we are redirected to the login page
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(LOCALHOST + ":" + config.getPort() + "/login", driver.getCurrentUrl(),
+                "URL should be the login page");
+    }
 }

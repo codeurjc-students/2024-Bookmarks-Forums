@@ -21,11 +21,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/chats")
-public class ChatController {
+public class APIChatController {
 
     private final ChatService chatService;
 
-    public ChatController(ChatService chatService) {
+    public APIChatController(ChatService chatService) {
         this.chatService = chatService;
     }
 
