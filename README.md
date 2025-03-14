@@ -96,11 +96,13 @@ The backend of the application is structured as follows:
 
 ![Backend Class Diagram](<Readme images/Backend Diagram.png>)
 
-- ![#808080](https://via.placeholder.com/15/808080/000000?text=+) **Grey**: entities.
-- ![#99c8ff](https://via.placeholder.com/15/99c8ff/000000?text=+) **Blue**: repositories.
-- ![#fe7070](https://via.placeholder.com/15/fe7070/000000?text=+) **Red**: services.
-- ![#fddf71](https://via.placeholder.com/15/fddf71/000000?text=+) **Yellow**: REST controllers.
-- ![#7ed886](https://via.placeholder.com/15/7ed886/000000?text=+) **Green**: other controllers.
+- `#eab6ff` Purple: Configurations.
+- `#808080` Grey: entities.
+- `#99c8ff` Blue: repositories.
+- `#fe7070` Red: services.
+- `#fddf71` Yellow: REST controllers.
+- `#7ed886` Green: other controllers.
+
 
 ### iii. Frontend (SPA) diagram
 
@@ -108,10 +110,10 @@ The frontend of the application is structured as follows:
 
 ![Frontend Class Diagram](<Readme images/Frontend Diagram.png>)
 
-- ![#eab6ff](https://via.placeholder.com/15/eab6ff/000000?text=+) **Purple**: components.
-- ![#99c8ff](https://via.placeholder.com/15/99c8ff/000000?text=+) **Blue**: services.
-- ![#fe7070](https://via.placeholder.com/15/fe7070/000000?text=+) **Red**: templates.
-- ![#7ed886](https://via.placeholder.com/15/7ed886/000000?text=+) **Green**: directives.
+- `#eab6ff` Purple: components.
+- `#99c8ff` Blue: services.
+- `#fe7070` Red: templates.
+- `#7ed886` Green: directives.
 
 ### iv. Permissions per kind of user
 
