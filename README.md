@@ -59,19 +59,18 @@ With Bookmarks Forums any user will be able to sign up or login to the forums, c
 
 Apart from what has been mentioned above, Bookmarks Forums will allow set search sorting filters for searching the most popular or recent posts.
 
-Users will be able to create chat rooms to chat between each other.
+Users will be able to create chats to chat between each other.
 
 The main landing page will serve posts and content using an algorithm based on the popularity of posts.
 
 The application will offer charts that will allow users and administrators to easily check the most popular users and more.
 
-Users will receive emails regarding messages or replies to their posts.
+Users will receive emails regarding important updates to their profiles (email and/or password change notifications).
 
 The application will serve a REST API.
 
-Administrators will be able to see the worst behaving users and ban them from the site.
+Administrators will be able to see the worst behaving users and disable their accounts.
 
-❗**The chats and advanced administrator functionalities will be implemented in the v1.0 release of the application.**
 
 ## 5. Other details
 
@@ -89,7 +88,7 @@ For the current version of the application, it has the following entities in its
 
 The users database is separated from Bookmarks to let the users decide whether they want to participate in the forums or not, regardless of having a Bookmarks account.
 
-![Database Entity Relationship Diagram](<Readme images/ER DB Diagram v2.png>)
+![Database Entity Relationship Diagram](<Readme images/ER DB Diagram v3.png>)
 
 ### ii. Backend diagram
 
@@ -137,14 +136,14 @@ These entities have images linked to them:
 ### vi. Graphs and charts
 
 - Users with the most liked content: shown in the landing page as a bar chart.
-- Rate of users registered per day: shown as a line chart in the administrator zone. (This will be implemented in the future as part of the administrator page, with its advanced functionalities).
+- Rate of likes/dislikes and community bans per user: shown as bar charts in the administrator zone.
 
 ### vii. Advanced complementary technology
 
 The aim is to include the following additional technologies to the project:
 
-- Mail notifications will be sent to users that have been directly messaged or replied.
-- Websockets will be used in order to offer real-time notifications for chat messages. (This will be implemented in the future as part of the chat functionality).
+- Mail notifications will be sent to users that have made any changes to their email addresses or password.
+- Websockets will be used in order to offer a real-time chat experience.
 
 ### viii. Other algorithms
 
@@ -238,6 +237,16 @@ _Page for modifying user profile details._
 ![Search Results Screen](<Readme images/Screenshots/Search_page_Screen.png>)
 _Search results page showing search outcomes._
 
+### Administrator page:
+
+![Administrator Screen](<Readme images/Screenshots/Admin_Screen.png>)
+_Administrator page displaying a list of users and two charts that show the ban and dislike count for each user._
+
+### Chat page:
+
+![Chat Screen](<Readme images/Screenshots/Chat_Screen.png>)
+_Chat page displaying a list of chats and an active chat with some messages._
+
 ### Error page:
 
 ![Error Screen](<Readme images/Screenshots/Error_Screen.png>)
@@ -247,9 +256,11 @@ _Error page displayed for invalid actions or pages._
 
 Here is the navigation map of the web application. The map shows the different screens and the possible transitions between them per user permissions.
 
-In this map, the chat and administrator zone are not shown as they will be implemented in the future as advanced functionalities.
 
 ![Navigation Map](<Readme images/Nav Diagram.png>)
+
+⚠️ **The Landing, Chat and Administrator pages are accessible all the time (this last one only if logged as Admin) through the navbar when it is visible. The navbar is visible in all pages except for the Login and Signup ones.**
+
 
 # 9. REST API Documentation
 
