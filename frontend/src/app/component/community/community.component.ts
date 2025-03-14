@@ -271,14 +271,15 @@ export class CommunityComponent implements OnInit {
     });
   }
 
-  loadPosts() {
+  loadPosts(searchTerm?: string) {
     if (this.community) {
       this.communityService
         .getPosts(
           this.community.identifier,
           this.page,
           this.size,
-          this.sortCriteria
+          this.sortCriteria,
+          searchTerm
         )
         .subscribe({
           next: (posts) => {
@@ -557,7 +558,7 @@ export class CommunityComponent implements OnInit {
     this.page = 0;
     this.noMorePosts = false;
     this.loadingMorePosts = true;
-    this.loadPosts();
+    this.loadPosts(this.searchTerm);
     this.loadingMorePosts = false;
   }
 

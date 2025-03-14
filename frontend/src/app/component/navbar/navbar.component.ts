@@ -146,9 +146,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       next: (r) => {
         this.loadedUser = false;
         this.loggedIn = false;
-
-        // reload the page
-        window.location.reload();
+        this.router.navigate(['/']);
       },
       error: (r) => {
         console.error('Error: ' + JSON.stringify(r));

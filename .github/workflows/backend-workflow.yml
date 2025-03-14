@@ -7,11 +7,13 @@ on:
       - main
       - ci-cd
       - feature-chats
+      - fix-UI-UX-patches
   pull_request:
     branches:
       - main
       - ci-cd
       - feature-chats
+      - fix-UI-UX-patches
 jobs:
   rest-tests:
     runs-on: ubuntu-latest

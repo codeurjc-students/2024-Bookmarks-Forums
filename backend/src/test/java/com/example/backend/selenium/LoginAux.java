@@ -50,7 +50,7 @@ class LoginAux {
         // Waits for 3 seconds to allow the page to load
 
         try {
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -124,13 +124,13 @@ class LoginAux {
     }
 
     void logoutFromAdminPage(WebDriver driver) { // This is used to logout from the admin page. Behaves just like
-                                                 // logout, but it redirects to the login page, no navbar is present
+                                                 // logout, but it redirects to the landing page, no navbar is present
 
         driver.findElement(By.id("navbarDropdown")).click();
         driver.findElement(By.id("logout-navbar-btn")).click();
 
-        // Check that we are redirected to the login page by checking that the URL is
-        // the login page
+        // Check that we are redirected to the landing page by checking that the URL is
+        // the landing page
 
         // wait for the page to load
         try {
@@ -139,8 +139,8 @@ class LoginAux {
             e.printStackTrace();
         }
 
-        assertEquals(LOCALHOST + ":" + config.getPort() + "/login", driver.getCurrentUrl(),
-                "URL should be the login page");
+        assertEquals(LOCALHOST + ":" + config.getPort() + "/", driver.getCurrentUrl(),
+                "URL should be the landing page");
     }
 
     void logoutFromChatPage(WebDriver driver) {
@@ -154,7 +154,7 @@ class LoginAux {
             e.printStackTrace();
         }
 
-        assertEquals(LOCALHOST + ":" + config.getPort() + "/login", driver.getCurrentUrl(),
+        assertEquals(LOCALHOST + ":" + config.getPort() + "/", driver.getCurrentUrl(),
                 "URL should be the login page");
     }
 }

@@ -479,12 +479,20 @@ export class NewPostComponent implements OnInit {
   addLink(): void {
     const url = prompt('Enter the URL');
     if (url) {
+      // Ensure the URL has a protocol
+      let finalUrl = url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        finalUrl = 'https://' + url;
+      }
+      
       const selection = window.getSelection();
       if (selection && selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         const selectedText = range.toString() || url;
         const anchor = document.createElement('a');
-        anchor.href = url;
+        anchor.href = finalUrl;
+        anchor.target = '_blank'; // Open in new tab
+        anchor.rel = 'noopener noreferrer'; // Security best practice
         anchor.textContent = selectedText;
         range.deleteContents();
         range.insertNode(anchor);

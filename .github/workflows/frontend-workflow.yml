@@ -6,11 +6,13 @@ on:
       - main
       - ci-cd
       - feature-chats
+      - fix-UI-UX-patches
   pull_request:
     branches:
       - main
       - ci-cd
       - feature-chats
+      - fix-UI-UX-patches
 jobs:
   selenium-tests:
     runs-on: ubuntu-22.04

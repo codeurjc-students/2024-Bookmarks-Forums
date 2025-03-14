@@ -124,6 +124,7 @@
                 <p
                   class="post-container-card-body-text post-content"
                   [innerHTML]="post?.content"
+                  (click)="handleLinkClick($event)"
                 ></p>
               </div>
               <!-- Post image -->
@@ -155,7 +156,7 @@
                 </div>
                 <button
                   id="delete-post-btn"
-                  *ngIf="post?.author?.username === loggedUsername || isAdmin || isCommunityAdmin"
+                  *ngIf="(post?.author?.username === loggedUsername || isAdmin || isCommunityAdmin) && !isUserBanned"
                   class="btn action-btn"
                   title="Eliminar post"
                   (click)="deletePost(post?.identifier)"
@@ -164,7 +165,7 @@
                 </button>
 
                 <button
-                  *ngIf="post?.author?.username === loggedUsername || isAdmin || isCommunityAdmin"
+                  *ngIf="(post?.author?.username === loggedUsername || isAdmin || isCommunityAdmin) && !isUserBanned"
                   id="edit-post-btn"
                   class="btn action-btn"
                   title="Editar post"
@@ -318,6 +319,9 @@
                         id="dropdownMenuButton"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
+                        [disabled]="searchTerm.trim().length > 0"
+                        [title]="searchTerm.trim().length > 0 ? 'Limpia el campo de búsqueda para ordenar los comentarios' : ''"
+                        [ngClass]="{'disabled-sort-button': searchTerm.trim().length > 0}"
                       >
                         {{ selectedOrderText }}
                       </button>

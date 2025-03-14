@@ -623,7 +623,7 @@ progress {
 }
 
 .blockquote-footer::before {
-  content: "— ";
+  content: "— ";
 }
 
 .img-fluid {
@@ -12430,4 +12430,15 @@ header {
 
 .dropdown-item {
   cursor: pointer;
+}
+
+.disabled-sort-button {
+  opacity: 0.65;
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+}
+
+.disabled-sort-button:hover {
+  cursor: not-allowed !important;
+  background-color: var(--branding-forums-dark-grey) !important;
 }

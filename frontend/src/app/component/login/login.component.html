@@ -81,8 +81,8 @@
                   <div *ngIf="errorMessage" class="info-message">
                     <p class="text-danger">{{ errorMessage }}</p>
                   </div>
-                  <div class="form-group">
-                    <a>
+                  <div class="form-group d-flex">
+                    <a class="flex-grow-1 me-2">
                       <input
                         type="submit"
                         id="login-submit"
@@ -91,20 +91,29 @@
                         (click)="logIn(userName.value, userPassword.value)"
                       />
                     </a>
+                    <a>
+                      <button
+                        type="button"
+                        class="form-control btn btn-secondary submit px-3 pill-button"
+                        [routerLink]="['/signup']"
+                      >
+                        Registrarse
+                      </button>
+                    </a>
+                  </div>
+                  <div class="form-group">
+                    <a>
+                      <button
+                        type="button"
+                        class="form-control btn btn-secondary submit px-3 pill-button"
+                        [routerLink]="['/']"
+                      >
+                        Volver a Inicio
+                      </button>
+                    </a>
                   </div>
                   <input type="hidden" name="_csrf" value="" />
                 </form>
-                <div class="form-group">
-                  <a>
-                    <button
-                      type="button"
-                      class="form-control btn btn-secondary submit px-3 pill-button"
-                      [routerLink]="['/signup']"
-                    >
-                      Registrarse
-                    </button>
-                  </a>
-                </div>
               </div>
             </div>
           </div>

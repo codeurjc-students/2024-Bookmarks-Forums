@@ -835,4 +835,24 @@ export class PostComponent implements OnInit {
       this.closeModal();
     }
   }
+
+  handleLinkClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target.tagName === 'A') {
+      event.preventDefault();
+      const href = target.getAttribute('href');
+      if (href && !href.startsWith('/')) {
+        // It's an external link
+        this.openAlertModal(
+          `¿Estás seguro de que quieres visitar ${href}?`,
+          () => {
+            window.open(href, '_blank', 'noopener,noreferrer');
+          }
+        );
+      } else {
+        // It's an internal link, navigate normally
+        window.location.href = href || '/';
+      }
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../services/session.service';
@@ -12,6 +12,7 @@ import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Ban } from '../../models/ban.model';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 Chart.register(...registerables);
 
@@ -21,7 +22,8 @@ Chart.register(...registerables);
   styleUrls: ['./user.component.css', '../../../animations.css'],
   providers: [DatePipe],
 })
-export class UserComponent implements OnInit {
+export class UserComponent implements OnInit, OnDestroy {
+  private routeSubscription: Subscription | undefined;
   showModal: boolean = false;
   showUsersModal: boolean = false;
   usersModalMode: number = 0; // 1 -> followers, 2 -> following
@@ -94,6 +96,37 @@ export class UserComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkIfLoggedIn();
+    
+    // Subscribe to the route parameters
+    this.routeSubscription = this.route.params.subscribe(params => {
+      // Reset the component state
+      this.posts = [];
+      this.page = 0;
+      this.noMorePosts = false;
+      this.following = false;
+      this.followed = false;
+      
+      // Close all modals
+      this.showModal = false;
+      this.showUsersModal = false;
+      this.showCommunitiesModal = false;
+      this.showAlertModal = false;
+      
+      // Clear search field and reset sorting criteria
+      this.searchTerm = '';
+      this.sortCriteria = 'default';
+      this.sortCriteriaText = 'Más antiguos';
+      
+      // Load the new profile
+      this.loadProfile();
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Clean the subscription when the component is destroyed
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
   }
 
   // User profile data (doesn't have to be the logged user)

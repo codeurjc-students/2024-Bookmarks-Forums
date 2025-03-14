@@ -125,6 +125,13 @@ class UserCreationDeletionTest {
         // Go to profile page (check that it redirects to the no user found error page)
         driver.get(LOCALHOST + ":" + port + "/profile/" + username);
 
+        // Wait for 5 seconds to allow the page to load
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement errorTitle = wait.until(presenceOfElementLocated(By.className("error-title")));
         assertEquals("Usuario no encontrado: 404", errorTitle.getText());
 
