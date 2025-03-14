@@ -96,12 +96,12 @@ The backend of the application is structured as follows:
 
 ![Backend Class Diagram](<Readme images/Backend Diagram.png>)
 
-- `#eab6ff` Purple: Configurations.
-- `#808080` Grey: entities.
-- `#99c8ff` Blue: repositories.
-- `#fe7070` Red: services.
-- `#fddf71` Yellow: REST controllers.
-- `#7ed886` Green: other controllers.
+- <span style="color: #eab6ff">Purple</span>: Configurations.
+- <span style="color: #808080">Grey</span>: entities.
+- <span style="color: #99c8ff">Blue</span>: repositories.
+- <span style="color: #fe7070">Red</span>: services.
+- <span style="color: #fddf71">Yellow</span>: REST controllers.
+- <span style="color: #7ed886">Green</span>: other controllers.
 
 
 ### iii. Frontend (SPA) diagram
@@ -110,10 +110,10 @@ The frontend of the application is structured as follows:
 
 ![Frontend Class Diagram](<Readme images/Frontend Diagram.png>)
 
-- `#eab6ff` Purple: components.
-- `#99c8ff` Blue: services.
-- `#fe7070` Red: templates.
-- `#7ed886` Green: directives.
+- <span style="color: #eab6ff">Purple</span>: components.
+- <span style="color: #99c8ff">Blue</span>: services.
+- <span style="color: #fe7070">Red</span>: templates.
+- <span style="color: #7ed886">Green</span>: directives.
 
 ### iv. Permissions per kind of user
 
