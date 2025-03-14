@@ -113,4 +113,23 @@ public class ChatService {
     public Long getUnreadMessageCount(String username) {
         return messageRepository.countUnreadMessagesByUsername(username);
     }
+
+    public Chat getChatById(Long chatId) {
+        return chatRepository.findById(chatId).orElse(null);
+    }
+
+    @Transactional
+    public void deleteChat(Long chatId, String username) {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new IllegalArgumentException("Chat not found"));
+
+        // Verify user is part of this chat
+        if (!chat.getUser1().getUsername().equals(username) && 
+            !chat.getUser2().getUsername().equals(username)) {
+            throw new IllegalArgumentException("User not authorized to delete this chat");
+        }
+
+        // Delete the chat (this will cascade delete all messages due to the @OnDelete annotation)
+        chatRepository.delete(chat);
+    }
 } 

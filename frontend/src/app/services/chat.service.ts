@@ -159,4 +159,16 @@ export class ChatService {
   getMessages(): Observable<Message> {
     return this.messageSubject.asObservable();
   }
+
+  deleteChat(chatId: number): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/${chatId}`)
+      .pipe(
+        map(() => {
+          // After deleting the chat, get updated unread count
+          this.http.get<number>(`${this.API_URL}/unread-count`).subscribe(
+            count => this.unreadCountSubject.next(count)
+          );
+        })
+      );
+  }
 } 

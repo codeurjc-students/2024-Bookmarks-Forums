@@ -11,6 +11,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
 import java.util.List;
@@ -141,6 +142,57 @@ class ChatTest {
         // Test active chat highlighting
         WebElement activeChat = wait.until(presenceOfElementLocated(By.cssSelector(".chat-item.active")));
         assertTrue(activeChat.isDisplayed(), "Active chat should be highlighted");
+
+        // Test chat deletion
+        // First, get the initial number of chats
+        List<WebElement> initialChats = driver.findElements(By.className("chat-item"));
+        int initialChatCount = initialChats.size();
+
+        // Find and click the delete button on the first chat
+        WebElement firstChatItem = wait.until(presenceOfElementLocated(By.className("chat-item")));
+        // Create Actions object to perform hover
+        Actions actions = new Actions(driver);
+        actions.moveToElement(firstChatItem).perform();
+        
+        // Now wait for and click the delete button
+        WebElement deleteButton = wait.until(elementToBeClickable(By.className("delete-chat-btn")));
+        deleteButton.click();
+
+        // Wait for and confirm the deletion in the alert modal
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        WebElement alertModal = wait.until(presenceOfElementLocated(By.id("alertModal")));
+        assertTrue(alertModal.isDisplayed(), "Alert modal should be visible");
+
+        // Click confirm button in the alert modal
+        WebElement confirmButton = wait.until(elementToBeClickable(By.id("confirm-btn")));
+        confirmButton.click();
+
+        // Wait for the chat to be removed from the list
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        wait.until((ExpectedCondition<Boolean>) driver -> {
+            List<WebElement> currentChats = driver.findElements(By.className("chat-item"));
+            return currentChats.size() < initialChatCount;
+        });
+
+        // Verify the chat was removed
+        List<WebElement> remainingChats = driver.findElements(By.className("chat-item"));
+        assertEquals(initialChatCount - 1, remainingChats.size(), "Chat count should be reduced by 1");
+
+        // Verify the current chat view is cleared
+        WebElement noChatSelected = wait.until(presenceOfElementLocated(By.className("no-chat-selected")));
+        assertTrue(noChatSelected.isDisplayed(), "No chat selected message should be visible");
 
         // Logout
         loginAux.logoutFromChatPage(driver);

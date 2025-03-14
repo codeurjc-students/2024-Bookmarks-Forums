@@ -9,6 +9,7 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class RESTChatTest {
 
     @LocalServerPort
@@ -26,6 +27,7 @@ class RESTChatTest {
     }
 
     @Test
+    @Order(1)
     void testGetUserChats() {
         // Case 1: Not logged in
         given()
@@ -59,6 +61,7 @@ class RESTChatTest {
     }
 
     @Test
+    @Order(2)
     void testGetChatMessages() {
         // Case 1: Not logged in
         given()
@@ -94,7 +97,7 @@ class RESTChatTest {
                 .when()
                 .get("/chats/999999/messages")
                 .then()
-                .statusCode(400);
+                .statusCode(404);
 
         // Case 2.3: Accessing unauthorized chat messages
         given()
@@ -102,10 +105,11 @@ class RESTChatTest {
                 .when()
                 .get("/chats/4/messages")
                 .then()
-                .statusCode(400);
+                .statusCode(403);
     }
 
     @Test
+    @Order(3)
     void testMarkMessagesAsRead() {
         // Case 1: Not logged in
         given()
@@ -140,7 +144,7 @@ class RESTChatTest {
                 .when()
                 .post("/chats/999999/read")
                 .then()
-                .statusCode(400);
+                .statusCode(404);
 
         // Case 2.3: Marking unauthorized chat messages as read
         given()
@@ -148,10 +152,11 @@ class RESTChatTest {
                 .when()
                 .post("/chats/4/read")
                 .then()
-                .statusCode(400);
+                .statusCode(403);
     }
 
     @Test
+    @Order(4)
     void testGetUnreadCount() {
         // Case 1: Not logged in
         given()
@@ -180,5 +185,52 @@ class RESTChatTest {
                 .then()
                 .statusCode(200)
                 .body(greaterThanOrEqualTo("0")); // Unread count should be non-negative
+    }
+
+    @Test
+    @Order(5)
+    void testDeleteChat() {
+        // Case 1: Not logged in
+        given()
+                .when()
+                .delete("/chats/1")
+                .then()
+                .statusCode(401);
+
+        // Case 2: Logged in user
+        String authCookie = given()
+                .contentType("application/json")
+                .body("{\"username\": \"BookReader_14\", \"password\": \"pass\"}")
+                .when()
+                .post("/login")
+                .then()
+                .statusCode(200)
+                .cookie("AuthToken")
+                .extract()
+                .cookie("AuthToken");
+
+        // Case 2.1: Delete own chat
+        given()
+                .cookie("AuthToken", authCookie)
+                .when()
+                .delete("/chats/1")
+                .then()
+                .statusCode(200);
+
+        // Case 2.2: Delete non-existent chat
+        given()
+                .cookie("AuthToken", authCookie)
+                .when()
+                .delete("/chats/999999")
+                .then()
+                .statusCode(404);
+
+        // Case 2.3: Delete unauthorized chat (chat that user is not part of)
+        given()
+                .cookie("AuthToken", authCookie)
+                .when()
+                .delete("/chats/4")
+                .then()
+                .statusCode(403);
     }
 } 

@@ -46,6 +46,7 @@ header {
   border: 2px solid var(--branding-forums-dark-grey);
   border-radius: 1rem;
   padding: 0.75rem;
+  position: relative;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -349,4 +350,18 @@ header {
 
 .user-profile-link .chat-profile-picture {
   margin-right: 10px;
+}
+
+.delete-chat-btn {
+  display: block !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  top: 0.5rem;
+  right: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.chat-item:hover .delete-chat-btn {
+  opacity: 1 !important;
 }

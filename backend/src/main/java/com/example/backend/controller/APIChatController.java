@@ -76,6 +76,19 @@ public class APIChatController {
     @GetMapping("/{chatId}/messages")
     public ResponseEntity<List<Message>> getChatMessages(HttpServletRequest request, @PathVariable Long chatId) {
         String username = getCurrentUsername(request);
+        
+        // Check if chat exists
+        Chat chat = chatService.getChatById(chatId);
+        if (chat == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Check if user is part of the chat
+        if (!chat.getUser1().getUsername().equals(username) && 
+            !chat.getUser2().getUsername().equals(username)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         List<Message> messages = chatService.getChatMessages(chatId, username);
         return ResponseEntity.ok(messages);
     }
@@ -90,6 +103,19 @@ public class APIChatController {
     @PostMapping("/{chatId}/read")
     public ResponseEntity<Void> markMessagesAsRead(HttpServletRequest request, @PathVariable Long chatId) {
         String username = getCurrentUsername(request);
+        
+        // Check if chat exists
+        Chat chat = chatService.getChatById(chatId);
+        if (chat == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Check if user is part of the chat
+        if (!chat.getUser1().getUsername().equals(username) && 
+            !chat.getUser2().getUsername().equals(username)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         chatService.markMessagesAsRead(chatId, username);
         return ResponseEntity.ok().build();
     }
@@ -105,6 +131,33 @@ public class APIChatController {
     public ResponseEntity<Long> getUnreadCount(HttpServletRequest request) {
         String username = getCurrentUsername(request);
         return ResponseEntity.ok(chatService.getUnreadMessageCount(username));
+    }
+
+    @Operation(summary = "Delete a chat")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Chat deleted successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+        @ApiResponse(responseCode = "403", description = "Forbidden - User not part of this chat", content = @Content),
+        @ApiResponse(responseCode = "404", description = "Chat not found", content = @Content)
+    })
+    @DeleteMapping("/{chatId}")
+    public ResponseEntity<Void> deleteChat(HttpServletRequest request, @PathVariable Long chatId) {
+        String username = getCurrentUsername(request);
+        
+        // Check if chat exists
+        Chat chat = chatService.getChatById(chatId);
+        if (chat == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Check if user is part of the chat
+        if (!chat.getUser1().getUsername().equals(username) && 
+            !chat.getUser2().getUsername().equals(username)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        chatService.deleteChat(chatId, username);
+        return ResponseEntity.ok().build();
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

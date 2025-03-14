@@ -32,6 +32,11 @@ export class ChatComponent implements OnInit, OnDestroy {
   userLoaded: boolean = false;
   recipientUsername: string | null = null;
 
+  // Alert modal state
+  showAlertModal: boolean = false;
+  alertModalText: string = '';
+  confirmAction: () => void = () => {};
+
   constructor(
     private chatService: ChatService,
     private loginService: LoginService,
@@ -409,6 +414,37 @@ export class ChatComponent implements OnInit, OnDestroy {
         code: error.status
       }
     });
+  }
+
+  openAlertModal(text: string, action: () => void) {
+    this.alertModalText = text;
+    this.confirmAction = action;
+    this.showAlertModal = true;
+  }
+
+  closeAlertModal() {
+    this.showAlertModal = false;
+  }
+
+  deleteChat(chatId: number) {
+    this.openAlertModal(
+      '¿Seguro que quieres eliminar este chat? Esta acción no se puede deshacer.',
+      () => {
+        this.chatService.deleteChat(chatId).subscribe({
+          next: () => {
+            // Remove chat from list
+            this.chats = this.chats.filter(chat => chat.id !== chatId);
+            
+            // If the deleted chat was the current chat, clear it
+            if (this.currentChat?.id === chatId) {
+              this.currentChat = null;
+              this.messages = [];
+            }
+          },
+          error: (error) => this.handleError('Error al eliminar el chat', error)
+        });
+      }
+    );
   }
 
   // Profile picture handling

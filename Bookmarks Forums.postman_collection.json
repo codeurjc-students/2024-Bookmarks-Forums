@@ -3398,6 +3398,26 @@
 					"response": []
 				},
 				{
+					"name": "Delete a Chat",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}/api/v1/chats/1",
+							"host": [
+								"{{LOCALHOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"chats",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Unread Count",
 					"request": {
 						"method": "GET",
