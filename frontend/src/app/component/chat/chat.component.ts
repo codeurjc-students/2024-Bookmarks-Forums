@@ -111,7 +111,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     // Load initial chats and handle direct chat opening
     if (this.recipientUsername) {
-      const username = this.recipientUsername; // Store in local variable to avoid null check issues
+      const username = this.recipientUsername;
       this.loadingChats = true;
       this.chatService.getChats(0, this.chatsSize).subscribe({
         next: (response: Chat[]) => {
@@ -360,7 +360,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
     } else if (this.currentChat?.id === 0 && 
               (otherUsername === this.getOtherUser(this.currentChat))) {
-      // New chat was created - reload chats and update current chat
+      // New chat was created, reload chats and update current chat
       this.chatsPage = 0;
       this.loadingChats = true;
       

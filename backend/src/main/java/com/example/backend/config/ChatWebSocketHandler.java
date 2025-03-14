@@ -24,16 +24,33 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        String username = extractUsername(session);
+        String username = (String) session.getAttributes().get("username");
+        if (username == null) {
+            session.close(CloseStatus.POLICY_VIOLATION);
+            return;
+        }
         System.out.println("WebSocket connection established for user: " + username);
         sessions.put(username, session);
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        String authenticatedUsername = (String) session.getAttributes().get("username");
+        if (authenticatedUsername == null) {
+            session.close(CloseStatus.POLICY_VIOLATION);
+            return;
+        }
+
         System.out.println("Received message: " + message.getPayload());
         try {
             ChatMessage chatMessage = objectMapper.readValue(message.getPayload(), ChatMessage.class);
+            
+            // Verify the sender is the authenticated user
+            if (!authenticatedUsername.equals(chatMessage.getSenderUsername())) {
+                session.close(CloseStatus.POLICY_VIOLATION);
+                return;
+            }
+
             System.out.println("Parsed message: sender=" + chatMessage.getSenderUsername() 
                 + ", recipient=" + chatMessage.getRecipientUsername());
             
@@ -56,9 +73,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        String username = extractUsername(session);
-        System.out.println("WebSocket connection closed for user: " + username + " with status: " + status);
-        sessions.remove(username);
+        String username = (String) session.getAttributes().get("username");
+        if (username != null) {
+            System.out.println("WebSocket connection closed for user: " + username + " with status: " + status);
+            sessions.remove(username);
+        }
     }
 
     @Override
@@ -66,14 +85,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         System.err.println("WebSocket transport error: " + exception.getMessage());
         exception.printStackTrace();
         session.close(CloseStatus.SERVER_ERROR);
-    }
-
-    private String extractUsername(WebSocketSession session) {
-        String query = session.getUri().getQuery();
-        if (query != null && query.startsWith("username=")) {
-            return query.substring("username=".length());
-        }
-        throw new IllegalStateException("Username not provided in WebSocket connection");
     }
 
     public static class ChatMessage {

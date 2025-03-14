@@ -19,50 +19,47 @@ export class ChatService {
 
   connect(username: string): void {
     if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
-      console.log('WebSocket already connected');
       return;
     }
 
     this.currentUsername = username;
-    const wsUrl = `/ws/chat?username=${username}`;
-    console.log('Connecting to WebSocket:', wsUrl);
     
-    this.webSocket = new WebSocket(wsUrl);
+    this.http.get('/api/v1/ws-token', { responseType: 'text' }).subscribe({
+      next: (token) => {
+        const wsUrl = `/ws/chat?token=${encodeURIComponent(token)}`;
+        this.webSocket = new WebSocket(wsUrl);
 
-    this.webSocket.onopen = () => {
-      console.log('WebSocket connection established');
-    };
-
-    this.webSocket.onmessage = (event) => {
-      console.log('Received message:', event.data);
-      try {
-        const message = JSON.parse(event.data);
-        // Add sender and receiver objects to match Message interface
-        const formattedMessage: Message = {
-          id: message.id,
-          sender: { username: message.senderUsername },
-          receiver: { username: message.recipientUsername },
-          content: message.content,
-          timestamp: new Date(message.timestamp),
-          read: false
+        this.webSocket.onmessage = (event) => {
+          try {
+            const message = JSON.parse(event.data);
+            const formattedMessage: Message = {
+              id: message.id,
+              sender: { username: message.senderUsername },
+              receiver: { username: message.recipientUsername },
+              content: message.content,
+              timestamp: new Date(message.timestamp),
+              read: false
+            };
+            this.messageSubject.next(formattedMessage);
+          } catch (error) {
+            console.error('Error parsing WebSocket message:', error);
+          }
         };
-        this.messageSubject.next(formattedMessage);
-      } catch (error) {
-        console.error('Error parsing message:', error);
-      }
-    };
 
-    this.webSocket.onclose = (event) => {
-      console.log('WebSocket connection closed. Code:', event.code, 'Reason:', event.reason, 'Clean:', event.wasClean);
-      if (!event.wasClean) {
-        console.log('Attempting to reconnect in 5 seconds...');
-        setTimeout(() => this.connect(username), 5000);
-      }
-    };
+        this.webSocket.onclose = (event) => {
+          if (!event.wasClean) {
+            setTimeout(() => this.connect(username), 5000);
+          }
+        };
 
-    this.webSocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+        this.webSocket.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+      },
+      error: (error) => {
+        console.error('Error getting WebSocket token:', error);
+      }
+    });
   }
 
   disconnect(): void {
@@ -80,10 +77,9 @@ export class ChatService {
         content,
         timestamp: Date.now()
       };
-      console.log('Sending message:', message);
       this.webSocket.send(JSON.stringify(message));
     } else {
-      console.error('WebSocket is not connected. State:', this.webSocket?.readyState);
+      console.error('WebSocket is not connected');
     }
   }
 
@@ -91,14 +87,10 @@ export class ChatService {
     return this.http.get(`${this.API_URL}?page=${page}&size=${size}`, { responseType: 'text' })
       .pipe(
         map(response => {
-          console.log('Raw response:', response);
           try {
-            // Fix the malformed roles array in the JSON string
             const fixedResponse = response.replace(/"roles"\s*:\s*\[\s*\]/g, '"roles": []');
             const parsedResponse = JSON.parse(fixedResponse);
-            console.log('Parsed response:', parsedResponse);
 
-            // Ensure each chat has an unreadCount property
             return parsedResponse.map((chat: Chat) => ({
               ...chat,
               unreadCount: chat.unreadCount || 0,
@@ -107,7 +99,6 @@ export class ChatService {
             }));
           } catch (e) {
             console.error('Error parsing chats response:', e);
-            console.error('Response that failed to parse:', response);
             return [];
           }
         })

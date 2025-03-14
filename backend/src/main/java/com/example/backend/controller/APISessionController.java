@@ -76,4 +76,14 @@ public class APISessionController {
 
         return ResponseEntity.ok(new AuthResponse(AuthResponse.Status.SUCCESS, userLoginService.logout(request, response)));
     }
+
+    @Operation(summary = "Get WebSocket token")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Token generated successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @GetMapping("/ws-token")
+    public ResponseEntity<String> getWebSocketToken(HttpServletRequest request) {
+        return ResponseEntity.ok(userLoginService.generateWebSocketToken(request));
+    }
 }

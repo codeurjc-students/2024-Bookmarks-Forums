@@ -150,6 +150,17 @@ public class UserLoginService {
 		return "logout successfully";
 	}
 
+	public String generateWebSocketToken(HttpServletRequest request) {
+		String username = getUserName();
+		if (username == null) {
+			throw new RuntimeException("User not authenticated");
+		}
+		
+		UserDetails user = userDetailsService.loadUserByUsername(username);
+		Token token = jwtTokenProvider.generateToken(user);
+		return token.getTokenValue();
+	}
+
 	private void addAccessTokenCookie(HttpHeaders httpHeaders, Token token) {
 		httpHeaders.add(HttpHeaders.SET_COOKIE,
 				cookieUtil.createAccessTokenCookie(token.getTokenValue(), token.getDuration()).toString());
