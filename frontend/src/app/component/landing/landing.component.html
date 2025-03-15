@@ -59,11 +59,23 @@
         </div>
       </header>
 
+      <!-- Column toggle for mobile -->
+      <div class="d-lg-none column-toggle-container">
+        <div class="column-toggle" [attr.data-active]="activeColumn">
+          <button [class.active]="activeColumn === 'main'" (click)="setActiveColumn('main')" class="toggle-btn">
+            Contenido principal
+          </button>
+          <button [class.active]="activeColumn === 'side'" (click)="setActiveColumn('side')" class="toggle-btn">
+            Información adicional
+          </button>
+        </div>
+      </div>
+
       <!-- Page content-->
       <div class="container">
         <div class="row justify-content-between">
           <!-- Blog entries-->
-          <div class="col-lg-7">
+          <div class="col-lg-7" [class.d-none]="isMobile && activeColumn === 'side'">
             <!-- Featured post header -->
             <h3 class="fw-semibold mb-4">
               <p
@@ -326,7 +338,7 @@
           </div>
 
           <!-- Side widgets-->
-          <div class="col-lg-4">
+          <div class="col-lg-4" [class.d-none]="isMobile && activeColumn === 'main'">
             <h3
               *ngIf="!loggedIn; else loggedProfilePanelMessage"
               class="fw-semibold mb-4 page-title"

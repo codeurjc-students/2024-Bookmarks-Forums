@@ -85,6 +85,10 @@ export class UserComponent implements OnInit, OnDestroy {
   confirmAction: () => void = () => {};
   showCancelButton: boolean = true;
 
+  // Column toggle properties
+  activeColumn: 'main' | 'side' = 'main';
+  isMobile: boolean = false;
+
   constructor(
     private http: HttpClient,
     public loginService: LoginService,
@@ -94,39 +98,37 @@ export class UserComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private titleService: TitleService
-  ) {}
+  ) {
+    // Check if mobile on init
+    this.checkIfMobile();
+    // Listen for window resize events
+    window.addEventListener('resize', () => this.checkIfMobile());
+  }
 
   ngOnInit(): void {
     this.titleService.setTitle('Perfil');
     this.checkIfLoggedIn();
-    
+
     // Subscribe to the route parameters
-    this.routeSubscription = this.route.params.subscribe(params => {
+    this.routeSubscription = this.route.params.subscribe((params) => {
       // Reset the component state
       this.posts = [];
       this.page = 0;
       this.noMorePosts = false;
       this.following = false;
       this.followed = false;
-      
+
       // Close all modals
       this.showModal = false;
       this.showUsersModal = false;
       this.showCommunitiesModal = false;
       this.showAlertModal = false;
-      
+
       // Clear search field and reset sorting criteria
       this.searchTerm = '';
       this.sortCriteria = 'default';
       this.sortCriteriaText = 'Más antiguos';
     });
-  }
-
-  ngOnDestroy(): void {
-    // Clean the subscription when the component is destroyed
-    if (this.routeSubscription) {
-      this.routeSubscription.unsubscribe();
-    }
   }
 
   // User profile data (doesn't have to be the logged user)
@@ -773,5 +775,23 @@ export class UserComponent implements OnInit, OnDestroy {
       },
       true
     );
+  }
+
+  // Column toggle methods
+  setActiveColumn(column: 'main' | 'side') {
+    this.activeColumn = column;
+  }
+
+  private checkIfMobile() {
+    this.isMobile = window.innerWidth < 992; // 992px is Bootstrap's lg breakpoint
+  }
+
+  ngOnDestroy() {
+    // Clean the subscription when the component is destroyed
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
+    // Remove resize listener when component is destroyed
+    window.removeEventListener('resize', () => this.checkIfMobile());
   }
 }

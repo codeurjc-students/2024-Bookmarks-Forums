@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LoginService } from '../../services/session.service';
 import { PostService } from '../../services/post.service';
@@ -19,7 +19,7 @@ Chart.register(...registerables);
   styleUrls: ['./landing.component.css', '../../../animations.css'],
   providers: [DatePipe],
 })
-export class LandingComponent implements OnInit {
+export class LandingComponent implements OnInit, OnDestroy {
   totalSiteBooks: number | undefined;
   totalSiteGenres: number | undefined;
   totalSiteAuthors: number | undefined;
@@ -53,6 +53,10 @@ export class LandingComponent implements OnInit {
 
   latestGeneralPosts: Post[] = [];
 
+  // Column toggle properties
+  activeColumn: 'main' | 'side' = 'main';
+  isMobile: boolean = false;
+
   constructor(
     private http: HttpClient,
     public loginService: LoginService,
@@ -61,7 +65,12 @@ export class LandingComponent implements OnInit {
     public communityService: CommunityService,
     private router: Router,
     private titleService: TitleService
-  ) {}
+  ) {
+    // Check if mobile on init
+    this.checkIfMobile();
+    // Listen for window resize events
+    window.addEventListener('resize', () => this.checkIfMobile());
+  }
 
   ngOnInit(): void {
     this.titleService.setTitle('Inicio');
@@ -636,5 +645,19 @@ export class LandingComponent implements OnInit {
     } else {
       this.loadMorePostsUser(mode);
     }
+  }
+
+  // Column toggle methods
+  setActiveColumn(column: 'main' | 'side') {
+    this.activeColumn = column;
+  }
+
+  private checkIfMobile() {
+    this.isMobile = window.innerWidth < 992; // 992px is Bootstrap's lg breakpoint
+  }
+
+  ngOnDestroy() {
+    // Remove resize listener when component is destroyed
+    window.removeEventListener('resize', () => this.checkIfMobile());
   }
 }

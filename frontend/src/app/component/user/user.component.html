@@ -104,11 +104,23 @@
       </header>
       <!-- ----------------------------------------------------------------- -->
 
+      <!-- Column toggle for mobile -->
+      <div class="d-lg-none column-toggle-container">
+        <div class="column-toggle" [attr.data-active]="activeColumn">
+          <button [class.active]="activeColumn === 'main'" (click)="setActiveColumn('main')" class="toggle-btn">
+            Posts del usuario
+          </button>
+          <button [class.active]="activeColumn === 'side'" (click)="setActiveColumn('side')" class="toggle-btn">
+            Acerca del usuario
+          </button>
+        </div>
+      </div>
+
       <!-- Page content-->
       <div class="container">
         <div class="row justify-content-between">
           <!-- Posts Column -->
-          <div class="col-lg-7">
+          <div class="col-lg-7" [class.d-none]="isMobile && activeColumn === 'side'">
             <!-- Post search bar and sorting -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
@@ -309,7 +321,7 @@
           </div>
 
           <!-- Profile Info + Actions column -->
-          <div class="col-lg-4">
+          <div class="col-lg-4" [class.d-none]="isMobile && activeColumn === 'main'">
             <!-- Follow / Unfollow widget -->
             <div
               *ngIf="loggedIn && loggedUsername !== profileUser?.username"

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../services/session.service';
@@ -23,7 +23,7 @@ Chart.register(...registerables);
   styleUrls: ['./post.component.css', '../../../animations.css'],
   providers: [DatePipe],
 })
-export class PostComponent implements OnInit {
+export class PostComponent implements OnInit, OnDestroy {
   showModal: boolean = false;
 
   selectedOrderText: string = 'Fecha de creación'; // Default text
@@ -80,6 +80,10 @@ export class PostComponent implements OnInit {
 
   isUserBanned: boolean = false;
 
+  // Column toggle properties
+  activeColumn: 'main' | 'side' = 'main';
+  isMobile: boolean = false;
+
   constructor(
     private http: HttpClient,
     public loginService: LoginService,
@@ -89,7 +93,12 @@ export class PostComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private titleService: TitleService
-  ) {}
+  ) {
+    // Check if mobile on init
+    this.checkIfMobile();
+    // Listen for window resize events
+    window.addEventListener('resize', () => this.checkIfMobile());
+  }
 
   ngOnInit(): void {
     this.titleService.setTitle('Post');
@@ -859,5 +868,19 @@ export class PostComponent implements OnInit {
         window.location.href = href || '/';
       }
     }
+  }
+
+  // Column toggle methods
+  setActiveColumn(column: 'main' | 'side') {
+    this.activeColumn = column;
+  }
+
+  private checkIfMobile() {
+    this.isMobile = window.innerWidth < 992; // 992px is Bootstrap's lg breakpoint
+  }
+
+  ngOnDestroy() {
+    // Remove resize listener when component is destroyed
+    window.removeEventListener('resize', () => this.checkIfMobile());
   }
 }

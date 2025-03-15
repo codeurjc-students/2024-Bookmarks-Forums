@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../services/session.service';
@@ -21,7 +21,7 @@ Chart.register(...registerables);
   styleUrls: ['./community.component.css', '../../../animations.css'],
   providers: [DatePipe],
 })
-export class CommunityComponent implements OnInit {
+export class CommunityComponent implements OnInit, OnDestroy {
   showModal: boolean = false;
 
   selectedOrderText: string = 'Fecha de creación'; // Default text
@@ -102,6 +102,10 @@ export class CommunityComponent implements OnInit {
   userBan: Ban | undefined;
   showUserBanInfo: boolean = false;
 
+  // Column toggle properties
+  activeColumn: 'main' | 'side' = 'main';
+  isMobile: boolean = false;
+
   constructor(
     private http: HttpClient,
     public loginService: LoginService,
@@ -111,7 +115,12 @@ export class CommunityComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private titleService: TitleService
-  ) {}
+  ) {
+    // Check if mobile on init
+    this.checkIfMobile();
+    // Listen for window resize events
+    window.addEventListener('resize', () => this.checkIfMobile());
+  }
 
   ngOnInit(): void {
     this.titleService.setTitle('Comunidad');
@@ -1235,5 +1244,19 @@ export class CommunityComponent implements OnInit {
 
   closeBanInfoModal() {
     this.showUserBanInfo = false;
+  }
+
+  // Column toggle methods
+  setActiveColumn(column: 'main' | 'side') {
+    this.activeColumn = column;
+  }
+
+  private checkIfMobile() {
+    this.isMobile = window.innerWidth < 992; // 992px is Bootstrap's lg breakpoint
+  }
+
+  ngOnDestroy() {
+    // Remove resize listener when component is destroyed
+    window.removeEventListener('resize', () => this.checkIfMobile());
   }
 }

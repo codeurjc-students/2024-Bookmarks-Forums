@@ -120,13 +120,24 @@
           </div>
         </div>
       </header>
-      <!-- ----------------------------------------------------------------- -->
+
+      <!-- Column toggle for mobile -->
+      <div class="d-lg-none column-toggle-container">
+        <div class="column-toggle" [attr.data-active]="activeColumn">
+          <button [class.active]="activeColumn === 'main'" (click)="setActiveColumn('main')" class="toggle-btn">
+            Posts de la comunidad
+          </button>
+          <button [class.active]="activeColumn === 'side'" (click)="setActiveColumn('side')" class="toggle-btn">
+            Acerca de la comunidad
+          </button>
+        </div>
+      </div>
 
       <!-- Page content-->
       <div class="container">
         <div class="row justify-content-between">
-          <!-- Posts Column -->
-          <div class="col-lg-7">
+          <!-- Blog entries-->
+          <div class="col-lg-7" [class.d-none]="isMobile && activeColumn === 'side'">
             <!-- Post search bar and sorting -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
@@ -320,7 +331,7 @@
           </div>
 
           <!-- Community Info + Actions column -->
-          <div class="col-lg-4">
+          <div class="col-lg-4" [class.d-none]="isMobile && activeColumn === 'main'">
             <!-- Community Info widget -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">

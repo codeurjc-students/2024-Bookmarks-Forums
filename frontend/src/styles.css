@@ -1972,6 +1972,10 @@ html {
   margin-bottom: var(--bs-card-group-margin);
 }
 
+.page-title {
+  color: var(--branding-light-grey) !important;
+}
+
 @media (min-width: 576px) {
   .card-group {
     display: flex;
@@ -2020,7 +2024,7 @@ html {
 
   .page-title {
     font-size: 2rem;
-    color: var(--branding-light-grey);
+    color: var(--branding-light-grey) !important;
   }
 
   hr {
@@ -3389,6 +3393,17 @@ html {
 .user-hero-username-alias {
   display: flex;
   flex-direction: row;
+}
+
+@media (max-width: 768px) {
+  .user-hero-username-alias {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .alias-text {
+    margin-left: 2.5rem !important;
+  }
 }
 
 .alias-text {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../services/session.service';
@@ -22,7 +22,7 @@ Chart.register(...registerables);
   styleUrls: ['./search.component.css', '../../../animations.css'],
   providers: [DatePipe],
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
   showModal: boolean = false;
 
   showAdvancedMenu: boolean = false;
@@ -77,6 +77,12 @@ export class SearchComponent implements OnInit {
   userSortCriteria: boolean = false; // true = newest, false = alphabetical
   userSortCriteriaText: string = 'Alfabético';
 
+  // Column toggle properties
+  activeColumn: 'posts' | 'communities' | 'users' = 'posts';
+  isMobile: boolean = false;
+  pillWidth: string = '0px';
+  pillOffset: string = '0px';
+
   constructor(
     private http: HttpClient,
     public loginService: LoginService,
@@ -87,7 +93,12 @@ export class SearchComponent implements OnInit {
     private location: Location,
     private router: Router,
     private titleService: TitleService
-  ) {}
+  ) {
+    // Check if mobile on init
+    this.checkIfMobile();
+    // Listen for window resize events
+    window.addEventListener('resize', () => this.checkIfMobile());
+  }
 
   ngOnInit(): void {
     this.titleService.setTitle('Explorar');
@@ -498,5 +509,33 @@ export class SearchComponent implements OnInit {
     this.loadPosts();
     this.loadCommunities();
     this.loadUsers();
+  }
+
+  // Column toggle methods
+  setActiveColumn(column: 'posts' | 'communities' | 'users') {
+    this.activeColumn = column;
+    // Update pill position after a short delay to ensure DOM is updated
+    setTimeout(() => this.updatePillDimensions(), 0);
+  }
+
+  private checkIfMobile() {
+    this.isMobile = window.innerWidth < 992; // 992px is Bootstrap's lg breakpoint
+    if (this.isMobile) {
+      // Update pill dimensions when switching to mobile
+      setTimeout(() => this.updatePillDimensions(), 0);
+    }
+  }
+
+  private updatePillDimensions() {
+    const activeButton = document.querySelector('.toggle-btn.active') as HTMLElement;
+    if (activeButton) {
+      this.pillWidth = `${activeButton.offsetWidth}px`;
+      this.pillOffset = `${activeButton.offsetLeft}px`;
+    }
+  }
+
+  ngOnDestroy() {
+    // Remove resize listener when component is destroyed
+    window.removeEventListener('resize', () => this.checkIfMobile());
   }
 }

@@ -78,6 +78,22 @@
       </header>
       <!-- ----------------------------------------------------------------- -->
 
+      <!-- Column toggle for mobile -->
+      <div class="d-lg-none column-toggle-container">
+        <div class="column-toggle" [attr.data-active]="activeColumn">
+          <div class="toggle-pill" [style.width]="pillWidth" [style.left]="pillOffset"></div>
+          <button [class.active]="activeColumn === 'posts'" (click)="setActiveColumn('posts')" class="toggle-btn">
+            Posts
+          </button>
+          <button [class.active]="activeColumn === 'communities'" (click)="setActiveColumn('communities')" class="toggle-btn">
+            Comunidades
+          </button>
+          <button [class.active]="activeColumn === 'users'" (click)="setActiveColumn('users')" class="toggle-btn">
+            Usuarios
+          </button>
+        </div>
+      </div>
+
       <!-- Page content-->
       <div class="container">
         <div class="row justify-content-between">
@@ -85,7 +101,7 @@
             <p class="page-title">{{ searchTitle }}</p>
           </h3>
           <!-- Posts Column -->
-          <div class="col-lg-5">
+          <div class="col-lg-5" [class.d-none]="isMobile && activeColumn !== 'posts'">
             <!-- Post search bar and sorting -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
@@ -276,9 +292,8 @@
               </div>
             </div>
           </div>
-          <!-- ----------------------------------------------------------------- -->
           <!-- Communities Column -->
-          <div class="col-lg-4">
+          <div class="col-lg-4" [class.d-none]="isMobile && activeColumn !== 'communities'">
             <!-- Post search bar and sorting -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">
@@ -466,9 +481,8 @@
               </div>
             </div>
           </div>
-          <!-- ----------------------------------------------------------------- -->
           <!-- Users Column -->
-          <div class="col-lg-3">
+          <div class="col-lg-3" [class.d-none]="isMobile && activeColumn !== 'users'">
             <!-- Post search bar and sorting -->
             <div class="card dark-card mb-4">
               <div class="post-container-card-top">

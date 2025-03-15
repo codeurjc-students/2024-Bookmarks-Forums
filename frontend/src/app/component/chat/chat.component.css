@@ -313,6 +313,21 @@ header {
   padding: 0;
 }
 
+/* Add main container height control */
+.main-body-container {
+  min-height: calc(100vh - 56px); /* Subtract navbar height */
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 0; /* Important for Firefox */
+}
+
 .post-container-divider {
   margin-left: 1rem !important;
   margin-right: 1rem !important;
@@ -364,4 +379,127 @@ header {
 
 .chat-item:hover .delete-chat-btn {
   opacity: 1 !important;
+}
+
+/* Update toggle button styles */
+.toggle-chat-list-btn {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  width: auto;
+  height: 40px;
+  border-radius: 0.5rem;
+  background-color: var(--branding-forums-dark-grey);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+  color: var(--branding-light-grey);
+  font-family: 'Poppins', sans-serif;
+}
+
+.toggle-chat-list-btn:hover {
+  background-color: var(--branding-forums-dark-grey-active);
+}
+
+.toggle-chat-list-btn:active {
+  background-color: var(--branding-forums-dark-grey-active);
+}
+
+.toggle-chat-list-btn i {
+  transition: transform 0.3s ease;
+}
+
+.show-chat-list .toggle-chat-list-btn {
+  display: none;
+}
+
+/* Update responsive styles */
+@media (max-width: 991px) {
+  /* Reduce page hero height on mobile */
+  .page-hero .container {
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .page-hero .header-main-text {
+    font-size: 2rem;
+  }
+
+  .page-hero{
+    height: 100px !important;
+  }
+
+  .chat-content {
+    padding-top: 4rem; /* Add space for the toggle button */
+  }
+
+  .chat-content-wrapper {
+    padding-bottom: 2rem; /* Add gap before footer */
+  }
+
+  .chat-columns-container {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 100px); /* Make cards even taller by reducing the subtracted height */
+    overflow: hidden;
+  }
+
+  .chat-list-column,
+  .chat-content-column {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .chat-list-column {
+    transform: translateX(-100%);
+  }
+
+  .chat-content-column {
+    transform: translateX(0);
+  }
+
+  .show-chat-list .chat-list-column {
+    transform: translateX(0);
+  }
+
+  .show-chat-list .chat-content-column {
+    transform: translateX(100%);
+  }
+
+  .col-lg-4,
+  .col-lg-8 {
+    width: 100%;
+    padding: 0;
+    height: 100%;
+  }
+
+  .chat-card,
+  .chat-list-card {
+    margin-bottom: 0 !important;
+    height: 100% !important;
+    border-radius: 1rem !important;
+  }
+
+  .messages-container {
+    height: calc(100% - 100px); /* Adjust for header and input to give more space to messages */
+  }
+
+  .delete-chat-btn {
+    opacity: 1 !important;
+  }
+
+  .chat-item:hover .delete-chat-btn {
+    opacity: 1 !important;
+    background-color: var(--branding-forums-dark-grey-active);
+  }
 }

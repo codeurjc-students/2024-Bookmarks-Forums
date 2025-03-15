@@ -19,6 +19,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   chatsSize: number = 10;
   loadingChats: boolean = false;
   noMoreChats: boolean = false;
+  showChatList: boolean = false;
 
   // Current chat state
   currentChat: Chat | null = null;
@@ -189,6 +190,10 @@ export class ChatComponent implements OnInit, OnDestroy {
     const otherUsername = this.getOtherUser(chat);
     this.titleService.setTitle(`Chat con ${otherUsername}`);
     this.loadMessages(chat.id);
+    // Hide chat list on mobile when opening a chat
+    if (window.innerWidth <= 991) {
+      this.showChatList = false;
+    }
     this.chatService.markMessagesAsRead(chat.id).subscribe({
       next: () => {
         // Update local unread count after marking messages as read
@@ -457,5 +462,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   profilePicture(username: string | undefined): string {
     if (!username) return '';
     return this.userService.getPostImageURL(username);
+  }
+
+  // Add toggle method for chat list
+  toggleChatList() {
+    this.showChatList = !this.showChatList;
   }
 } 

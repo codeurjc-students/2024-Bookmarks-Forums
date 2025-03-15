@@ -111,7 +111,7 @@ body {
   font-size: var(--bs-body-font-size);
   font-weight: var(--bs-body-font-weight);
   line-height: var(--bs-body-line-height);
-  color: var(--bs-body-color);
+  color: var(--branding-light-grey);
   text-align: var(--bs-body-text-align);
   background-color: var(--bs-body-bg);
   -webkit-text-size-adjust: 100%;
@@ -417,6 +417,74 @@ button:not(:disabled),
 
 textarea {
   resize: vertical;
+}
+
+/* Column toggle styles */
+.column-toggle-container {
+  position: sticky;
+  top: 70px; /* Adjust this value based on your navbar height */
+  z-index: 1000;
+  padding-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.column-toggle {
+  background: rgba(33, 37, 41, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 50px;
+  padding: 0.25rem;
+  display: inline-flex;
+  gap: 0.25rem;
+  position: relative;
+}
+
+.toggle-btn {
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  background: transparent;
+  color: var(--branding-white);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+}
+
+.toggle-btn.active {
+  color: var(--branding-dark-grey);
+}
+
+.column-toggle::before {
+  content: '';
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  width: calc(50% - 0.25rem);
+  height: calc(100% - 0.5rem);
+  background-color: var(--branding-peach);
+  border-radius: 50px;
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+.column-toggle[data-active="side"]::before {
+  transform: translateX(100%);
+}
+
+/* Show the container on all screen sizes */
+.column-toggle-container {
+  display: flex !important;
+}
+
+/* Hide the inactive column on mobile */
+@media (max-width: 991.98px) {
+  .d-none {
+    display: none !important;
+  }
 }
 
 fieldset {
