@@ -15,29 +15,154 @@
 
 <div class="gradient-overlay"></div>
 
+<!-- Hamburger Menu Button -->
+<button
+  class="bm-navbar-toggler d-lg-none"
+  type="button"
+  data-bs-toggle="offcanvas"
+  data-bs-target="#navbarOffcanvas"
+  aria-controls="navbarOffcanvas"
+  aria-expanded="false"
+  aria-label="Toggle navigation"
+>
+  <i class="fas fa-bars"></i>
+  <img class="mobile-logo" src="assets/imagotipo.svg" alt="Bookmarks" />
+</button>
+
+<!-- Mobile Profile Button -->
+<div class="mobile-profile-button d-lg-none" *ngIf="loggedIn">
+  <button
+    class="bm-navbar-toggler"
+    type="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    <img
+      class="bm-navbar-profile-picture bm-rounded-circle"
+      *ngIf="loadedUser"
+      [src]="profileImage(username)"
+      alt="Perfil"
+    />
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li [routerLink]="['profile', username]">
+      <a id="my-profile-dropdown-btn" class="dropdown-item">Mi perfil</a>
+    </li>
+    <li>
+      <hr class="dropdown-divider" />
+    </li>
+    <li>
+      <input
+        id="logout-navbar-btn"
+        type="submit"
+        value="Cerrar sesión"
+        class="dropdown-item"
+        (click)="logout()"
+      />
+    </li>
+  </ul>
+</div>
+
+<!-- Off-canvas Menu -->
+<div
+  class="offcanvas offcanvas-start side-panel"
+  tabindex="-1"
+  id="navbarOffcanvas"
+  aria-labelledby="navbarOffcanvasLabel"
+>
+  <div class="offcanvas-header">
+    <a class="bm-navbar-brand" [routerLink]="['/']">
+      <img src="assets/imagotipo.svg" alt="Bookmarks" />
+    </a>
+    <button
+      type="button"
+      class="btn-close text-reset"
+      data-bs-dismiss="offcanvas"
+      aria-label="Close"
+    ></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column">
+    <ul class="bm-navbar-nav">
+      <li class="bm-nav-item" style="cursor: pointer">
+        <a
+          class="bm-nav-link"
+          [routerLink]="['/']"
+          routerLinkActive="underline-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          data-bs-dismiss="offcanvas"
+        >
+          <i class="fa fas fa-home"></i>
+          Inicio
+        </a>
+      </li>
+      <li class="bm-nav-item" style="cursor: pointer">
+        <a
+          id="explore-nav-btn"
+          class="bm-nav-link"
+          [routerLink]="['/search']"
+          routerLinkActive="underline-active"
+          data-bs-dismiss="offcanvas"
+        >
+          <i class="fa fas fa-search"></i>
+          Explorar
+        </a>
+      </li>
+      <li class="bm-nav-item" *ngIf="loggedIn" style="cursor: pointer">
+        <a
+          class="bm-nav-link"
+          [routerLink]="['/chats']"
+          routerLinkActive="underline-active"
+          data-bs-dismiss="offcanvas"
+        >
+          <i class="fa fas fa-comments"></i>
+          Chats
+          <span class="badge bg-danger" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
+        </a>
+      </li>
+      <li class="bm-nav-item" *ngIf="loggedIn">
+        <a
+          class="bm-nav-link"
+          [routerLink]="['/admin']"
+          *ngIf="isAdmin"
+          routerLinkActive="underline-active"
+          data-bs-dismiss="offcanvas"
+        >
+          <i class="bi-gear-fill"></i>
+          Administrador
+        </a>
+      </li>
+      <div class="post-container-divider-container" *ngIf="!loggedIn">
+        <hr class="post-container-divider" />
+      </div>
+      <li class="bm-nav-item">
+        <a
+          id="login-nav-btn"
+          class="bm-nav-link"
+          [routerLink]="['/login']"
+          *ngIf="!loggedIn"
+          routerLinkActive="underline-active"
+          data-bs-dismiss="offcanvas"
+        >
+          <i class="fa fas fa-sign-in-alt"></i>
+          Iniciar sesión
+        </a>
+      </li>
+    </ul>
+    <div class="mt-auto text-center pb-3">
+      <p class="mb-0 copyright-text">Copyright &copy; Bookmarks 2025</p>
+    </div>
+  </div>
+</div>
+
 <nav
-  class="bm-navbar bm-navbar-expand-lg bm-navbar-light bm-bg-dark bm-bg-backdrop-filter navbar-floating"
+  class="bm-navbar bm-navbar-expand-lg bm-navbar-light bm-bg-dark bm-bg-backdrop-filter navbar-floating d-none d-lg-flex"
 >
   <div class="bm-container bm-navbar-px-4 bm-navbar-px-lg-5">
     <!-- Navbar brand (is an image) and has alternative text for when the image does not load-->
     <a class="bm-navbar-brand" [routerLink]="['/']">
       <img src="assets/imagotipo.svg" alt="Bookmarks" />
     </a>
-    <button
-      class="bm-navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="bm-navbar-toggler-icon"></span>
-    </button>
-    <div
-      class="bm-collapse bm-navbar-collapse bm-navbar-menu"
-      id="navbarSupportedContent"
-    >
+    <div class="bm-collapse bm-navbar-collapse bm-navbar-menu">
       <!-- Has to be centered -->
       <ul class="bm-navbar-nav bm-me-auto bm-mb-auto bm-mt-auto bm-ms-auto">
         <!-- Main page option (has little house icon on the left)-->
@@ -80,7 +205,6 @@
         </li>
 
         <!-- Administrator menu option -->
-        <!--{{#admin}} -->
         <li class="bm-nav-item">
           <a
             class="bm-nav-link"
@@ -104,9 +228,7 @@
             Iniciar sesión
           </a>
         </li>
-        <!-- {{/admin}} -->
       </ul>
-      <!-- {{#user}} -->
       <form class="bm-d-flex" method="post" (submit)="logout()">
         <ul class="bm-navbar-nav bm-me-auto bm-mb-lg-0 bm-ms-lg-4">
           <!-- Profile dropdown -->
@@ -151,7 +273,6 @@
           </li>
         </ul>
       </form>
-      <!-- {{/user}} -->
     </div>
   </div>
 </nav>

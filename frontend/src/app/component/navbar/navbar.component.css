@@ -8,19 +8,202 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  height: 5px; /* Adjustable */
+  height: 5px;
   width: 100%;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="5"><circle cx="4" cy="2.5" r="2.5" fill="%23efefef"/><circle cx="15" cy="2.5" r="2.5" fill="%23efefef"/><circle cx="26" cy="2.5" r="2.5" fill="%23efefef"/></svg>');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  margin-top: 5px; /* Adjustable */
+  margin-top: 5px;
 }
 
-.bm-navbar-menu{
+/* Vertical dots for hamburger menu */
+.offcanvas .bm-nav-link.underline-active::after {
+  content: "";
+  position: absolute;
+  left: -0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 30px;
+  width: 5px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="30"><circle cx="2.5" cy="4" r="2.5" fill="%23efefef"/><circle cx="2.5" cy="15" r="2.5" fill="%23efefef"/><circle cx="2.5" cy="26" r="2.5" fill="%23efefef"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  margin-top: 0;
+}
+
+.bm-navbar-menu {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Hamburger Menu Button */
+.bm-navbar-toggler {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1050;
+  padding: 0.75rem;
+  font-size: 1.5rem;
+  color: #efefef;
+  background-color: rgba(42, 43, 46, 0.8);
+  border: none;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  opacity: 1;
+  transform: translateX(0);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: auto;
+  width: auto;
+}
+
+.bm-navbar-toggler .mobile-logo {
+  height: 24px;
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+.bm-navbar-toggler i {
+  font-size: 1.25rem;
+}
+
+.bm-navbar-toggler:hover {
+  background-color: rgba(42, 43, 46, 0.9);
+}
+
+/* Hide hamburger button when offcanvas is shown */
+body:has(.offcanvas.show) .bm-navbar-toggler {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-100%);
+}
+
+/* Off-canvas Menu */
+.offcanvas {
+  background-color: rgba(42, 43, 46, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: none !important;
+}
+
+.offcanvas-header {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.offcanvas-header .btn-close {
+  color: #efefef;
+  filter: invert(1);
+  border: 1px solid transparent;
+}
+
+.btn-close{
+  margin-left: 1rem;
+}
+
+.offcanvas-body {
+  padding: 1rem 0;
+}
+
+.offcanvas .bm-navbar-nav {
+  width: 100%;
+}
+
+.offcanvas .bm-nav-item {
+  width: 100%;
+  position: relative;
+  padding: 0.5rem 1rem;
+}
+
+.offcanvas .bm-nav-link {
+  padding: 0.75rem 1rem;
+  padding-left: 2rem; /* Always reserve space for the dots */
+  color: rgba(239, 239, 239, 0.65);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  border-radius: 12px;
+}
+
+.offcanvas .bm-nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #efefef;
+}
+
+/* Active state styling */
+.offcanvas .bm-nav-link.underline-active {
+  background-color: rgba(248, 221, 164, 0.151);
+  color: #efefef; /* Full white for active items */
+}
+
+/* Restore and reposition the dots for active items */
+.offcanvas .bm-nav-link.underline-active::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 30px;
+  width: 5px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="30"><circle cx="2.5" cy="4" r="2.5" fill="%23efefef"/><circle cx="2.5" cy="15" r="2.5" fill="%23efefef"/><circle cx="2.5" cy="26" r="2.5" fill="%23efefef"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  margin-top: 0;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.offcanvas .bm-nav-link.underline-active::after {
+  opacity: 1;
+}
+
+.offcanvas .bm-nav-link i {
+  width: 20px;
+  text-align: center;
+}
+
+.offcanvas .dropdown-menu {
+  position: static !important;
+  margin: 0;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 12px;
+  background-color: rgba(32, 33, 36, 0.95);
+}
+
+.offcanvas .dropdown-item {
+  padding: 0.75rem 1rem;
+  color: rgba(239, 239, 239, 0.65) !important;
+  border-radius: 8px;
+  margin: 0.25rem 0;
+  transition: all 0.3s ease;
+}
+
+.offcanvas .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #efefef !important;
+}
+
+.offcanvas .dropdown-item.active {
+  background-color: rgba(255, 138, 98, 0.15);
+  color: #efefef !important;
+}
+
+.offcanvas .dropdown-divider {
+  border-color: rgba(255, 255, 255, 0.1);
+  margin: 0;
 }
 
 .dropdown-menu {
@@ -47,14 +230,156 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 80px; /* Adjustable */
+  height: 80px;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease-in-out;
-  z-index: 999; 
+  z-index: 999;
+}
+
+@media (max-width: 991.98px) {
+  .gradient-overlay {
+    height: 120px; /* Increased height for mobile */
+    background: linear-gradient(to bottom, 
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.3) 40%,
+      transparent 100%
+    );
+  }
 }
 
 .bm-navbar {
   z-index: 1000 !important;
 }
+
+.side-panel {
+  background-color: rgba(42, 43, 46, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin-top: 1.5rem;
+  margin-left: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 15px;
+  width: 250px;
+}
+
+/* Mobile Profile Button */
+.mobile-profile-button {
+  position: fixed;
+  top: 1rem;
+  left: 16rem;
+  z-index: 1050;
+  transition: all 0.3s ease;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mobile-profile-button .bm-navbar-toggler {
+  position: relative;
+  top: 0;
+  left: 0;
+  padding: 0.5rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-profile-button .bm-navbar-profile-picture {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.mobile-profile-button .dropdown-menu {
+  position: absolute !important;
+  left: 0 !important;
+  margin-top: 0.5rem;
+  background-color: rgba(42, 43, 46, 0.95) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  min-width: 160px;
+  padding: 0.375rem;
+  border-radius: 10px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+}
+
+.mobile-profile-button .dropdown-item {
+  padding: 0.5rem 0.75rem;
+  color: rgba(239, 239, 239, 0.65) !important;
+  border-radius: 6px;
+  margin: 0.125rem 0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.mobile-profile-button .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #efefef !important;
+}
+
+.mobile-profile-button .dropdown-divider {
+  border-color: rgba(255, 255, 255, 0.1);
+  margin: 0.375rem 0;
+}
+
+.mobile-profile-button input.dropdown-item {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Hide mobile profile button when offcanvas is shown */
+body:has(.offcanvas.show) .mobile-profile-button {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-100%);
+  transition: all 0.3s ease;
+}
+
+/* Common transition class for both buttons */
+.nav-button-hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateX(-20px) !important;
+}
+
+/* Mobile nav spacing */
+@media (max-width: 991.98px) { /* This targets screens smaller than lg breakpoint */
+  :host {
+    display: block;
+    height: 80px; /* Height of the mobile nav area */
+  }
+
+  :host + * {
+    margin-top: 1rem; /* Additional spacing between nav and content */
+  }
+}
+
+.copyright-text {
+  color: rgba(239, 239, 239, 0.5);
+  font-size: 0.875rem;
+}
+
+.post-container-divider-container {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  height: auto !important;
+}
+
+.post-container-divider {
+  margin: auto !important;
+}
+
+
+

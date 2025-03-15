@@ -119,6 +119,32 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
 
     window.addEventListener('scroll', this.onScroll);
+
+    // Add event listeners for offcanvas
+    const offcanvasElement = document.getElementById('navbarOffcanvas');
+    if (offcanvasElement) {
+      offcanvasElement.addEventListener('show.bs.offcanvas', () => {
+        const toggler = document.querySelector('.bm-navbar-toggler') as HTMLElement;
+        const profileButton = document.querySelector('.mobile-profile-button') as HTMLElement;
+        if (toggler) {
+          toggler.classList.add('nav-button-hidden');
+        }
+        if (profileButton) {
+          profileButton.classList.add('nav-button-hidden');
+        }
+      });
+
+      offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
+        const toggler = document.querySelector('.bm-navbar-toggler') as HTMLElement;
+        const profileButton = document.querySelector('.mobile-profile-button') as HTMLElement;
+        if (toggler) {
+          toggler.classList.remove('nav-button-hidden');
+        }
+        if (profileButton) {
+          profileButton.classList.remove('nav-button-hidden');
+        }
+      });
+    }
   }
 
   ngOnDestroy() {
