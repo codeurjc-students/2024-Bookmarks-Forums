@@ -46,14 +46,14 @@
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
     <li [routerLink]="['profile', username]">
-      <a id="my-profile-dropdown-btn" class="dropdown-item">Mi perfil</a>
+      <a id="my-profile-dropdown-btn-mobile" class="dropdown-item">Mi perfil</a>
     </li>
     <li>
       <hr class="dropdown-divider" />
     </li>
     <li>
       <input
-        id="logout-navbar-btn"
+        id="logout-navbar-btn-mobile"
         type="submit"
         value="Cerrar sesión"
         class="dropdown-item"
@@ -97,7 +97,7 @@
       </li>
       <li class="bm-nav-item" style="cursor: pointer">
         <a
-          id="explore-nav-btn"
+          id="explore-nav-btn-mobile"
           class="bm-nav-link"
           [routerLink]="['/search']"
           routerLinkActive="underline-active"
@@ -136,7 +136,7 @@
       </div>
       <li class="bm-nav-item">
         <a
-          id="login-nav-btn"
+          id="login-nav-btn-mobile"
           class="bm-nav-link"
           [routerLink]="['/login']"
           *ngIf="!loggedIn"
