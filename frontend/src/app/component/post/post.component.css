@@ -12510,3 +12510,55 @@ header {
   cursor: not-allowed !important;
   background-color: var(--branding-forums-dark-grey) !important;
 }
+
+/* Mobile styles for the hero section */
+@media screen and (max-width: 768px) {
+  .profile-picture {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .card-community-name-container p {
+    font-size: 1.2rem !important;
+  }
+
+  .post-author-container {
+    gap: 1rem !important;
+    align-items: center !important;
+  }
+
+  .user-hero-username-alias {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+  }
+
+  .hero-username {
+    font-size: 1.5rem !important;
+    margin-left: 0 !important;
+    word-wrap: break-word !important;
+    max-width: 100% !important;
+    margin-bottom: 0 !important;
+    line-height: 1.2 !important;
+  }
+
+  .hero-username p {
+    margin-bottom: 0 !important;
+  }
+
+  .alias-text {
+    font-size: 1rem !important;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    line-height: 1 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .alias-text p {
+    margin-bottom: 0 !important;
+  }
+
+  .header-top-info {
+    font-size: 0.9rem !important;
+  }
+}

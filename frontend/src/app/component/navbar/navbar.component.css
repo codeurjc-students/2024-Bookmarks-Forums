@@ -98,6 +98,12 @@ body:has(.offcanvas.show) .bm-navbar-toggler {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Add size control for the offcanvas logo */
+.offcanvas-header .bm-navbar-brand img {
+  height: 24px;
+  width: auto;
+}
+
 .offcanvas-header .btn-close {
   color: #efefef;
   filter: invert(1);
@@ -296,7 +302,7 @@ body:has(.offcanvas.show) .bm-navbar-toggler {
 
 .mobile-profile-button .dropdown-menu {
   position: absolute !important;
-  left: 0 !important;
+  right: 0 !important; /* Changed from left: 0 to right: 0 */
   margin-top: 0.5rem;
   background-color: rgba(42, 43, 46, 0.95) !important;
   backdrop-filter: blur(10px);

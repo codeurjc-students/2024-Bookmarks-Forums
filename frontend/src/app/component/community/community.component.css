@@ -12451,3 +12451,9 @@ header {
 .post-container-card-top.dimmed{
   background-color: transparent !important;
 }
+
+@media screen and (max-width: 768px) {
+  .card-community-name-container p {
+    font-size: 1.2rem !important;
+  }
+}

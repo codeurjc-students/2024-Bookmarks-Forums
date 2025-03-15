@@ -1039,6 +1039,7 @@ progress {
 }
 
 @media (min-width: 768px) {
+
   .col-md {
     flex: 1 0 0%;
   }
@@ -12429,3 +12430,21 @@ header {
     margin-bottom: 0;
   }
 }
+
+@media (max-width: 768px) {
+
+  #searchTerm{
+    font-size: 1.75rem !important;
+  }
+
+  .search-icon-button{
+    font-size: 1.5rem !important;
+  }
+
+  .clear-icon-button{
+    right: 3.4rem !important;
+    font-size: 1.75rem !important;
+  }
+
+}
+
