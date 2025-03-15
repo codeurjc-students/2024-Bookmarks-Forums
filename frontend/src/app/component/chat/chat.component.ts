@@ -6,7 +6,7 @@ import { Page } from '../../models/page';
 import { Chat, ChatUser } from '../../models/chat';
 import { Message } from '../../models/message';
 import { UserService } from '../../services/user.service';
-
+import { TitleService } from '../../services/title.service';
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
@@ -42,10 +42,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     private loginService: LoginService,
     private userService: UserService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {}
 
   ngOnInit() {
+    this.titleService.setTitle('Chat');
     this.checkIfLoggedIn();
 
     // Check for direct chat parameter
@@ -184,6 +186,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   openChat(chat: Chat) {
     this.currentChat = chat;
+    const otherUsername = this.getOtherUser(chat);
+    this.titleService.setTitle(`Chat con ${otherUsername}`);
     this.loadMessages(chat.id);
     this.chatService.markMessagesAsRead(chat.id).subscribe({
       next: () => {
@@ -213,6 +217,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         unreadCount: 0
       };
       this.messages = [];
+      this.titleService.setTitle(`Chat con ${username}`);
     }
   }
 
@@ -435,10 +440,11 @@ export class ChatComponent implements OnInit, OnDestroy {
             // Remove chat from list
             this.chats = this.chats.filter(chat => chat.id !== chatId);
             
-            // If the deleted chat was the current chat, clear it
+            // If the deleted chat was the current chat, clear it and reset title
             if (this.currentChat?.id === chatId) {
               this.currentChat = null;
               this.messages = [];
+              this.titleService.setTitle('Chat');
             }
           },
           error: (error) => this.handleError('Error al eliminar el chat', error)

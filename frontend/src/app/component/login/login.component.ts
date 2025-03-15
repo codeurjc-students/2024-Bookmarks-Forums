@@ -2,7 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {LoginService} from "../../services/session.service";
 import {Chart, registerables} from "chart.js";
 import {Router} from "@angular/router";
-
+import { TitleService } from '../../services/title.service';
 Chart.register(...registerables);
 
 @Component({
@@ -15,10 +15,12 @@ export class LoginComponent implements OnInit {
   title = "Bookmarks";
   errorMessage: string | null = null;
 
-  constructor(public loginService:LoginService, private router:Router) {
+  constructor(public loginService:LoginService, private router:Router, private titleService: TitleService) {
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.titleService.setTitle('Iniciar sesión');
+  }
 
   logIn(userName: string, userPassword: string) {
     this.loginService.login({ username: userName, password: userPassword }).subscribe({

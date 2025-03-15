@@ -13,6 +13,7 @@ import { DatePipe } from '@angular/common';
 import { Ban } from '../../models/ban.model';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { TitleService } from '../../services/title.service';
 
 Chart.register(...registerables);
 
@@ -91,10 +92,12 @@ export class UserComponent implements OnInit, OnDestroy {
     public postService: PostService,
     public communityService: CommunityService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {}
 
   ngOnInit(): void {
+    this.titleService.setTitle('Perfil');
     this.checkIfLoggedIn();
     
     // Subscribe to the route parameters
@@ -116,9 +119,6 @@ export class UserComponent implements OnInit, OnDestroy {
       this.searchTerm = '';
       this.sortCriteria = 'default';
       this.sortCriteriaText = 'Más antiguos';
-      
-      // Load the new profile
-      this.loadProfile();
     });
   }
 
@@ -140,6 +140,7 @@ export class UserComponent implements OnInit, OnDestroy {
           this.loadPosts();
           this.getPostsCount();
           this.checkFollowing();
+          this.titleService.setTitle(`Perfil de ${user.username}`);
         },
         error: (r) => {
           // if error is 404, user is not found, redirect to error page

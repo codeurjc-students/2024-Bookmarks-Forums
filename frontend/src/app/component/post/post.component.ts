@@ -12,6 +12,8 @@ import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Reply } from '../../models/reply.model';
 import { Router } from '@angular/router';
+import { TitleService } from '../../services/title.service';
+
 
 Chart.register(...registerables);
 
@@ -85,10 +87,12 @@ export class PostComponent implements OnInit {
     public postService: PostService,
     public communityService: CommunityService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {}
 
   ngOnInit(): void {
+    this.titleService.setTitle('Post');
     // Check if user is logged in
     this.checkIfLoggedIn();
   }
@@ -396,6 +400,7 @@ export class PostComponent implements OnInit {
     let postID = Number(this.route.snapshot.paramMap.get('identifier'));
     this.postService.getPostById(Number(postID)).subscribe({
       next: (post) => {
+        this.titleService.setTitle(`${post.title}`);
         this.post = post;
         this.postReplies = post.comments;
         this.loadUserData(this.user); // load the user data

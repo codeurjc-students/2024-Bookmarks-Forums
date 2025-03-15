@@ -13,7 +13,7 @@ import { DatePipe } from '@angular/common';
 import { Ban } from '../../models/ban.model';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-
+import { TitleService } from '../../services/title.service';
 Chart.register(...registerables);
 
 @Component({
@@ -85,10 +85,12 @@ export class SearchComponent implements OnInit {
     public communityService: CommunityService,
     private route: ActivatedRoute,
     private location: Location,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {}
 
   ngOnInit(): void {
+    this.titleService.setTitle('Explorar');
     this.route.queryParams.subscribe((params) => {
       if (!this.searchTerm) {
         this.searchTerm = params['query'] || '';
@@ -466,8 +468,10 @@ export class SearchComponent implements OnInit {
 
   search() {
     if (this.searchTerm.trim() === '') {
+      this.titleService.setTitle('Explorar');
       this.searchTitle = 'Aquí tienes todo Bookmarks Forums';
     } else {
+      this.titleService.setTitle(`Explorar: "${this.searchTerm}"`);
       this.searchTitle = 'Resultados de la búsqueda para: "' + this.searchTerm + '"';
     }
 

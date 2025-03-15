@@ -12,6 +12,8 @@ import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Ban } from '../../models/ban.model';
 import { Router } from '@angular/router';
+import { TitleService } from '../../services/title.service';
+
 
 Chart.register(...registerables);
 
@@ -65,10 +67,12 @@ export class ModifyUserComponent implements OnInit {
     public postService: PostService,
     public communityService: CommunityService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {}
 
   ngOnInit(): void {
+    this.titleService.setTitle('Editor de perfil');
     this.checkIfLoggedIn();
   }
 
@@ -89,6 +93,7 @@ export class ModifyUserComponent implements OnInit {
       this.profileService.getUser(username).subscribe({
         next: (user) => {
           this.profileUser = user;
+          this.titleService.setTitle(`Editor de perfil - ${user.username}`);
           this.currentEmail = user.email;
         },
         error: (r) => {

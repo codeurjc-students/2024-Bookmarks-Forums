@@ -11,7 +11,7 @@ import {Community} from '../../models/community.model';
 import {Chart, registerables} from 'chart.js';
 import {DatePipe} from '@angular/common';
 import {Router} from '@angular/router';
-
+import { TitleService } from '../../services/title.service';
 Chart.register(...registerables);
 
 @Component({
@@ -57,11 +57,13 @@ export class ModifyPostComponent implements OnInit {
     public postService: PostService,
     public communityService: CommunityService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit(): void {
+    this.titleService.setTitle('Editor de post');
     // Check if user is logged in
     this.checkIfLoggedIn();
 

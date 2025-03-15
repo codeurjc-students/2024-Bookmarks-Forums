@@ -4,7 +4,7 @@ import { Chart, registerables } from 'chart.js';
 import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 import { debounceTime, switchMap } from 'rxjs';
-
+import { TitleService } from '../../services/title.service';
 Chart.register(...registerables);
 
 @Component({
@@ -25,9 +25,10 @@ export class SignupComponent implements OnInit {
   passwordControl = new FormControl('');
   confirmPasswordControl = new FormControl('');
 
-  constructor(public userService: UserService, private router: Router) {}
+  constructor(public userService: UserService, private router: Router, private titleService: TitleService) {}
 
   ngOnInit() {
+    this.titleService.setTitle('Crear cuenta');
     this.usernameControl.valueChanges
       .pipe(
         // Debounce time to avoid too many requests

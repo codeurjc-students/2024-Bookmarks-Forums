@@ -63,6 +63,13 @@ class PostCreationDeletionTest {
 
         driver.get(LOCALHOST + ":" + config.getPort() + "/community/1");
 
+        // Wait for 3 seconds
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         WebElement communityName = wait.until(presenceOfElementLocated(By.id("community-name-text")));
         wait.until((ExpectedCondition<Boolean>) driver -> !communityName.getText().isEmpty());
         String community = communityName.getText();

@@ -7,7 +7,7 @@ import { UserService } from '../../services/user.service';
 import { CommunityService } from '../../services/community.service';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
-
+import { TitleService } from '../../services/title.service';
 Chart.register(...registerables);
 
 @Component({
@@ -28,10 +28,12 @@ export class ErrorComponent implements OnInit {
     public profileService: UserService,
     public postService: PostService,
     public communityService: CommunityService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {}
 
   ngOnInit(): void {
+    this.titleService.setTitle('Error');
     this.route.queryParams.subscribe((params) => {
       if (!params['title'] && !params['description']) {
         this.errorTitle = 'Algo ha salido mal';

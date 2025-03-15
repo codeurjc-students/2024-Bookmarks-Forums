@@ -11,7 +11,7 @@ import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-
+import { TitleService } from '../../services/title.service';
 Chart.register(...registerables);
 
 @Component({
@@ -75,10 +75,12 @@ export class ModifyCommunityComponent implements OnInit {
     public postService: PostService,
     public communityService: CommunityService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {}
 
   ngOnInit(): void {
+    this.titleService.setTitle('Editor de comunidad');
     // Check if user is logged in
     this.checkIfLoggedIn();
   }
@@ -122,6 +124,7 @@ export class ModifyCommunityComponent implements OnInit {
     let communityID = Number(this.route.snapshot.paramMap.get('identifier'));
     this.communityService.getCommunityById(communityID).subscribe({
       next: (community) => {
+        this.titleService.setTitle(`Editor de comunidad - ${community.name}`);
         this.community = community;
         this.communityName = community.name;
         this.communityDescription = community.description;

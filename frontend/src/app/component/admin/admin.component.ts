@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LoginService } from '../../services/session.service';
 import { UserService } from '../../services/user.service';
+import { TitleService } from '../../services/title.service';
 import { User } from '../../models/user.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
@@ -34,7 +35,6 @@ export class AdminComponent implements OnInit {
 
   searchTerm: string = '';
 
-  title = 'Bookmarks';
   userLoaded = false;
 
   user: User | undefined;
@@ -83,10 +83,12 @@ export class AdminComponent implements OnInit {
   constructor(
     public loginService: LoginService,
     public profileService: UserService,
-    private readonly router: Router
+    private readonly router: Router,
+    private titleService: TitleService
   ) {}
 
   ngOnInit(): void {
+    this.titleService.setTitle('Administración');
     this.checkIfLoggedIn();
     this.loadBansChart();
     this.loadDislikesChart();

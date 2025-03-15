@@ -12,7 +12,7 @@ import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Ban } from '../../models/ban.model';
 import { Router } from '@angular/router';
-
+import { TitleService } from '../../services/title.service';
 Chart.register(...registerables);
 
 @Component({
@@ -109,10 +109,12 @@ export class CommunityComponent implements OnInit {
     public postService: PostService,
     public communityService: CommunityService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {}
 
   ngOnInit(): void {
+    this.titleService.setTitle('Comunidad');
     this.checkIfLoggedIn();
   }
 
@@ -240,6 +242,7 @@ export class CommunityComponent implements OnInit {
     this.communityService.getCommunityById(communityID).subscribe({
       next: (community) => {
         this.community = community;
+        this.titleService.setTitle(`${community.name}`);
         this.isUserMember();
         this.getMembers();
         this.getMembersCount();

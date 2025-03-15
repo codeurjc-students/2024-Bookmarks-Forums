@@ -10,7 +10,7 @@ import { Community } from '../../models/community.model';
 import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-
+import { TitleService } from '../../services/title.service';
 Chart.register(...registerables);
 
 @Component({
@@ -20,7 +20,6 @@ Chart.register(...registerables);
   providers: [DatePipe],
 })
 export class LandingComponent implements OnInit {
-  title = 'Bookmarks';
   totalSiteBooks: number | undefined;
   totalSiteGenres: number | undefined;
   totalSiteAuthors: number | undefined;
@@ -60,10 +59,12 @@ export class LandingComponent implements OnInit {
     public profileService: UserService,
     public postService: PostService,
     public communityService: CommunityService,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {}
 
   ngOnInit(): void {
+    this.titleService.setTitle('Inicio');
     // This is done to ensure that the URL does not end with a trailing slash so that refreshing the landing page works
     let url = window.location.href;
     url = url.substring(0, url.length - 1);

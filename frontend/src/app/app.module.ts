@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, Title } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -59,7 +59,10 @@ import { ChatComponent } from './component/chat/chat.component';
     ReactiveFormsModule,
     BrowserAnimationsModule,
   ],
-  providers: [provideHttpClient(withInterceptorsFromDi())],
+  providers: [
+    provideHttpClient(withInterceptorsFromDi()),
+    Title
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
