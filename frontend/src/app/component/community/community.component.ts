@@ -905,6 +905,10 @@ export class CommunityComponent implements OnInit, OnDestroy {
   }
 
   reloadAllMembersList() {
+    // First check if logged in to update all permissions
+    this.checkIfLoggedIn();
+
+    // Reset and reload moderators list
     this.moderators = [];
     this.moderatorsPage = 0;
     this.noMoreModerators = false;
@@ -912,6 +916,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
     this.loadModerators();
     this.loadingMoreModerators = false;
 
+    // Reset and reload members list
     this.communityMembers = [];
     this.membersPage = 0;
     this.noMoreMembers = false;
@@ -919,6 +924,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
     this.getMembers();
     this.loadingMoreMembers = false;
 
+    // Update counts
     this.getMembersCount();
   }
 

@@ -190,7 +190,7 @@
                   [ngClass]="{ 'active-icon-btn': upvoted }"
                   title="Me gusta"
                   (click)="upvotePost(post?.identifier)"
-                  [disabled]="!loggedIn || isUserBanned"
+                  [disabled]="!loggedIn || isUserBanned || postVotingDisabled"
                 >
                   <i class="far fa-thumbs-up" [ngClass]="{ fas: upvoted }"></i>
                 </button>
@@ -207,7 +207,7 @@
                   [ngClass]="{ 'active-icon-btn': downvoted }"
                   title="No me gusta"
                   (click)="downvotePost(post?.identifier)"
-                  [disabled]="!loggedIn || isUserBanned"
+                  [disabled]="!loggedIn || isUserBanned || postVotingDisabled"
                 >
                   <i
                     class="far fa-thumbs-down flip-horizontal"
@@ -436,7 +436,7 @@
                         }"
                         title="Me gusta"
                         (click)="upvoteReply(reply.identifier)"
-                        [disabled]="!loggedIn || isUserBanned"
+                        [disabled]="!loggedIn || isUserBanned || disabledReplyVotes.has(reply.identifier)"
                       >
                         <i
                           class="far fa-thumbs-up"

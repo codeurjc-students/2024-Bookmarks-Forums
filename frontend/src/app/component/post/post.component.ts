@@ -42,6 +42,10 @@ export class PostComponent implements OnInit, OnDestroy {
   upvoted: boolean = false;
   downvoted: boolean = false;
 
+  // Add tracking for disabled states
+  postVotingDisabled: boolean = false;
+  disabledReplyVotes: Set<number> = new Set<number>();
+
   replies: Reply[] = [];
   replyTitle: string = '';
   replyContent: string = '';
@@ -646,35 +650,33 @@ export class PostComponent implements OnInit, OnDestroy {
   }
 
   downvotePost(postId: number | undefined): void {
-    if (!postId) {
-      this.router.navigate(['/error'], {
-        queryParams: {
-          title: 'Error al votar post',
-          description: 'No se ha encontrado el post a votar.',
-          code: 404,
-        },
-      });
+    if (!postId || this.postVotingDisabled) {
       return;
     }
+    
+    // Disable both voting buttons while processing
+    this.postVotingDisabled = true;
+    
     this.postService.editPost(postId, new FormData(), 'downvote').subscribe({
       next: () => {
         if (this.upvoted) {
-          // If the post was upvoted, remove the upvote and add a downvote
           this.upvotes -= 1;
           this.upvoted = false;
           this.downvotes += 1;
           this.downvoted = true;
         } else if (this.downvoted) {
-          // If the post was already downvoted, remove the downvote
           this.downvotes -= 1;
           this.downvoted = false;
         } else {
-          // If the post was not voted, add a downvote
           this.downvotes += 1;
           this.downvoted = true;
         }
+        // Re-enable voting buttons after successful update
+        this.postVotingDisabled = false;
       },
       error: (r) => {
+        // Re-enable voting buttons on error
+        this.postVotingDisabled = false;
         this.router.navigate(['/error'], {
           queryParams: {
             title: 'Error al votar post',
@@ -687,35 +689,33 @@ export class PostComponent implements OnInit, OnDestroy {
   }
 
   upvotePost(postId: number | undefined): void {
-    if (!postId) {
-      this.router.navigate(['/error'], {
-        queryParams: {
-          title: 'Error al votar post',
-          description: 'No se ha encontrado el post a votar.',
-          code: 404,
-        },
-      });
+    if (!postId || this.postVotingDisabled) {
       return;
     }
+    
+    // Disable both voting buttons while processing
+    this.postVotingDisabled = true;
+    
     this.postService.editPost(postId, new FormData(), 'upvote').subscribe({
       next: () => {
         if (this.downvoted) {
-          // If the post was downvoted, remove the downvote and add an upvote
           this.downvotes -= 1;
           this.downvoted = false;
           this.upvotes += 1;
           this.upvoted = true;
         } else if (this.upvoted) {
-          // If the post was already upvoted, remove the upvote
           this.upvotes -= 1;
           this.upvoted = false;
         } else {
-          // If the post was not voted, add an upvote
           this.upvotes += 1;
           this.upvoted = true;
         }
+        // Re-enable voting buttons after successful update
+        this.postVotingDisabled = false;
       },
       error: (r) => {
+        // Re-enable voting buttons on error
+        this.postVotingDisabled = false;
         this.router.navigate(['/error'], {
           queryParams: {
             title: 'Error al votar post',
@@ -732,9 +732,13 @@ export class PostComponent implements OnInit, OnDestroy {
   }
 
   upvoteReply(replyID: number) {
-    if (!this.user) {
+    if (!this.user || this.disabledReplyVotes.has(replyID)) {
       return;
     }
+
+    // Disable the reply's vote button while processing
+    this.disabledReplyVotes.add(replyID);
+    
     this.postService.likeReply(replyID, 'like').subscribe({
       next: () => {
         this.replies = this.replies.map((reply) => {
@@ -749,8 +753,12 @@ export class PostComponent implements OnInit, OnDestroy {
           }
           return reply;
         });
+        // Re-enable the reply's vote button after successful update
+        this.disabledReplyVotes.delete(replyID);
       },
       error: (r) => {
+        // Re-enable the reply's vote button on error
+        this.disabledReplyVotes.delete(replyID);
         this.router.navigate(['/error'], {
           queryParams: {
             title: 'Error al votar respuesta',
