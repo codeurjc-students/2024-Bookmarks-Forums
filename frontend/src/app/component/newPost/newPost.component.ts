@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../services/session.service';
@@ -21,6 +21,7 @@ Chart.register(...registerables);
   providers: [DatePipe],
 })
 export class NewPostComponent implements OnInit {
+  @ViewChild('toolbar') toolbar!: ElementRef;
   showModal: boolean = false;
   showAlertModal: boolean = false;
   alertModalText: string = '';
@@ -41,6 +42,9 @@ export class NewPostComponent implements OnInit {
   loggedIn: boolean = false;
   isAdmin: boolean = false;
   isMember: boolean = false;
+
+  showLeftGradient: boolean = false;
+  showRightGradient: boolean = false;
 
   public chart: any;
 
@@ -75,6 +79,22 @@ export class NewPostComponent implements OnInit {
         'input',
         this.updateToolbarButtons.bind(this)
       );
+    }
+  }
+
+  ngAfterViewInit() {
+    this.checkGradients();
+  }
+
+  onToolbarScroll() {
+    this.checkGradients();
+  }
+
+  checkGradients() {
+    if (this.toolbar) {
+      const element = this.toolbar.nativeElement;
+      this.showLeftGradient = element.scrollLeft > 0;
+      this.showRightGradient = element.scrollLeft < (element.scrollWidth - element.clientWidth);
     }
   }
 

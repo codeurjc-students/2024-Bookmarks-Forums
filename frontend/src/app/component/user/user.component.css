@@ -1512,6 +1512,17 @@ progress {
   .header-top-info {
     font-size: 0.9rem !important;
   }
+
+  .card-link .card-community-name-container{
+    padding-left: 0.55rem !important;
+    padding-right: 0.55rem !important;
+    padding-top: 0.3rem !important;
+    padding-bottom: 0.3rem !important;
+  }
+
+  .card-link .card-community-name-container p {
+    font-size: 0.8rem !important;
+  }
 }
 
 @media (min-width: 1200px) {

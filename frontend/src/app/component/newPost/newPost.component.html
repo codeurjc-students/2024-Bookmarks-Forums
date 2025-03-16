@@ -115,56 +115,60 @@
               <div class="post-container-card-body">
                 <!-- Post content toolbar -->
                 <div class="rich-text-editor-container sticky-item">
-                  <div class="rich-text-editor-toolbar">
-                    <button
-                      class="btn toolbar-btn toggle"
-                      title="Negrita"
-                      (click)="applyStyle('bold', $event)"
-                    >
-                      <i class="fas fa-bold"></i>
-                    </button>
-                    <button
-                      class="btn toolbar-btn toggle"
-                      title="Cursiva"
-                      (click)="applyStyle('italic', $event)"
-                    >
-                      <i class="fas fa-italic"></i>
-                    </button>
-                    <button
-                      class="btn toolbar-btn toggle"
-                      title="Subrayado"
-                      (click)="applyStyle('underline', $event)"
-                    >
-                      <i class="fas fa-underline"></i>
-                    </button>
-                    <button
-                      class="btn toolbar-btn toggle"
-                      title="Tachado"
-                      (click)="applyStyle('strikethrough', $event)"
-                    >
-                      <i class="fas fa-strikethrough"></i>
-                    </button>
-                    <button
-                      class="btn toolbar-btn"
-                      title="Añadir enlace"
-                      (click)="addLink()"
-                    >
-                      <i class="fas fa-link"></i>
-                    </button>
-                    <button
-                      class="btn toolbar-btn"
-                      title="Añadir lista"
-                      (click)="applyTextList('unorderedList', $event)"
-                    >
-                      <i class="fas fa-list-ul"></i>
-                    </button>
-                    <button
-                      class="btn toolbar-btn"
-                      title="Añadir lista numerada"
-                      (click)="applyTextList('orderedList', $event)"
-                    >
-                      <i class="fas fa-list-ol"></i>
-                    </button>
+                  <div class="toolbar-gradient-wrapper">
+                    <div class="gradient-overlay left" [class.active]="showLeftGradient"></div>
+                    <div class="gradient-overlay right" [class.active]="showRightGradient"></div>
+                    <div class="rich-text-editor-toolbar" #toolbar (scroll)="onToolbarScroll()">
+                      <button
+                        class="btn toolbar-btn toggle"
+                        title="Negrita"
+                        (click)="applyStyle('bold', $event)"
+                      >
+                        <i class="fas fa-bold"></i>
+                      </button>
+                      <button
+                        class="btn toolbar-btn toggle"
+                        title="Cursiva"
+                        (click)="applyStyle('italic', $event)"
+                      >
+                        <i class="fas fa-italic"></i>
+                      </button>
+                      <button
+                        class="btn toolbar-btn toggle"
+                        title="Subrayado"
+                        (click)="applyStyle('underline', $event)"
+                      >
+                        <i class="fas fa-underline"></i>
+                      </button>
+                      <button
+                        class="btn toolbar-btn toggle"
+                        title="Tachado"
+                        (click)="applyStyle('strikethrough', $event)"
+                      >
+                        <i class="fas fa-strikethrough"></i>
+                      </button>
+                      <button
+                        class="btn toolbar-btn"
+                        title="Añadir enlace"
+                        (click)="addLink()"
+                      >
+                        <i class="fas fa-link"></i>
+                      </button>
+                      <button
+                        class="btn toolbar-btn"
+                        title="Añadir lista"
+                        (click)="applyTextList('unorderedList', $event)"
+                      >
+                        <i class="fas fa-list-ul"></i>
+                      </button>
+                      <button
+                        class="btn toolbar-btn"
+                        title="Añadir lista numerada"
+                        (click)="applyTextList('orderedList', $event)"
+                      >
+                        <i class="fas fa-list-ol"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <!-- Post content (textarea with placeholder)-->

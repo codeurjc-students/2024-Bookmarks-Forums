@@ -2707,6 +2707,51 @@ html {
   max-width: max-content;
 }
 
+.toolbar-gradient-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.gradient-overlay {
+  display: none; /* Hide by default on desktop */
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.gradient-overlay.active {
+  opacity: 1;
+}
+
+.gradient-overlay.left {
+  left: 0;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  background: linear-gradient(to right, rgba(42, 43, 46, 0.8) 0%, rgba(42, 43, 46, 0) 100%);
+  height: 60px;
+}
+
+.gradient-overlay.right {
+  right: 0;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  background: linear-gradient(to left, rgba(42, 43, 46, 0.8) 0%, rgba(42, 43, 46, 0) 100%);
+  height: 60px;
+}
+
+@media screen and (max-width: 768px) {
+  .gradient-overlay {
+    display: block; /* Only show on mobile */
+    height: 100%;
+  }
+}
+
 .rich-text-editor-container {
   display: flex;
   flex-direction: column;
@@ -2727,6 +2772,47 @@ html {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+
+/* Mobile view styles */
+@media screen and (max-width: 768px) {
+  .rich-text-editor-toolbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    white-space: nowrap;
+  }
+
+  .rich-text-editor-toolbar .toolbar-btn {
+    width: 2.5rem !important;
+
+  }
+
+  .rich-text-editor-toolbar .toolbar-btn i {
+    font-size: 0.9rem;
+  }
+
+  .rich-text-editor-toolbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  .toolbar-btn {
+    flex: 0 0 auto;
+    margin-right: 0.5rem;
+  }
+
+  .card-community-name-container{
+    padding-left: 0.55rem !important;
+    padding-right: 0.55rem !important;
+    padding-top: 0.3rem !important;
+    padding-bottom: 0.3rem !important;
+  }
+
+  .card-community-name-container p {
+    font-size: 0.8rem !important;
+  }
 }
 
 .toolbar-btn {
