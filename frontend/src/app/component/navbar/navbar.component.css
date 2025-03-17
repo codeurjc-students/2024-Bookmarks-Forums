@@ -242,14 +242,15 @@ body:has(.offcanvas.show) .bm-navbar-toggler {
   pointer-events: none;
   transition: opacity 0.3s ease-in-out;
   z-index: 999;
+  display: block;
 }
 
 @media (max-width: 991.98px) {
   .gradient-overlay {
-    height: 120px; /* Increased height for mobile */
+    height: 160px; /* Increased height for mobile to cover column switchers */
     background: linear-gradient(to bottom, 
       rgba(0, 0, 0, 0.5) 0%,
-      rgba(0, 0, 0, 0.3) 40%,
+      rgba(0, 0, 0, 0.356) 40%,
       transparent 100%
     );
   }

@@ -3799,3 +3799,7 @@ html {
   height: 100%;
 
 }
+
+.column-toggle{
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.308) !important;
+}

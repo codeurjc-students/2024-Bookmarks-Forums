@@ -128,9 +128,6 @@ export class UserComponent implements OnInit, OnDestroy {
       this.searchTerm = '';
       this.sortCriteria = 'default';
       this.sortCriteriaText = 'Más antiguos';
-
-      // Load the new profile data
-      this.loadProfile();
     });
   }
 

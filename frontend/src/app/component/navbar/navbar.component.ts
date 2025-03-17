@@ -157,10 +157,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   onScroll = () => {
     const gradientOverlay = document.querySelector('.gradient-overlay') as HTMLElement;
-    const navbar = document.querySelector('.bm-navbar') as HTMLElement;
     const scrollTop = window.scrollY;
 
-    if (scrollTop > navbar.offsetHeight) {
+    if (scrollTop > 0) {
       gradientOverlay.style.opacity = '1';
     } else {
       gradientOverlay.style.opacity = '0';
