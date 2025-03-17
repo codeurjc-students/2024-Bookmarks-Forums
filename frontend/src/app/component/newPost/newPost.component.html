@@ -318,5 +318,43 @@
         </div>
       </div>
     </div>
+
+    <!-- Hyperlink modal -->
+    <div id="hyperlinkModal" class="custom-modal" [ngClass]="{ show: showHyperlinkModal }">
+      <div class="custom-modal-content no-scroll">
+        <div class="custom-modal-header">
+          <span class="action-btn close" (click)="closeHyperlinkModal()">
+            <i class="fas fa-times"></i>
+          </span>
+        </div>
+        <div class="custom-modal-body">
+          <p class="alert-modal-text">Introduce la URL del enlace:</p>
+          <input
+            type="text"
+            class="form-control mb-2 input-field reply-title-input"
+            placeholder="https://ejemplo.com"
+            maxlength="500"
+            [(ngModel)]="hyperlinkURL"
+            (keyup.enter)="insertHyperlink(); closeHyperlinkModal()"
+          />
+          <div class="alert-modal-buttons">
+            <button
+              class="btn primary-btn"
+              title="Insertar enlace"
+              (click)="insertHyperlink(); closeHyperlinkModal()"
+            >
+              <i class="fas fa-link"></i> Insertar
+            </button>
+            <button
+              class="btn primary-btn"
+              title="Cancelar"
+              (click)="closeHyperlinkModal()"
+            >
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

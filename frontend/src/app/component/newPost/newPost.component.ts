@@ -24,9 +24,12 @@ export class NewPostComponent implements OnInit {
   @ViewChild('toolbar') toolbar!: ElementRef;
   showModal: boolean = false;
   showAlertModal: boolean = false;
+  showHyperlinkModal: boolean = false;
+  hyperlinkURL: string = '';
   alertModalText: string = '';
   confirmAction: () => void = () => {};
   showCancelButton: boolean = true;
+  savedSelection: Range | null = null;
 
   post: Post | undefined;
   community: Community | undefined;
@@ -499,27 +502,75 @@ export class NewPostComponent implements OnInit {
   }
 
   addLink(): void {
-    const url = prompt('Enter the URL');
-    if (url) {
-      // Ensure the URL has a protocol
-      let finalUrl = url;
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        finalUrl = 'https://' + url;
-      }
-      
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const selectedText = range.toString() || url;
-        const anchor = document.createElement('a');
-        anchor.href = finalUrl;
-        anchor.target = '_blank'; // Open in new tab
-        anchor.rel = 'noopener noreferrer'; // Security best practice
-        anchor.textContent = selectedText;
-        range.deleteContents();
-        range.insertNode(anchor);
+    // Save the current selection
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      this.savedSelection = selection.getRangeAt(0);
+    } else {
+      // If no text is selected, create a new selection at the cursor position
+      const postContentElement = document.getElementById('postContent');
+      if (postContentElement) {
+        const range = document.createRange();
+        range.selectNodeContents(postContentElement);
+        range.collapse(false); // collapse to end
+        this.savedSelection = range;
       }
     }
+
+    this.showHyperlinkModal = true;
+    setTimeout(() => {
+      const modalElement = document.getElementById('hyperlinkModal');
+      if (modalElement) {
+        modalElement.classList.add('show');
+      }
+    }, 0);
+  }
+
+  closeHyperlinkModal(): void {
+    const modalElement = document.getElementById('hyperlinkModal');
+    if (modalElement) {
+      modalElement.classList.remove('show');
+      setTimeout(() => {
+        this.showHyperlinkModal = false;
+        this.hyperlinkURL = '';
+        this.savedSelection = null;
+      }, 300); // Match the duration of the CSS transition
+    }
+  }
+
+  insertHyperlink(): void {
+    if (!this.hyperlinkURL || !this.savedSelection) {
+      return;
+    }
+
+    // Ensure the URL has a protocol
+    let finalUrl = this.hyperlinkURL;
+    if (!this.hyperlinkURL.startsWith('http://') && !this.hyperlinkURL.startsWith('https://')) {
+      finalUrl = 'https://' + this.hyperlinkURL;
+    }
+
+    // Restore the selection
+    const selection = window.getSelection();
+    if (selection) {
+      selection.removeAllRanges();
+      selection.addRange(this.savedSelection);
+    }
+
+    // Create and insert the link
+    const range = this.savedSelection;
+    const selectedText = range.toString() || finalUrl;
+    const anchor = document.createElement('a');
+    anchor.href = finalUrl;
+    anchor.target = '_blank'; // Open in new tab
+    anchor.rel = 'noopener noreferrer'; // Security best practice
+    anchor.textContent = selectedText;
+    range.deleteContents();
+    range.insertNode(anchor);
+
+    // Refocus the post content
+    this.refocusPostContent();
+
+    this.closeHyperlinkModal();
   }
 
   updateToolbarButtons(): void {

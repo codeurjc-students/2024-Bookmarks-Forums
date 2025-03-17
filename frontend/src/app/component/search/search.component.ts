@@ -514,23 +514,39 @@ export class SearchComponent implements OnInit, OnDestroy {
   // Column toggle methods
   setActiveColumn(column: 'posts' | 'communities' | 'users') {
     this.activeColumn = column;
-    // Update pill position after a short delay to ensure DOM is updated
-    setTimeout(() => this.updatePillDimensions(), 0);
+    // Use requestAnimationFrame to ensure DOM is updated
+    requestAnimationFrame(() => {
+      // Add a small delay to ensure iOS has processed the DOM changes
+      setTimeout(() => {
+        this.updatePillDimensions();
+      }, 50);
+    });
   }
 
   private checkIfMobile() {
     this.isMobile = window.innerWidth < 992; // 992px is Bootstrap's lg breakpoint
     if (this.isMobile) {
-      // Update pill dimensions when switching to mobile
-      setTimeout(() => this.updatePillDimensions(), 0);
+      // Use requestAnimationFrame for mobile check as well
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          this.updatePillDimensions();
+        }, 50);
+      });
     }
   }
 
   private updatePillDimensions() {
     const activeButton = document.querySelector('.toggle-btn.active') as HTMLElement;
     if (activeButton) {
-      this.pillWidth = `${activeButton.offsetWidth}px`;
-      this.pillOffset = `${activeButton.offsetLeft}px`;
+      // Force a reflow to ensure dimensions are up to date
+      activeButton.offsetHeight;
+      
+      const width = activeButton.offsetWidth;
+      const left = activeButton.offsetLeft;
+      
+      // Update both properties at once to ensure smooth animation
+      this.pillWidth = `${width}px`;
+      this.pillOffset = `${left}px`;
     }
   }
 
