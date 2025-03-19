@@ -51,7 +51,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         Page<Community> findByNameOrderByLastPostDate(String name, Pageable pageable);
 
         // Find communities by name and sort by number of members
-        @Query("SELECT c FROM Community c WHERE c.name LIKE %:name% GROUP BY c ORDER BY COUNT(c.members) DESC")
+        @Query("SELECT c FROM Community c WHERE c.name LIKE %:name% ORDER BY (SELECT COUNT(m) FROM c.members m) DESC")
         Page<Community> findByNameOrderByMembers(String name, Pageable pageable);
 
         // Find communities by description and sort by creation date
@@ -63,7 +63,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         Page<Community> findByDescriptionOrderByLastPostDate(String description, Pageable pageable);
 
         // Find communities by description and sort by number of members
-        @Query("SELECT c FROM Community c WHERE c.description LIKE %:description% GROUP BY c ORDER BY COUNT(c.members) DESC")
+        @Query("SELECT c FROM Community c WHERE c.description LIKE %:description% ORDER BY (SELECT COUNT(m) FROM c.members m) DESC")
         Page<Community> findByDescriptionOrderByMembers(String description, Pageable pageable);
 
         // Search engine default behaviour + sort by latest modified date
