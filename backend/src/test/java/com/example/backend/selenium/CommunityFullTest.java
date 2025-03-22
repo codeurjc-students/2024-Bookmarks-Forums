@@ -84,6 +84,7 @@ class CommunityFullTest {
 
         WebElement confirmButton = wait.until(presenceOfElementLocated(By.id("confirm-modal-btn")));
         wait.until((ExpectedCondition<Boolean>) driver -> confirmButton.isEnabled());
+        wait.until(elementToBeClickable(By.id("confirm-modal-btn")));
 
         try {
             Thread.sleep(2000);
@@ -91,7 +92,12 @@ class CommunityFullTest {
             e.printStackTrace();
         }
 
-        confirmButton.click();
+        // Try regular click first, if it fails use JavaScript click
+        try {
+            confirmButton.click();
+        } catch (Exception e) {
+            js.executeScript("arguments[0].click();", confirmButton);
+        }
 
         // Then (check that the community name and description are displayed on the
         // community page)

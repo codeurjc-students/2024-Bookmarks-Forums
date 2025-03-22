@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -79,8 +80,22 @@ class PostVisitTest {
         WebElement postAuthor = wait.until(presenceOfElementLocated(By.id("post-author-username")));
         WebElement postDate = wait.until(presenceOfElementLocated(By.id("post-date")));
         WebElement postCommunity = wait.until(presenceOfElementLocated(By.className("branding-hyperlink-text")));
+        
+        // Wait for all elements to have non-empty text
+        wait.until((ExpectedCondition<Boolean>) driver -> !postTitle.getText().isEmpty());
+        wait.until((ExpectedCondition<Boolean>) driver -> !postContent.getText().isEmpty());
+        wait.until((ExpectedCondition<Boolean>) driver -> !postAuthor.getText().isEmpty());
+        wait.until((ExpectedCondition<Boolean>) driver -> !postDate.getText().isEmpty());
+        wait.until((ExpectedCondition<Boolean>) driver -> !postCommunity.getText().isEmpty());
+        
+        // Additional wait to ensure all data is loaded
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         // Compare
-        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for posts to finish loading
         assertEquals(firstPostTitle, postTitle.getText());
         assertEquals(firstPostContent, postContent.getText());
         assertEquals(firstPostAuthor, postAuthor.getText());
