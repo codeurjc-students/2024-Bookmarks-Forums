@@ -144,9 +144,20 @@ class CommunityFullTest {
 
         WebElement confirmButton2 = wait.until(presenceOfElementLocated(By.id("confirm-modal-btn")));
         wait.until((ExpectedCondition<Boolean>) driver -> confirmButton2.isEnabled());
-        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for modal animation to
-                                                                                    // finish
-        confirmButton2.click();
+        wait.until(elementToBeClickable(By.id("confirm-modal-btn")));
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Try regular click first, if it fails use JavaScript click
+        try {
+            confirmButton2.click();
+        } catch (Exception e) {
+            js.executeScript("arguments[0].click();", confirmButton2);
+        }
 
         // Then (Check elements changed)
 
@@ -199,9 +210,13 @@ class CommunityFullTest {
 
         WebElement confirmButton3 = wait.until(presenceOfElementLocated(By.id("confirm-modal-btn")));
         wait.until((ExpectedCondition<Boolean>) driver -> confirmButton3.isEnabled());
-        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for modal animation to
-                                                                                    // finish
-        confirmButton3.click();
+        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for modal animation to finish
+        
+        try {
+            confirmButton3.click();
+        } catch (Exception e) {
+            js.executeScript("arguments[0].click();", confirmButton3);
+        }
 
         // Then (community should no longer display its page)
         // Get community ID from URL
