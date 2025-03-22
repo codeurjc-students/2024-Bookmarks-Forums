@@ -100,7 +100,7 @@ class UserEditTest {
         wait.until((ExpectedCondition<Boolean>) driver -> !descriptionText.getAttribute("innerHTML").isEmpty());
 
         // Validate alias and description
-        assertEquals("(" + newAlias + ")", aliasText.getText()); // The alias has () add in the profile page
+        assertEquals("(" + newAlias + ")", aliasText.getText()); // The alias has () added in the profile page
         assertEquals(newDescription, descriptionText.getAttribute("innerHTML"));
 
         loginAux.logout(driver);

@@ -12,7 +12,7 @@ import { Chart, registerables } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Ban } from '../../models/ban.model';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { skip, Subscription } from 'rxjs';
 import { TitleService } from '../../services/title.service';
 
 Chart.register(...registerables);
@@ -109,8 +109,8 @@ export class UserComponent implements OnInit, OnDestroy {
     this.titleService.setTitle('Perfil');
     this.checkIfLoggedIn();
 
-    // Subscribe to the route parameters
-    this.routeSubscription = this.route.params.subscribe((params) => {
+    // Subscribe to subsequent route changes
+    this.routeSubscription = this.route.params.pipe(skip(1)).subscribe((params) => {
       // Reset the component state
       this.posts = [];
       this.page = 0;

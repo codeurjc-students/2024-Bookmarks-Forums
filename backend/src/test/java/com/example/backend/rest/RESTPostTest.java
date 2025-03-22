@@ -66,7 +66,7 @@ class RESTPostTest {
                 .then()
                 .statusCode(200)
                 .contentType("application/json")
-                .body("get(0).identifier", anyOf(equalTo(2), equalTo(1), equalTo(3)));
+                .body("get(0).identifier", anyOf(equalTo(2), equalTo(1), equalTo(3), equalTo(4)));
 
 
         given()
@@ -128,7 +128,7 @@ class RESTPostTest {
                 .statusCode(200)
                 .contentType("application/json")
                 .body("size()", greaterThan(0))
-                .body("get(0).identifier", equalTo(1));
+                .body("get(0).identifier", anyOf(equalTo(1), equalTo(5)));
 
         // Login as AdminReader
         String authCookieAdmin =
@@ -410,7 +410,7 @@ class RESTPostTest {
                 .contentType(anyOf(equalTo("image/jpeg"), equalTo("image/png")));
 
         // Attempt to get an image for a post that exists but has no image
-        int postIdWithoutImage = 2;
+        int postIdWithoutImage = 5;
         given()
                 .pathParam("postId", postIdWithoutImage)
                 .when()

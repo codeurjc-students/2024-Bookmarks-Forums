@@ -11,7 +11,11 @@ import org.springframework.stereotype.Service;
 import com.example.backend.entity.Community;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,18 +39,35 @@ public class PostSampleService {
     }
 
     @PostConstruct
-    public void init() {
+    public void init() throws IOException, SQLException {
         List<User> users = userRepository.findAll();
         List<Community> communities = communityRepository.findAll();
         List<String> postTitles = List.of("Welcome to Bookmarks Forums", "Bookmarks News: New Book Releases", "Bookmarks Reviews: The Best Books", "Bookmarks Events: Upcoming Events");
         List<String> postContents = List.of("Welcome to Bookmarks Forums! This is a forum for book readers to discuss their favorite books.", "Check out the new book releases in Bookmarks News!", "Read the reviews of the best books in Bookmarks Reviews.", "Join us for the upcoming events for book readers in Bookmarks Events.");
+        List<String> postImages = List.of("static/assets/cmbg1.png", "static/assets/cmbg2.png", "static/assets/cmbg3.png", "static/assets/cmbg4.png");
 
         List<Post> posts = new ArrayList<>();
 
         for (int i = 0; i < postTitles.size(); i++) {
             Post post = new Post(postTitles.get(i), postContents.get(i), users.get(i), communities.get(i));
+            try {
+                // Load and set the image for each post
+                ClassPathResource resource = new ClassPathResource(postImages.get(i));
+                if (resource.exists()) {
+                    Blob image = new javax.sql.rowset.serial.SerialBlob(resource.getInputStream().readAllBytes());
+                    post.addImage(image);
+                } else {
+                    System.out.println("Warning: Image file not found: " + postImages.get(i));
+                }
+            } catch (Exception e) {
+                System.out.println("Warning: Could not load image for post " + i + ": " + e.getMessage());
+            }
             posts.add(post);
         }
+
+        // Another post by AdminReader without image
+        Post postWithoutImage = new Post("Forum's rules apply to all communities!", "Remember to follow the rules of the forum in all communities. If you see a violation, please report it to the admin.", users.get(3), communities.get(0));
+        posts.add(postWithoutImage);
 
         postRepository.saveAll(posts);
 

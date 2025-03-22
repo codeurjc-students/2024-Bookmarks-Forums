@@ -75,6 +75,11 @@ class CommentCreationDeletionTest {
         // Check on post page
 
         // Get comments list block
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         WebElement commentsListContainer = wait.until(presenceOfElementLocated(By.className("replies-list")));
         // Get last commentCard
 

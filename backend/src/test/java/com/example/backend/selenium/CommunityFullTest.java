@@ -84,8 +84,13 @@ class CommunityFullTest {
 
         WebElement confirmButton = wait.until(presenceOfElementLocated(By.id("confirm-modal-btn")));
         wait.until((ExpectedCondition<Boolean>) driver -> confirmButton.isEnabled());
-        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true); // waits for modal animation to
-                                                                                    // finish
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         confirmButton.click();
 
         // Then (check that the community name and description are displayed on the

@@ -80,7 +80,12 @@ class LandingLoginTest {
         assertTrue(landingGreeting.isDisplayed(), "Landing greeting should be displayed");
 
         // wait until alias is shown
-        await().atMost(Duration.ofSeconds(config.getWaitTime())).until(() -> true);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         assertTrue(landingGreeting.getText().contains("Muy buenas, " + username),
                 "Landing greeting should contain alias");
 

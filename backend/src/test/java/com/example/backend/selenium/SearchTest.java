@@ -182,35 +182,45 @@ class SearchTest {
 
         // Clear search
         clearButton.click();
+
+        // Wait for search to load
+        try {
+            Thread.sleep(8000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         assertEquals("", searchInput.getAttribute("value"));
 
         // Search for non-existent term
 
         // Given
-
         String nonExistentSearchTerm = "nonexistent";
         searchInput.sendKeys(nonExistentSearchTerm);
 
         // When
-
         searchButton.click();
 
         // Then (there should be no post, community or member card elements)
 
-        // Wait for the search results to appear
+        // Wait for the search to complete by waiting for the search title to update
+        wait.until(presenceOfElementLocated(By.className("page-title")));
+        
+        // Delay
         try {
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        // Check that no results exist
         List<WebElement> postCards = driver.findElements(By.className("post-card"));
         List<WebElement> communityCards = driver.findElements(By.className("community-card"));
         List<WebElement> memberCards = driver.findElements(By.className("community-member-card"));
 
-        assertTrue(postCards.isEmpty());
-        assertTrue(communityCards.isEmpty());
-        assertTrue(memberCards.isEmpty());
+        assertTrue(postCards.isEmpty(), "Found unexpected post cards");
+        assertTrue(communityCards.isEmpty(), "Found unexpected community cards");
+        assertTrue(memberCards.isEmpty(), "Found unexpected member cards");
 
         // Clear search
         clearButton.click();

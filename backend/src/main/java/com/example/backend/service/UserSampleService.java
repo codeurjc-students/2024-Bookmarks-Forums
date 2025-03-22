@@ -37,9 +37,10 @@ public class UserSampleService {
         List<String> passwords = List.of(passwordEncoder.encode("pass"), passwordEncoder.encode("pass"), passwordEncoder.encode("pass"), passwordEncoder.encode("adminpass"), passwordEncoder.encode("pass"));
         List<List<String>> roles = List.of(userRoles, userRoles, userRoles, adminRoles, userRoles);
         List<String> descriptions = List.of("I'm a reader fan that loves fantasy books", "I love books", "I'm a reader", "I'm a Bookmarks Forums admin", "I'm a bad dude");
+        List<String> profilePictures = List.of("/assets/cuspfp1.PNG", "/assets/cuspfp2.PNG", "/assets/cuspfp3.PNG", "/assets/cuspfp7.PNG", "/assets/cuspfp5.PNG");
 
         for (int i = 0; i < usernames.size(); i++) {
-            User user = new User(usernames.get(i), aliases.get(i), descriptions.get(i), null, emails.get(i), passwords.get(i), roles.get(i));
+            User user = new User(usernames.get(i), aliases.get(i), descriptions.get(i), profilePictures.get(i), emails.get(i), passwords.get(i), roles.get(i));
             users.add(user);
         }
 
