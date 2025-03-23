@@ -12,7 +12,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.css', './disable-duration-slider.css', '../../../animations.css', './duration-slider.css'],
+  styleUrls: ['./admin.component.css', '../../../animations.css', './duration-slider.css'],
   providers: [DatePipe],
 })
 export class AdminComponent implements OnInit {

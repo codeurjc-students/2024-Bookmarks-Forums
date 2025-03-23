@@ -103,9 +103,7 @@
                   <div class="admin-user-card" *ngFor="let user of users" [routerLink]="['/profile', user.username]" style="cursor: pointer;">
                     <div class="admin-user-info">
                       <img
-                        [src]="
-                          user.pfpString || 'assets/img/default-profile.png'
-                        "
+                        [src]="profilePicture(user.username)"
                         alt="Profile"
                         class="community-member-profile-picture"
                       />
@@ -193,45 +191,12 @@
         </div>
       </div>
     </div>
-    <!-- Alert Modal -->
-    <div class="alert-modal-overlay" *ngIf="alertModalVisible">
-      <div class="alert-modal">
-        <div class="alert-modal-header">
-          <h5>{{ alertModalTitle }}</h5>
-          <span
-            class="action-btn close"
-            (click)="alertModalVisible = false"
-            (keypress)="alertModalVisible = false"
-          >
-            <i class="fas fa-times"></i>
-          </span>
-        </div>
-        <div class="alert-modal-body">
-          <p>{{ alertModalMessage }}</p>
-        </div>
-        <div class="alert-modal-footer">
-          <button
-            class="btn"
-            [ngClass]="
-              alertModalType === 'warning' ? 'negative-btn' : 'primary-btn'
-            "
-            (click)="confirmAction(); alertModalVisible = false"
-          >
-            <i class="fas fa-check"></i> {{ alertModalConfirmText }}
-          </button>
-          <button class="btn secondary-btn" (click)="alertModalVisible = false">
-            <i class="fas fa-times"></i> {{ alertModalCancelText }}
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Modal -->
     <div id="disableDurationModal" class="custom-modal" [ngClass]="{ 'show': alertModalVisible }">
       <div class="custom-modal-content no-scroll">
         <div class="custom-modal-header with-title">
           <h5 class="modal-title">{{ alertModalTitle }}</h5>
-          <span class="action-btn close" (click)="alertModalVisible = false">
+          <span class="action-btn close" (click)="alertModalVisible = false" (keydown)="alertModalVisible = false">
             <i class="fas fa-times"></i>
           </span>
         </div>

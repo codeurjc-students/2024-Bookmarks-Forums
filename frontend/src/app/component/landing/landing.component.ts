@@ -145,175 +145,100 @@ export class LandingComponent implements OnInit, OnDestroy {
     }
   }
 
-  algoUser(option: string) {
-    if (option === 'default' || option === 'most-liked-users') {
-      this.postService
-        .getUserRecommendations(
-          'most-liked-users',
-          this.pagePostUsers,
-          this.size
-        )
-        .subscribe({
-          next: (posts) => {
-            if (!posts) {
-              this.noMorePostsUsers = true;
-              this.loadingMorePostsUsers = false;
-              return;
-            }
-            this.recommendedPostsPopularUsers =
-              this.recommendedPostsPopularUsers.concat(posts);
-            this.pagePostUsers += 1;
-            this.loadingMorePostsUsers = false;
-
-            if (posts.length < this.size) {
-              this.noMorePostsUsers = true;
-            }
-          },
-          error: (r) => {
-            this.router.navigate(['/error'], {
-              queryParams: {
-                title: 'Error obteniendo posts recomendados',
-                description: r.error.message,
-                code: 500,
-              },
-            });
-          },
-        });
-    } else if (option === 'most-recent-communities' || option === 'default') {
-      this.postService
-        .getUserRecommendations(
-          'most-recent-communities',
-          this.pagePostCommunities,
-          this.size
-        )
-        .subscribe({
-          next: (posts) => {
-            if (!posts) {
-              this.noMorePostsCommunities = true;
-              this.loadingMorePostsCommunities = false;
-              return;
-            }
-            this.recommendedPostsPopularCommunities =
-              this.recommendedPostsPopularCommunities.concat(posts);
-            this.pagePostCommunities += 1;
-            this.loadingMorePostsCommunities = false;
-
-            if (posts.length < this.size) {
-              this.noMorePostsCommunities = true;
-            }
-          },
-          error: (r) => {
-            this.router.navigate(['/error'], {
-              queryParams: {
-                title: 'Error obteniendo posts recomendados',
-                description: r.error.message,
-                code: 500,
-              },
-            });
-          },
-        });
-    } else if (option === 'no-following' || option === 'most-liked-users') {
-      this.postService
-        .getGeneralRecommendations(
-          'most-liked-users',
-          this.pagePostUsers,
-          this.size
-        )
-        .subscribe({
-          next: (posts) => {
-            if (!posts) {
-              this.noMorePostsUsers = true;
-              this.loadingMorePostsUsers = false;
-              return;
-            }
-            this.recommendedPostsPopularUsers =
-              this.recommendedPostsPopularUsers.concat(posts);
-            this.pagePostUsers += 1;
-            this.loadingMorePostsUsers = false;
-
-            if (posts.length < this.size) {
-              this.noMorePostsUsers = true;
-            }
-          },
-          error: (r) => {
-            this.router.navigate(['/error'], {
-              queryParams: {
-                title: 'Error obteniendo posts recomendados',
-                description: r.error.message,
-                code: 500,
-              },
-            });
-          },
-        });
-    } else if (
-      option === 'most-liked-communities' ||
-      option === 'no-following'
-    ) {
-      this.postService
-        .getUserRecommendations(
-          'most-recent-communities',
-          this.pagePostCommunities,
-          this.size
-        )
-        .subscribe({
-          next: (posts) => {
-            if (!posts) {
-              this.noMorePostsCommunities = true;
-              this.loadingMorePostsCommunities = false;
-              return;
-            }
-            this.recommendedPostsPopularCommunities =
-              this.recommendedPostsPopularCommunities.concat(posts);
-            this.pagePostCommunities += 1;
-            this.loadingMorePostsCommunities = false;
-
-            if (posts.length < this.size) {
-              this.noMorePostsCommunities = true;
-            }
-          },
-          error: (r) => {
-            this.router.navigate(['/error'], {
-              queryParams: {
-                title: 'Error obteniendo posts recomendados sin seguir a nadie',
-                description: r.error.message,
-                code: 500,
-              },
-            });
-          },
-        });
+  loadLists() {
+    // if user is logged in
+    if (this.loggedIn && this.user) {
+      // Reset states before loading
+      this.recommendedPostsPopularUsers = [];
+      this.recommendedPostsPopularCommunities = [];
+      this.pagePostUsers = 0;
+      this.pagePostCommunities = 0;
+      this.noMorePostsUsers = false;
+      this.noMorePostsCommunities = false;
+      
+      // does the user follow anyone
+      if (this.user.following > 0) {
+        this.algoUser('most-liked-users');
+        this.algoUser('most-recent-communities');
+      } else {
+        this.algoUser('no-following');
+        this.algoUser('most-liked-users');
+        this.algoUser('most-liked-communities');
+      }
     } else {
-      this.postService
-        .getUserRecommendations(
-          'most-liked-communities',
-          this.pagePostCommunities,
-          this.size
-        )
-        .subscribe({
-          next: (posts) => {
-            if (!posts) {
+      // if user is not logged in
+      this.algoGeneral('most-liked-users');
+      this.algoGeneral('most-recent-communities');
+    }
+  }
+
+  algoUser(option: string) {
+    if (!this.loggedIn || !this.user) {
+      this.algoGeneral(option);
+      return;
+    }
+
+    const loadPosts = (recommendationType: string, isUserPosts: boolean) => {
+      const service = isUserPosts ? 
+        this.postService.getUserRecommendations(recommendationType, this.pagePostUsers, this.size) :
+        this.postService.getUserRecommendations(recommendationType, this.pagePostCommunities, this.size);
+
+      service.subscribe({
+        next: (posts) => {
+          if (!posts) {
+            if (isUserPosts) {
+              this.noMorePostsUsers = true;
+              this.loadingMorePostsUsers = false;
+            } else {
               this.noMorePostsCommunities = true;
               this.loadingMorePostsCommunities = false;
-              return;
             }
-            this.recommendedPostsPopularCommunities =
-              this.recommendedPostsPopularCommunities.concat(posts);
+            return;
+          }
+
+          if (isUserPosts) {
+            this.recommendedPostsPopularUsers = this.recommendedPostsPopularUsers.concat(posts);
+            this.pagePostUsers += 1;
+            this.loadingMorePostsUsers = false;
+            if (posts.length < this.size) {
+              this.noMorePostsUsers = true;
+            }
+          } else {
+            this.recommendedPostsPopularCommunities = this.recommendedPostsPopularCommunities.concat(posts);
             this.pagePostCommunities += 1;
             this.loadingMorePostsCommunities = false;
-
             if (posts.length < this.size) {
               this.noMorePostsCommunities = true;
             }
-          },
-          error: (r) => {
-            this.router.navigate(['/error'], {
-              queryParams: {
-                title: 'Error obteniendo posts recomendados para el usuario',
-                description: r.error.message,
-                code: 500,
-              },
-            });
-          },
-        });
+          }
+        },
+        error: (r) => {
+          // Log the error but don't redirect
+          console.error('Error loading posts:', r.error.message);
+          if (isUserPosts) {
+            this.loadingMorePostsUsers = false;
+          } else {
+            this.loadingMorePostsCommunities = false;
+          }
+        },
+      });
+    };
+
+    if (option === 'default' || option === 'most-liked-users') {
+      this.loadingMorePostsUsers = true;
+      loadPosts('most-liked-users', true);
+    } else if (option === 'most-recent-communities' || option === 'default') {
+      this.loadingMorePostsCommunities = true;
+      loadPosts('most-recent-communities', false);
+    } else if (option === 'no-following' || option === 'most-liked-users') {
+      this.loadingMorePostsUsers = true;
+      loadPosts('most-liked-users', true);
+    } else if (option === 'most-liked-communities' || option === 'no-following') {
+      this.loadingMorePostsCommunities = true;
+      loadPosts('most-recent-communities', false);
+    } else {
+      this.loadingMorePostsCommunities = true;
+      loadPosts('most-liked-communities', false);
     }
   }
 
@@ -418,25 +343,6 @@ export class LandingComponent implements OnInit, OnDestroy {
             });
           },
         });
-    }
-  }
-
-  loadLists() {
-    // if user is logged in
-    if (this.loggedIn) {
-      // does the user follow anyone
-      if (this.user!.following > 0) {
-        this.algoUser('most-liked-users');
-        this.algoUser('most-recent-communities');
-      } else {
-        this.algoUser('no-following');
-        this.algoUser('most-liked-users');
-        this.algoUser('most-liked-communities');
-      }
-    } else {
-      // if user is not logged in
-      this.algoGeneral('most-liked-users');
-      this.algoGeneral('most-recent-communities');
     }
   }
 
