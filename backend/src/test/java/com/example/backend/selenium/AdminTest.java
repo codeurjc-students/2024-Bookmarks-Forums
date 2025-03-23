@@ -142,7 +142,7 @@ class AdminTest {
         enableButton.click();
 
         // Wait for confirmation modal to be visible and interactable
-        WebElement alertModal = wait.until(visibilityOf(driver.findElement(By.className("alert-modal"))));
+        WebElement alertModal = wait.until(visibilityOf(driver.findElement(By.className("custom-modal"))));
         assertTrue(alertModal.isDisplayed(), "Alert modal should be visible");
 
         // Wait for and click the enable confirm button
