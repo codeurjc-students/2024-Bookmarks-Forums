@@ -46,7 +46,7 @@ public class APIUserController {
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
 
-    interface UserBasicView extends User.BasicInfo {
+    interface UserBasicView extends User.CommunitiesInfo, Community.NameInfo {
     }
 
     interface UserUsername extends User.UsernameInfo {

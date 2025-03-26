@@ -51,6 +51,9 @@ export class LandingComponent implements OnInit, OnDestroy {
   noMorePostsUsers = false;
   noMorePostsCommunities = false;
 
+  userFollows = false;
+  userInCommunities = false;
+
   latestGeneralPosts: Post[] = [];
 
   // Column toggle properties
@@ -79,7 +82,6 @@ export class LandingComponent implements OnInit, OnDestroy {
     url = url.substring(0, url.length - 1);
     history.pushState(null, '', url);
     this.loadChart();
-    this.loadPopularCommunitiesList();
 
     // Check if user is logged in
     this.checkIfLoggedIn();
@@ -106,6 +108,7 @@ export class LandingComponent implements OnInit, OnDestroy {
     this.user = user;
     this.loggedUsername = user.username;
     this.isAdmin = user.roles.includes('ADMIN');
+    this.loadLists();
   }
 
   doesPostHaveImage(postID: number) {
@@ -155,15 +158,20 @@ export class LandingComponent implements OnInit, OnDestroy {
       this.pagePostCommunities = 0;
       this.noMorePostsUsers = false;
       this.noMorePostsCommunities = false;
-      
+      this.userFollows = false;
+      this.userInCommunities = false;
       // does the user follow anyone
       if (this.user.following > 0) {
+        this.userFollows = true;
         this.algoUser('most-liked-users');
+      } else {
+        this.algoGeneral('most-liked-users');
+      }
+      if (this.user.communities.length > 0) {
+        this.userInCommunities = true;
         this.algoUser('most-recent-communities');
       } else {
-        this.algoUser('no-following');
-        this.algoUser('most-liked-users');
-        this.algoUser('most-liked-communities');
+        this.algoGeneral('most-recent-communities');
       }
     } else {
       // if user is not logged in
@@ -243,7 +251,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   }
 
   algoGeneral(option: string) {
-    if (option === 'most-liked-users' || option === 'default') {
+    if (option === 'most-liked-users' || option === 'default') { // most liked users
       this.postService
         .getGeneralRecommendations(
           'most-liked-users', // default
@@ -277,7 +285,7 @@ export class LandingComponent implements OnInit, OnDestroy {
             });
           },
         });
-    } else if (option === 'most-recent-communities' || option === 'default') {
+    } else if (option === 'most-recent-communities' || option === 'default') { // most recent communities
       this.postService
         .getGeneralRecommendations(
           'most-recent-communities', // default
@@ -310,7 +318,7 @@ export class LandingComponent implements OnInit, OnDestroy {
             });
           },
         });
-    } else {
+    } else { // most liked communities
       this.postService
         .getGeneralRecommendations(
           'most-liked-communities',
@@ -358,7 +366,6 @@ export class LandingComponent implements OnInit, OnDestroy {
             next: (user) => {
               this.userLoaded = true;
               this.loadUserData(user); // load the user data
-              this.loadLists();
             },
             error: (r) => {
               this.router.navigate(['/error'], {

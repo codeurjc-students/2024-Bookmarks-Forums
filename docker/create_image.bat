@@ -24,7 +24,7 @@ REM Go to backend directory
 cd ..\backend
 
 REM Maven build
-call mvnw.cmd clean package -DskipTests -P local
+.\mvnw.cmd clean package -DskipTests -P local
 
 REM Go to Docker folder
 cd ..\docker

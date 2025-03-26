@@ -84,6 +84,13 @@ class CommentCreationDeletionTest {
         // Get last commentCard
 
         // Wait for reply-card
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         wait.until(presenceOfElementLocated(By.className("reply-card")));
 
         wait.until(driver -> commentsListContainer.findElements(By.className("reply-card")).size() == 2);

@@ -36,7 +36,7 @@ public class User {
     public interface FollowersInfo {
     }
 
-    public interface CommunitiesInfo {
+    public interface CommunitiesInfo extends BasicInfo {
     }
 
     public interface BanInfo extends BasicInfo {

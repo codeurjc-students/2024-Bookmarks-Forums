@@ -80,7 +80,7 @@
             <h3 class="fw-semibold mb-4">
               <p
                 class="page-title"
-                *ngIf="loggedIn; else notLoggedRecommendedPost"
+                *ngIf="loggedIn && userFollows; else notLoggedRecommendedPost"
               >
                 De los usuarios a los que sigues
               </p>
@@ -208,7 +208,7 @@
             <hr class="my-0" />
             <h3 class="fw-semibold mb-4 mt-4">
               <p
-                *ngIf="loggedIn; else notLoggedRecommendedPostByCommunities"
+                *ngIf="loggedIn && userInCommunities; else notLoggedRecommendedPostByCommunities"
                 class="page-title"
               >
                 Lo último de tus comunidades

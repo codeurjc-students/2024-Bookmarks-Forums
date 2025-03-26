@@ -1,3 +1,5 @@
+import { Community } from "./community.model";
+
 export interface User {
   username: string;
   roles: string[];
@@ -13,4 +15,5 @@ export interface User {
   banCount: number;
   isDisabled: boolean;
   disabledUntil: string;
+  communities: Community[];
 }
