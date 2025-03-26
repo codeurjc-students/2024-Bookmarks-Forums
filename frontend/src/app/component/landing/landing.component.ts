@@ -82,6 +82,7 @@ export class LandingComponent implements OnInit, OnDestroy {
     url = url.substring(0, url.length - 1);
     history.pushState(null, '', url);
     this.loadChart();
+    this.loadPopularCommunitiesList();
 
     // Check if user is logged in
     this.checkIfLoggedIn();
