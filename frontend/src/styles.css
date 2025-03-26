@@ -3396,7 +3396,8 @@ html {
 .card-hyperlink {
   color: var(--branding-light-grey) !important;
   text-decoration: none !important;
-  transition: all 0.2s ease-in-out !important;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+  border: 1px solid transparent !important;
 }
 
 .card-hyperlink:hover {
