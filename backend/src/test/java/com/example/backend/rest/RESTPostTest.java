@@ -530,6 +530,7 @@ class RESTPostTest {
         // Attempt with missing username
         given()
                 .pathParam("postId", 1)
+                .queryParam("username", "")
                 .queryParam("type", "upvote")
                 .when()
                 .get("/posts/{postId}/votes")
